@@ -1,0 +1,97 @@
+/* Subset contains only the welcome title/subtitle (plus Chinese punctuation). */
+@font-face {
+  font-family: "Blanktime Welcome Serif";
+  src: url("../fonts/welcome-serif.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  unicode-range: U+3002, U+5185, U+5411, U+65F6, U+6C89, U+6DC0, U+751F, U+767D, U+7A7A, U+800C, U+95F4, U+9759, U+9ED8, U+FF0C;
+}
+.welcome-home .welcome-intro h1,
+.welcome-home .welcome-intro p {
+  font-family: "Blanktime Welcome Serif", "Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun", serif;
+  font-weight: 700;
+}
+.welcome-window { container-type: inline-size; min-width: 380px; }
+/* Default desktop size grows with the available screen; dragged sizes still use inline styles. */
+@media (min-width: 761px) {
+  .welcome-window {
+    width: min(920px, calc(100vw - 112px));
+    height: min(760px, calc(100dvh - 64px));
+    left: max(88px, calc(50vw - 428px));
+    top: max(32px, calc((100dvh - 760px) / 2));
+  }
+}
+.welcome-site-icon { width: 24px; height: 24px; object-fit: contain; border-radius: 5px; }
+.welcome-content.welcome-home {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: minmax(320px, 1fr) auto; align-items: center;
+  align-content: space-between; gap: 26px;
+  padding: 28px 30px;
+  margin: 0 8px 8px;
+}
+.welcome-home .welcome-intro {
+  min-width: 0;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.welcome-home .welcome-intro h1 {
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  line-height: 1.4;
+  color: #35463c;
+  margin: 0 0 16px;
+  white-space: nowrap;
+}
+.welcome-home .welcome-intro p { font-size: 14px; color: #7b867e; line-height: 1.9; margin: 0 0 32px; }
+.welcome-home .primary-button { background: var(--welcome-accent); padding: 11px 18px; gap: 22px; font-size: 13px; }
+.welcome-home .primary-button:hover { background: var(--welcome-accent-hover); }
+.welcome-profile { text-align: center; min-width: 0; padding-left: 22px; border-left: 1px solid #edf0ed; }
+.profile-avatar { display: block; width: 144px; height: 144px; max-width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 50%; margin: 0 auto; }
+.profile-name { margin: 20px 0 14px; color: var(--profile-name-color); font-family: Georgia, serif; font-size: 32px; line-height: 1.2; text-shadow: 1px 2px 3px #b9a58138; }
+.profile-poem { min-height: 3.8em; margin: 0 auto; max-width: 230px; font-family: "KaiTi", "STKaiti", "Songti SC", serif; font-size: 16px; color: #777980; line-height: 1.9; overflow-wrap: anywhere; text-wrap: balance; }
+@container (max-width: 570px) {
+  .welcome-content.welcome-home { grid-template-columns: 1fr; grid-template-rows: none; align-content: start; gap: 26px; padding: 30px 22px; text-align: center; }
+  .welcome-home .welcome-intro h1 { font-size: 32px; margin-bottom: 9px; }
+  .welcome-home .welcome-intro p { margin-bottom: 19px; }
+  .welcome-profile { padding: 25px 0 0; border-left: 0; border-top: 1px solid #edf0ed; }
+  .profile-avatar { width: 105px; height: 105px; }
+  .profile-name { margin: 13px 0 9px; font-size: 29px; }
+  .profile-poem { font-size: 15px; }
+}
+@media (max-width: 760px) {
+  .welcome-window { min-width: 0; }
+  .welcome-content.welcome-home { margin: 0 5px 5px; }
+}
+@media (max-height: 650px) {
+  .welcome-content.welcome-home { align-content: start; }
+}
+
+.poem-refresh { margin-top: 8px; padding: 4px 12px; border: 1px solid #e6eae7; border-radius: 14px; color: #738078; font-size: 12px; }
+.poem-refresh:hover { color: var(--welcome-accent); border-color: currentColor; }
+.poem-refresh:disabled { opacity: .6; cursor: wait; }
+.poem-feedback { display: block; min-height: 16px; margin-top: 3px; font-size: 11px; color: #8b7765; }
+.welcome-card { align-self: stretch; min-width: 0; border-top: 1px solid #edf0ed; padding-top: 18px; color: #67716a; }
+.welcome-card h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 17px; font-size: 14px; font-weight: 600; color: #657269; }
+.welcome-card h2 svg { width: 18px; height: 18px; }
+.site-info dl { margin: 0; font-size: 13px; }
+.site-info dl > div { display: flex; justify-content: space-between; gap: 8px; margin: 14px 0; }
+.site-info dt { color: #828b85; }
+.site-info dd { margin: 0; font-variant-numeric: tabular-nums; text-align: right; }
+.contact-actions { display: flex; justify-content: space-between; gap: 6px; font-size: 12px; margin-bottom: 15px; }
+.contact-actions a:hover { color: var(--welcome-accent); text-decoration: underline; text-underline-offset: 4px; }
+.contact-qrcodes { display: flex; justify-content: space-around; gap: 10px; }
+.contact-qrcode { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11px; color: #879088; min-width: 0; }
+.contact-qrcode img { width: 88px; height: 88px; max-width: 100%; object-fit: contain; background: white; border-radius: 4px; }
+@container (min-width: 571px) and (max-width: 740px) {
+  .profile-avatar { width: 116px; height: 116px; }
+  .profile-name { margin-top: 12px; margin-bottom: 9px; }
+}
+
+
