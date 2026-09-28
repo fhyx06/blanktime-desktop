@@ -34,8 +34,8 @@
   text-decoration: underline;
 }
 .post-content :not(pre) > code {
-  color: var(--md-inline-code-color, #409eff);
-  background: var(--md-inline-code-background, #ecf5ff);
+  color: var(--md-inline-code-color, #7850a8);
+  background: var(--md-inline-code-background, #f3edf9);
   padding: 2px 5px;
   border-radius: 2px;
 }

@@ -1,9 +1,9 @@
 (() => {
   const toggle = document.getElementById('settings-toggle');
   const panel = document.getElementById('settings-panel');
-  const themeSwitch = document.getElementById('settings-reader-theme');
-  const browser = document.getElementById('browser');
-  const sync = () => themeSwitch.setAttribute('aria-checked',String(browser.dataset.theme === 'dark'));
+  const themeSwitch = document.getElementById('settings-system-theme');
+  const appearance = window.blanktimeAppearance;
+  const sync = () => themeSwitch.setAttribute('aria-checked',String(appearance.getTheme() === 'dark'));
   function show(open, restoreFocus = false) {
     panel.hidden = !open;
     toggle.setAttribute('aria-expanded',String(open));
@@ -21,10 +21,10 @@
     if (event.key === 'Escape' && !panel.hidden) {event.preventDefault();show(false,true);}
   });
   themeSwitch.addEventListener('click',() => {
-    document.querySelector('.browser-theme-button').click();
+    appearance.setTheme(appearance.getTheme() === 'dark' ? 'light' : 'dark');
     sync();
   });
-  new MutationObserver(sync).observe(browser,{attributes:true,attributeFilter:['data-theme']});
+  document.addEventListener('blanktime:system-theme', sync);
   document.getElementById('settings-desktop').addEventListener('click',() => {
     show(false,true);
     document.querySelector('.desktop-toggle').click();

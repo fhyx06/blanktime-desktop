@@ -1,0 +1,70 @@
+/* System surfaces. Browser reading may temporarily override its own appearance. */
+html[data-system-theme="dark"] {
+  color-scheme: dark;
+  --sys-base: #20252c;
+  --sys-raised: #292f38;
+  --sys-hover: #343d48;
+  --sys-border: #3a424e;
+  --sys-text: #dde3ea;
+  --sys-muted: #a4afbc;
+  --chrome: #292f38;
+  --line: #3a424e;
+}
+html[data-system-theme="dark"] .app-window:not(.reader-window) {background:var(--sys-raised);color:var(--sys-text);border-color:var(--sys-border);box-shadow:0 22px 70px #0007,0 3px 12px #0003;}
+html[data-system-theme="dark"] .app-window:not(.reader-window) .titlebar {background:var(--sys-raised);}
+html[data-system-theme="dark"] .app-window:not(.reader-window) .window-controls button:hover {background:var(--sys-hover);}
+html[data-system-theme="dark"] .app-window:not(.reader-window) .window-controls button[data-action="close"]:hover {background:#ce505b;color:white;}
+html[data-system-theme="dark"] .app-window:not(.reader-window) .window-status {color:var(--sys-muted);border-color:var(--sys-border);}
+html[data-system-theme="dark"] .dock {background:#19232c99;border-color:#8d9eaf38;}
+html[data-system-theme="dark"] .desktop-status {background:#252e39ed;border-color:var(--sys-border);color:var(--sys-text);}
+html[data-system-theme="dark"] .status-divider {background:var(--sys-border);}
+html[data-system-theme="dark"] :is(.settings-panel,.toast) {background:var(--sys-raised);border-color:var(--sys-border);color:var(--sys-text);}
+html[data-system-theme="dark"] :is(.settings-profile p,.settings-note) {color:var(--sys-muted);}
+html[data-system-theme="dark"] :is(.settings-items>button,.settings-note) {border-color:var(--sys-border);}
+html[data-system-theme="dark"] .settings-items>button:hover {background:var(--sys-hover);}
+html[data-system-theme="dark"] .settings-switch {background:#637080;}
+html[data-system-theme="dark"] [aria-checked="true"]>.settings-switch {background:var(--accent);}
+/* Welcome, statistics and contact cards. QR images retain their white backing. */
+html[data-system-theme="dark"] .welcome-content {background:var(--sys-base);}
+html[data-system-theme="dark"] .welcome-home .welcome-intro h1 {color:#e0e9e3;}
+html[data-system-theme="dark"] :is(.welcome-home .welcome-intro p,.profile-poem,.welcome-card,.welcome-card h2,.site-info dt,.contact-qrcode,.poem-refresh) {color:var(--sys-muted);}
+html[data-system-theme="dark"] :is(.welcome-profile,.welcome-card,.poem-refresh) {border-color:var(--sys-border);}
+html[data-system-theme="dark"] .poem-feedback {color:#c5b39d;}
+/* File manager. */
+html[data-system-theme="dark"] :is(.files-main,.files-table th) {background:var(--sys-base);}
+html[data-system-theme="dark"] :is(.files-breadcrumb,.files-search,.files-actions>button,.files-table th,.files-table td) {border-color:var(--sys-border);}
+html[data-system-theme="dark"] :is(.files-breadcrumb,.files-sort-label,.files-table th,.files-category small,.files-category svg,.files-sidebar-label,.file-extension,.files-empty) {color:var(--sys-muted);}
+html[data-system-theme="dark"] :is(.file-link,.files-table td,.files-breadcrumb strong,.files-search input,.files-empty strong) {color:var(--sys-text);}
+html[data-system-theme="dark"] .files-sort-label select {background:var(--sys-raised);color:var(--sys-text);border-color:var(--sys-border);}
+html[data-system-theme="dark"] :is(.files-category:hover,.post-file:hover,.files-actions>button:enabled:hover) {background:var(--sys-hover);}
+html[data-system-theme="dark"] :is(.files-category.is-selected,.post-file.is-selected) {background:#293e59;color:#80b6ff;}
+html[data-system-theme="dark"] .file-icon {background:linear-gradient(145deg,#3c4958,#2b3540);border-color:#566374;color:#c4d6e3;}
+/* Album and image preview. */
+html[data-system-theme="dark"] :is(.album-content,.album-preview-toolbar) {background:var(--sys-base);border-color:var(--sys-border);}
+html[data-system-theme="dark"] :is(.album-toolbar p,.album-empty) {color:var(--sys-muted);}
+html[data-system-theme="dark"] :is(.album-card,.album-preview,.album-toolbar button,.album-preview-toolbar button) {background:var(--sys-raised);border-color:var(--sys-border);color:var(--sys-text);}
+html[data-system-theme="dark"] :is(.album-card:hover,.album-toolbar button:hover,.album-preview-toolbar button:hover) {background:var(--sys-hover);}
+html[data-system-theme="dark"] #album-wallpaper {background:var(--accent);color:#fff;}
+/* Music keeps its user-selected accent, while all neutral surfaces follow the system. */
+html[data-system-theme="dark"] #music {--text:var(--sys-text);--text-2:var(--sys-muted);--line:var(--sys-border);--window-bg:var(--sys-base);--panel-bg:var(--sys-raised);background:var(--sys-base);}
+html[data-system-theme="dark"] #music :is(.theme-pop,.list-state) {background:var(--sys-raised);color:var(--sys-text);}
+html[data-system-theme="dark"] #music :is(.tp-title,.list-state .ls-title) {color:var(--sys-text);}
+html[data-system-theme="dark"] #music :is(.tp-reset,.mini-btn:not(.primary)) {background:var(--sys-base);color:var(--sys-text);}
+html[data-system-theme="dark"] #music :is(.row:hover,.theme-btn:hover,.tp-reset:hover,.mini-btn:not(.primary):hover) {background:var(--sys-hover);}
+html[data-system-theme="dark"] #music .row.active {background:var(--accent-soft);}
+html[data-system-theme="dark"] #music .rail {background:#ffffff25;}
+html[data-system-theme="dark"] #music .buffer {background:#ffffff18;}
+html[data-system-theme="dark"] #music .lyrics {background:linear-gradient(180deg,#242a33,#20252c);}
+html[data-system-theme="dark"] #music .row.bad .row-name {color:#f18b91;}
+html[data-system-theme="dark"] #music .playlist::-webkit-scrollbar-thumb {background:#637080;border:2.5px solid transparent;background-clip:content-box;}
+html[data-system-theme="dark"] ::-webkit-scrollbar-thumb {background:#515d6d;}
+/* A manually light reading window must not inherit the dark system chrome. */
+.reader-window[data-theme="light"] {color-scheme:light;--chrome:#f3f3f3;--line:#e8eae8;color:#414b54;background:var(--chrome);}
+
+html[data-system-theme="dark"] .app-window:not(.reader-window) .window-caption {color:var(--sys-text);}
+html[data-system-theme="dark"] .files-category {color:var(--sys-text);}
+html[data-system-theme="dark"] .files-category.is-selected {color:#80b6ff;}
+html[data-system-theme="dark"] #music :is(.ctrl:not(.play):not(.on),.vol-btn) {color:var(--sys-muted);}
+html[data-system-theme="dark"] #music :is(.ctrl:not(.play):hover,.vol-btn:hover) {background:var(--sys-hover);color:var(--sys-text);}
+
+html[data-system-theme="dark"] #music .titlebar {background:var(--sys-raised);}

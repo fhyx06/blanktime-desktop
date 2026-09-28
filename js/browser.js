@@ -21,8 +21,7 @@
   function readToc() { try { return (localStorage.getItem(tocKey()) ?? String(!screenMode.matches)) === 'true'; } catch { return !screenMode.matches; } }
   let tocVisible = readToc();
   function setToc(visible) { tocVisible = visible; try { localStorage.setItem(tocKey(), String(visible)); } catch {} updateTools(); }
-  let theme = 'light';
-  try { theme = localStorage.getItem('blanktime-reader-theme') || theme; } catch {}
+  let theme = window.blanktimeAppearance.getTheme();
   function applyTheme() {
     win.dataset.theme = theme;
     themeButton.setAttribute('aria-pressed', String(theme === 'dark'));
@@ -30,9 +29,10 @@
     themeButton.title = themeButton.getAttribute('aria-label');
   }
   applyTheme();
+  document.addEventListener('blanktime:system-theme', event => { theme = event.detail.theme; applyTheme(); });
   themeButton.addEventListener('click', () => {
     theme = theme === 'dark' ? 'light' : 'dark'; applyTheme();
-    try { localStorage.setItem('blanktime-reader-theme', theme); } catch {}
+    // The toolbar adjusts this reading session; the system preference stays unchanged.
   });
   function suspend(tab) {
     tab.page.querySelectorAll('audio,video').forEach(media => media.pause());

@@ -25,7 +25,8 @@
   color-scheme: dark;
   --chrome: #252930;
   --line: #363c45;
-  --md-inline-code-background: var(--md-inline-code-background-dark, #233448);
+  --md-inline-code-color: var(--md-inline-code-color-dark, #d3b5f3);
+  --md-inline-code-background: var(--md-inline-code-background-dark, #342c42);
   --md-blockquote-background: var(--md-blockquote-background-dark, #2c323a);
   background: var(--chrome);
   border-color: #49515c;
