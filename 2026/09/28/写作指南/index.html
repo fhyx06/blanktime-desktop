@@ -7,8 +7,8 @@
   <meta name="description" content="文字、折腾记录，以及一些突发奇想。">
   <meta name="theme-color" content="#1270FE">
   <link rel="icon" href="/images/icon/favicon.ico" type="image/x-icon">
-  <title>Ubuntu部分 · 空白时间</title>
-  <link rel="canonical" href="https://blog.blanktime.cn/2025/09/25/Ubuntu/">
+  <title>写作文档 · 空白时间</title>
+  <link rel="canonical" href="https://blog.blanktime.cn/2026/09/28/%E5%86%99%E4%BD%9C%E6%8C%87%E5%8D%97/">
   <link rel="stylesheet" href="/css/desktop.css">
   <link rel="stylesheet" href="/css/markdown.css">
   <link rel="stylesheet" href="/css/reader.css">
@@ -449,61 +449,120 @@
 </div>
 
     </section>
-    <template id="article-source"><article class="markdown-body" data-article data-title="Ubuntu部分" data-date="2025-09-25" data-file="Ubuntu.md">
+    <template id="article-source"><article class="markdown-body" data-article data-title="写作文档" data-date="2026-09-28" data-file="写作指南.md">
   <header class="article-heading">
     <p class="eyebrow">BLANKTIME / NOTES</p>
-    <h1 class="post-title">Ubuntu部分</h1>
-    <div class="article-meta"><time datetime="2025-09-25T14:31:15.000Z">2025年09月25日</time><span># 部署</span></div>
+    <h1 class="post-title">写作文档</h1>
+    <div class="article-meta"><time datetime="2026-09-28T13:40:00.000Z">2026年09月28日</time><span># 记录</span><span># 写作文档</span></div>
   </header>
-  <div class="post-content"><p>Ubuntu 部署宝塔</p>
+  <div class="post-content"><p>面向在本站写新文章的语法参考。所有行为均以当前版本（Hexo 8 + <code>blanktime-desktop</code>）实测为准，示例都经过构建验证。</p>
 <span id="more"></span>
 
-<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><ul>
-<li>一台Ubuntu服务器</li>
-</ul>
-<h2 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h2><ol>
-<li><p>更新系统软件包（也许不需要）</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 更新软件包列表</span><br><span class="hljs-built_in">sudo</span> apt update<br><br><span class="hljs-comment"># 升级所有已安装的软件包</span><br><span class="hljs-built_in">sudo</span> apt upgrade -y<br></code></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="安装宝塔"><a href="#安装宝塔" class="headerlink" title="安装宝塔"></a>安装宝塔</h2><ol>
-<li><p>正式版：11.1.0</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs plaintext">if [ -f /usr/bin/curl ];then curl -sSO https://download.bt.cn/install/install_panel.sh;else wget -O install_panel.sh https://download.bt.cn/install/install_panel.sh;fi;bash install_panel.sh ed8484bec<br></code></pre></td></tr></table></figure>
+<p>由于本人之前使用 <a target="_blank" rel="noopener" href="https://volantis.js.org/">Volantis</a> 主题，一些插件标签会采用类似使用语法。</p>
+<h2 id="1-文章头信息"><a href="#1-文章头信息" class="headerlink" title="1.文章头信息"></a><strong>1.文章头信息</strong></h2><p><code>source/_posts/</code> 下每篇文章以 YAML front matter 开头：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><code class="hljs yaml"><span class="hljs-meta">---</span><br><span class="hljs-attr">title:</span> &#123;&#123; <span class="hljs-string">title</span> &#125;&#125; <span class="hljs-comment"># 文章标题</span><br><span class="hljs-attr">date:</span> &#123;&#123; <span class="hljs-string">date</span> &#125;&#125; <span class="hljs-comment"># 创建日期</span><br><span class="hljs-attr">plugins:</span>         <span class="hljs-comment"># 数学公式</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">mathjax</span><br><span class="hljs-attr">author:</span> <span class="hljs-string">η</span><br><span class="hljs-attr">published:</span> <span class="hljs-string">ture</span> <span class="hljs-comment"># 是否发布文章，false 表示只保留但不生成。</span><br><span class="hljs-comment"># 多半需要修改</span><br><span class="hljs-attr">tags:</span> <span class="hljs-string">未指定标签</span> <span class="hljs-comment"># 标签</span><br><span class="hljs-attr">category:</span> <span class="hljs-string">未指定分类</span> <span class="hljs-comment"># 分类</span><br><span class="hljs-attr">headimg:</span>  <span class="hljs-string">头图链接</span>  <span class="hljs-comment"># 头图链接</span><br><span class="hljs-string">pin：</span> <span class="hljs-comment"># 置顶文章 TURE 或数字（数值越大优先级越高）。</span><br><span class="hljs-meta">---</span><br></code></pre></td></tr></table></figure>
 
-<p>提示后 y 确认</p>
-<p>得到如下：</p>
-<blockquote>
-<p>面板账户登录信息</p>
-<p> 【云服务器】请在安全组放行 xxxxx 端口
- 外网ipv4面板地址: <code>https://ipv4</code>
- 内网面板地址:    <code>https://example.com</code>
- username: 生成的用户名
- password: 生成的密码</p>
-</blockquote>
-</li>
-<li><p>开放端口</p>
+<p>主题会读取的字段：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>title</code></td>
+<td>文章标题。</td>
+</tr>
+<tr>
+<td><code>date</code></td>
+<td>发布时间。</td>
+</tr>
+<tr>
+<td><code>updated</code></td>
+<td>更新时间。</td>
+</tr>
+<tr>
+<td><code>tags</code></td>
+<td>标签。</td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td>分类。</td>
+</tr>
+<tr>
+<td><code>headimg</code></td>
+<td>头图链接。</td>
+</tr>
+<tr>
+<td><code>plugins</code></td>
+<td>公式。</td>
+</tr>
+<tr>
+<td><code>author</code></td>
+<td>作者名称</td>
+</tr>
+</tbody></table>
+<h2 id="2-文本修饰标签"><a href="#2-文本修饰标签" class="headerlink" title="2.文本修饰标签"></a><strong>2.文本修饰标签</strong></h2><div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id001"><button type="button" role="tab" id="legacy-tabs-1-tab-0" aria-controls="legacy-tabs-1-panel-0">效果</button><button type="button" role="tab" id="legacy-tabs-1-tab-1" aria-controls="legacy-tabs-1-panel-1">源码</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-1-panel-0" aria-labelledby="legacy-tabs-1-tab-0"><p class="legacy-tab-fallback-label">效果</p><p>这是普通文本</p>&#10;<p><em>这是斜体</em></p>&#10;<p><strong>这是粗体文本</strong><br><u>这是带下划线文本</u></p>&#10;<p><del>这是删除线文本写法1</del></p>&#10;<p><del>这是删除线写法2</del></p>&#10;<p><code>这是行内代码样式</code></p>&#10;<p><span class="spoiler" tabindex="0">这是一段默认隐藏的文本</span></p>&#10;<p><kbd>键盘样式</kbd> <kbd>Win</kbd> + <kbd>R</kbd> </p>&#10;<p><kbd>Ctrl</kbd> + <kbd>C</kbd>，以及 <kbd>Ctrl</kbd> + <kbd>V</kbd></p>&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-1-panel-1" aria-labelledby="legacy-tabs-1-tab-1"><p class="legacy-tab-fallback-label">源码</p><p><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs markdown">这是普通文本<br><br><span class="hljs-emphasis"><em>这是斜体</em></span><br><span class="hljs-strong"><strong>这是粗体文本</strong></span><br><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">u</span>&gt;</span></span>这是带下划线文本<span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">u</span>&gt;</span></span><br><br><del>这是删除线文本写法1</del><br><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">del</span>&gt;</span></span>这是删除线写法2<span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">del</span>&gt;</span></span><br><br>这是行内代码样式<br><br>&#123;% psw 这是一段默认隐藏的文本 %&#125;<br>&#123;% kbd 键盘样式 %&#125; &#123;% kbd Win %&#125; + &#123;% kbd R %&#125; <br><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">kbd</span>&gt;</span></span>Ctrl<span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">kbd</span>&gt;</span></span> + <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">kbd</span>&gt;</span></span>C<span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">kbd</span>&gt;</span></span>，以及 <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">kbd</span>&gt;</span></span>Ctrl<span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">kbd</span>&gt;</span></span> + <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">kbd</span>&gt;</span></span>V<span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">kbd</span>&gt;</span></span><br></code></pre></td></tr></table></figure></p>&#10;<p>这是普通文本</p>&#10;<p><code>*这是斜体*</code></p>&#10;<p><code>**这是粗体文本**</code>&#10;<code>&lt;u&gt;这是带下划线文本&lt;/u&gt;</code></p>&#10;<p><code>~~这是删除线文本写法1~~</code></p>&#10;<p><code>&lt;del&gt;这是删除线写法2&lt;/del&gt;</code></p>&#10;<p>`这是行内代码样式`</p>&#10;</section></div>
+
+<h2 id="3-tab"><a href="#3-tab" class="headerlink" title="3.tab"></a><strong>3.tab</strong></h2><h3 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h3><div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id999"><button type="button" role="tab" id="legacy-tabs-2-tab-0" aria-controls="legacy-tabs-2-panel-0">这里是第一个栏目</button><button type="button" role="tab" id="legacy-tabs-2-tab-1" aria-controls="legacy-tabs-2-panel-1">这里是第二个栏目</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-2-panel-0" aria-labelledby="legacy-tabs-2-tab-0"><p class="legacy-tab-fallback-label">这里是第一个栏目</p><p>这里是第一个栏目的内容</p>&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-2-panel-1" aria-labelledby="legacy-tabs-2-tab-1"><p class="legacy-tab-fallback-label">这里是第二个栏目</p><p>这里是第二个栏目的内容</p>&#10;</section></div>
+
+<h3 id="tab源码"><a href="#tab源码" class="headerlink" title="tab源码"></a>tab源码</h3><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs Markdown">&#123;% tabs id999 %&#125;<br>&lt;!-- tab 这里是第一个栏目 --&gt;<br>这里是第一个栏目的内容<br>&lt;!-- endtab --&gt;<br>&lt;!-- tab 这里是第二个栏目 --&gt;<br>这里是第二个栏目的内容<br>&lt;!-- endtab --&gt;<br>&#123;% endtabs %&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="4-span"><a href="#4-span" class="headerlink" title="4.span"></a><strong>4.span</strong></h2><div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id002"><button type="button" role="tab" id="legacy-tabs-3-tab-0" aria-controls="legacy-tabs-3-panel-0">效果</button><button type="button" role="tab" id="legacy-tabs-3-tab-1" aria-controls="legacy-tabs-3-panel-1">源码</button><button type="button" role="tab" id="legacy-tabs-3-tab-2" aria-controls="legacy-tabs-3-panel-2">参数</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-3-panel-0" aria-labelledby="legacy-tabs-3-tab-0"><p class="legacy-tab-fallback-label">效果</p><p><span class="legacy-text legacy-text-red">红色文字</span></p>&#10;<p><span class="legacy-text legacy-text-green">绿色文字</span></p>&#10;<p><span class="legacy-text legacy-text-blue">蓝色文字</span></p>&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-3-panel-1" aria-labelledby="legacy-tabs-3-tab-1"><p class="legacy-tab-fallback-label">源码</p><p><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs markdown">&#123;% span red::红色文字 %&#125;<br>&#123;% span green::绿色文字 %&#125;<br>&#123;% span blue::蓝色文字 %&#125;<br></code></pre></td></tr></table></figure></p>&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-3-panel-2" aria-labelledby="legacy-tabs-3-tab-2"><p class="legacy-tab-fallback-label">参数</p><table>&#10;<thead>&#10;<tr>&#10;<th>属性</th>&#10;<th>可选项</th>&#10;</tr>&#10;</thead>&#10;<tbody><tr>&#10;<td>字体</td>&#10;<td><code>logo</code>, <code>code</code></td>&#10;</tr>&#10;<tr>&#10;<td>颜色</td>&#10;<td><code>red</code>, <code>yellow</code>, <code>green</code>, <code>cyan</code>, <code>blue</code>, <code>gray</code></td>&#10;</tr>&#10;<tr>&#10;<td>大小</td>&#10;<td><code>small</code>, <code>h4</code>, <code>h3</code>, <code>h2</code>, <code>h1</code>, <code>large</code>, <code>huge</code>, <code>ultra</code></td>&#10;</tr>&#10;<tr>&#10;<td>对齐方向</td>&#10;<td><code>left</code>, <code>center</code>, <code>right</code></td>&#10;</tr>&#10;</tbody></table>&#10;</section></div>
+
+<h2 id="5-p"><a href="#5-p" class="headerlink" title="5.p"></a><strong>5.p</strong></h2><div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id003"><button type="button" role="tab" id="legacy-tabs-4-tab-0" aria-controls="legacy-tabs-4-panel-0">效果</button><button type="button" role="tab" id="legacy-tabs-4-tab-1" aria-controls="legacy-tabs-4-panel-1">源码</button><button type="button" role="tab" id="legacy-tabs-4-tab-2" aria-controls="legacy-tabs-4-panel-2">参数</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-4-panel-0" aria-labelledby="legacy-tabs-4-tab-0"><p class="legacy-tab-fallback-label">效果</p><p><span class="legacy-text legacy-paragraph legacy-text-red">红色文本</span>&#10;<span class="legacy-text legacy-paragraph legacy-text-yellow">黄色文本</span>&#10;<span class="legacy-text legacy-paragraph legacy-text-green">绿色文本</span>&#10;<span class="legacy-text legacy-paragraph legacy-text-cyan">青色文本</span>&#10;<span class="legacy-text legacy-paragraph legacy-text-blue">蓝色文本</span>&#10;<span class="legacy-text legacy-paragraph legacy-text-gray">灰色文本</span></p>&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-4-panel-1" aria-labelledby="legacy-tabs-4-tab-1"><p class="legacy-tab-fallback-label">源码</p><p><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs markdown">&#123;% p red::红色文本 %&#125;<br>&#123;% p yellow::黄色文本 %&#125;<br>&#123;% p green::绿色文本 %&#125;<br>&#123;% p cyan::青色文本 %&#125;<br>&#123;% p blue::蓝色文本 %&#125;<br>&#123;% p gray::灰色文本 %&#125;<br></code></pre></td></tr></table></figure></p>&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-4-panel-2" aria-labelledby="legacy-tabs-4-tab-2"><p class="legacy-tab-fallback-label">参数</p><table>&#10;<thead>&#10;<tr>&#10;<th>属性</th>&#10;<th>可选项</th>&#10;</tr>&#10;</thead>&#10;<tbody><tr>&#10;<td>字体</td>&#10;<td><code>logo</code>, <code>code</code></td>&#10;</tr>&#10;<tr>&#10;<td>颜色</td>&#10;<td><code>red</code>, <code>yellow</code>, <code>green</code>, <code>cyan</code>, <code>blue</code>, <code>gray</code></td>&#10;</tr>&#10;<tr>&#10;<td>大小</td>&#10;<td><code>small</code>, <code>h4</code>, <code>h3</code>, <code>h2</code>, <code>h1</code>, <code>large</code>, <code>huge</code>, <code>ultra</code></td>&#10;</tr>&#10;<tr>&#10;<td>对齐方向</td>&#10;<td><code>left</code>, <code>center</code>, <code>right</code></td>&#10;</tr>&#10;</tbody></table>&#10;</section></div>
+
+<h2 id="6-note"><a href="#6-note" class="headerlink" title="6.note"></a><strong>6.note</strong></h2><div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id004"><button type="button" role="tab" id="legacy-tabs-5-tab-0" aria-controls="legacy-tabs-5-panel-0">效果</button><button type="button" role="tab" id="legacy-tabs-5-tab-1" aria-controls="legacy-tabs-5-panel-1">源码</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-5-panel-0" aria-labelledby="legacy-tabs-5-tab-0"><p class="legacy-tab-fallback-label">效果</p><div class="legacy-note"><p>note warning 默认黄色，适合警告性的信息</p>&#10;</div>&#10;&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-5-panel-1" aria-labelledby="legacy-tabs-5-tab-1"><p class="legacy-tab-fallback-label">源码</p><p><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs markdown">&#123;% note warning::note warning 默认黄色，适合警告性的信息 %&#125;<br></code></pre></td></tr></table></figure></p>&#10;</section></div>
+
+<h2 id="7-folding"><a href="#7-folding" class="headerlink" title="7.folding"></a><strong>7.folding</strong></h2><div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id005"><button type="button" role="tab" id="legacy-tabs-6-tab-0" aria-controls="legacy-tabs-6-panel-0">效果</button><button type="button" role="tab" id="legacy-tabs-6-tab-1" aria-controls="legacy-tabs-6-panel-1">参数</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-6-panel-0" aria-labelledby="legacy-tabs-6-tab-0"><p class="legacy-tab-fallback-label">效果</p><details><summary>点击展开：旧主题的折叠标签</summary><p><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs markdown">&#123;% folding::点击展开：旧主题的折叠标签 %&#125;<br><br>这里是这段folding的源码<br><br>&#123;% endfolding %&#125;<br></code></pre></td></tr></table></figure></p>&#10;</details>&#10;&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-6-panel-1" aria-labelledby="legacy-tabs-6-tab-1"><p class="legacy-tab-fallback-label">参数</p><p>参数位置可以填写颜色和状态，多个参数用空格隔开。</p>&#10;<table>&#10;<thead>&#10;<tr>&#10;<th>颜色</th>&#10;<th>状态</th>&#10;</tr>&#10;</thead>&#10;<tbody><tr>&#10;<td><code>blue</code>, <code>cyan</code>, <code>reen</code>, <code>yellow</code>, <code>red</code>(未实现)</td>&#10;<td><code>open</code> (默认打开)</td>&#10;</tr>&#10;</tbody></table>&#10;</section></div>
+
+<h2 id="8-link"><a href="#8-link" class="headerlink" title="8.link"></a><strong>8.link</strong></h2><div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id006"><button type="button" role="tab" id="legacy-tabs-7-tab-0" aria-controls="legacy-tabs-7-panel-0">效果</button><button type="button" role="tab" id="legacy-tabs-7-tab-1" aria-controls="legacy-tabs-7-panel-1">源码</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-7-panel-0" aria-labelledby="legacy-tabs-7-tab-0"><p class="legacy-tab-fallback-label">效果</p><p><a href="https://www.cloudflare.com/products/turnstile/" target="_blank" rel="noopener noreferrer">验证码Turnstile ↗</a></p>&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-7-panel-1" aria-labelledby="legacy-tabs-7-tab-1"><p class="legacy-tab-fallback-label">源码</p><p><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs markdown">&#123;% link 验证码Turnstile::<a target="_blank" rel="noopener" href="https://www.cloudflare.com/products/turnstile/::https://cf-assets.www.cloudflare.com/dzlvafdwdttg/69wNwfiY5mFmgpd9eQFW6j/d5131c08085a977aa70f19e7aada3fa9/1pixel-down">https://www.cloudflare.com/products/turnstile/::https://cf-assets.www.cloudflare.com/dzlvafdwdttg/69wNwfiY5mFmgpd9eQFW6j/d5131c08085a977aa70f19e7aada3fa9/1pixel-down</a><span class="hljs-strong">_<em>1<span class="hljs-emphasis"></em>.svg %&#125;</span></span><br></code></pre></td></tr></table></figure></p>&#10;</section></div>
+
+<h2 id="9-gallery"><a href="#9-gallery" class="headerlink" title="9.gallery"></a><strong>9.gallery</strong></h2><h3 id="效果-1"><a href="#效果-1" class="headerlink" title="效果"></a>效果</h3><div class="gallery"><p><img src="https://patchwiki.biligame.com/images/mcs/2/20/1tofwu9ldxh3bei2u8novj62u19rgnt.png" alt="逸风城">&#10;<img src="https://patchwiki.biligame.com/images/mcs/a/a9/hdlh2z13repbrcwtyr6be2apixh7zap.png" alt="武陵城">&#10;<img src="https://patchwiki.biligame.com/images/mcs/d/db/ibu9k8kngl8i9oeupjvo78w5g179w9r.png" alt="云汐城">&#10;<img src="https://patchwiki.biligame.com/images/mcs/f/f7/f86swad2k0c1w5ztjdx6sbu56stfuas.png" alt="天星城">&#10;<img src="https://patchwiki.biligame.com/images/mcs/c/cd/nyroc9orr2ljhzbt61tjp77b8449kr7.png" alt="广陵城"></p>&#10;</div>
+
+<h3 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h3><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs Markdown">&#123;% gallery::::one %&#125;<br>![<span class="hljs-string">逸风城</span>](<span class="hljs-link">https://</span>)<br>![<span class="hljs-string">武陵城</span>](<span class="hljs-link">https://</span>)<br>![<span class="hljs-string">云汐城</span>](<span class="hljs-link">https://</span>)<br>![<span class="hljs-string">天星城</span>](<span class="hljs-link">https://</span>)<br>![<span class="hljs-string">广陵城</span>](<span class="hljs-link">https://</span>)<br>&#123;% endgallery %&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="10-timeline"><a href="#10-timeline" class="headerlink" title="10.timeline"></a><strong>10.timeline</strong></h2><div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id007"><button type="button" role="tab" id="legacy-tabs-8-tab-0" aria-controls="legacy-tabs-8-panel-0">效果</button><button type="button" role="tab" id="legacy-tabs-8-tab-1" aria-controls="legacy-tabs-8-panel-1">源码</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-8-panel-0" aria-labelledby="legacy-tabs-8-tab-0"><p class="legacy-tab-fallback-label">效果</p><div class="legacy-timeline"><p class="legacy-timeline-title"></p><section class="legacy-timenode"><p class="legacy-time-label">2020-06-06</p><blockquote>&#10;<p>“有缘再见，强尼。”</p>&#10;</blockquote>&#10;</section>&#10;&#10;<section class="legacy-timenode"><p class="legacy-time-label">2020-05-15</p><blockquote>&#10;<p>“我是V，夜之城活着的传奇。”</p>&#10;</blockquote>&#10;</section>&#10;&#10;<section class="legacy-timenode"><p class="legacy-time-label">2077-04-15</p><blockquote>&#10;<p>“无名小卒，还是名扬天下？”</p>&#10;</blockquote>&#10;</section></div>&#10;&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-8-panel-1" aria-labelledby="legacy-tabs-8-tab-1"><p class="legacy-tab-fallback-label">源码</p><p><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs markdown">&#123;% timeline %&#125;<br><br>&#123;% timenode 2020-06-06 %&#125;<br><br><span class="hljs-quote">&gt; “有缘再见，强尼。”</span><br><br>&#123;% endtimenode %&#125;<br><br>&#123;% timenode 2020-05-15 %&#125;<br><br><span class="hljs-quote">&gt; “我是V，夜之城活着的传奇。”</span><br><br>&#123;% endtimenode %&#125;<br><br>&#123;% timenode 2077-04-15 %&#125;<br><br><span class="hljs-quote">&gt; “无名小卒，还是名扬天下？”</span><br><br>&#123;% endtimenode %&#125;<br><br>&#123;% endtimeline %&#125;<br></code></pre></td></tr></table></figure></p>&#10;</section></div>
+
+<h2 id="11-image"><a href="#11-image" class="headerlink" title="11.image"></a><strong>11.image</strong></h2><h3 id="效果-2"><a href="#效果-2" class="headerlink" title="效果"></a>效果</h3><p>添加描述：</p>
+<img src="https://cos.blanktime.cn/assets/images/149976844_p0.jpg" alt="那条路." loading="lazy">
+
+<p>指定宽度：</p>
+<img src="https://cos.blanktime.cn/assets/images/149976844_p0.jpg" alt="" loading="lazy" style="width:500px;max-width:100%">
+
+<p>指定宽度并添加描述：</p>
+<img src="https://cos.blanktime.cn/assets/images/149976844_p0.jpg" alt="没有什么故事。" loading="lazy" style="width:400px;max-width:100%">
+
+<p>设置占位背景色：</p>
+<img src="https://cos.blanktime.cn/assets/images/149976844_p0.jpg" alt="未实现" loading="lazy" style="width:300px;max-width:100%">
+
+<h3 id="源码-1"><a href="#源码-1" class="headerlink" title="源码"></a>源码</h3><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs markdown">&#123;% image https://::alt=那条路. %&#125;<br>指定宽度：<br>&#123;% image https://::width=500px %&#125;<br>指定宽度并添加描述：<br>&#123;% image https://::width=400px::alt=没有什么故事。 %&#125;<br>设置占位背景色：<br>&#123;% image https://::width=300px::bg=#1D0C04::alt=未实现 %&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h3><table>
+<thead>
+<tr>
+<th>宽高</th>
+<th>描述</th>
+<th>占位背景色</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>width=300px::height=32px</code></td>
+<td><code>alt=描述</code></td>
+<td><code>bg=#000</code></td>
+</tr>
+</tbody></table>
+<h2 id="12-尚未支持"><a href="#12-尚未支持" class="headerlink" title="12.尚未支持"></a><strong>12.尚未支持</strong></h2><p>以下旧 Volantis 能力当前<strong>没有实现</strong>，写了不会生效（部分会导致构建失败）：</p>
 <ul>
-<li>根据前面提示：<code>【云服务器】请在安全组放行 xxxxx 端口</code> 来开放端口</li>
-<li>多半是在 <code>安全组</code> ， <code>防火墙</code> 部分</li>
-<li>添加自定义规则 TCP  端口号  允许</li>
+<li><code>&#123;% note %&#125;</code> 的 type 差异化配色（所有 type 同款样式）</li>
+<li><code>&#123;% link %&#125;</code> 的第三段描述</li>
+<li><code>&#123;% tabs %&#125;</code> 的图标参数</li>
+<li><code>&#123;% gallery::::one %&#125;</code> 目前不支持点开图片</li>
+<li><code>&lt;img src=&quot;https://&quot; alt=&quot;那条路.&quot; loading=&quot;lazy&quot;&gt;</code> 未实现描述</li>
 </ul>
-</li>
-<li><p>宝塔部分</p>
-<ul>
-<li>根据前面提示：进入 <code>https://ipv4</code>链接</li>
-<li>账号：<code>前面生成的用户名</code></li>
-<li>密码：<code>前面生成的密码</code></li>
-<li>登录后选择：<code>站点</code> - <code>添加站点</code> - <code>填写域名/IP</code> 其余根据需求选择</li>
-</ul>
-</li>
-<li><p>Git</p>
-<ul>
-<li><p>打开终端进入创建站点位置，若无修改应为 <code>/www/wwwroot/xxxxxx</code></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> /www/wwwroot/xxxxxx<br>git <span class="hljs-built_in">clone</span> 你的仓库名  <span class="hljs-comment"># 例如github、gitee</span><br></code></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p>访问 <code>域名/IP</code> 地址若无异常会出现页面</p>
-</li>
-</ol>
 </div>
 </article>
 </template>
@@ -627,61 +686,120 @@
 
   </main>
   <div id="announcement" class="toast" role="status" hidden></div>
-  <noscript><style>body{overflow:auto}.desktop,.dock{display:none}.noscript-article{background:white;margin:20px auto;max-width:1000px}</style><div class="noscript-article"><article class="markdown-body" data-article data-title="Ubuntu部分" data-date="2025-09-25" data-file="Ubuntu.md">
+  <noscript><style>body{overflow:auto}.desktop,.dock{display:none}.noscript-article{background:white;margin:20px auto;max-width:1000px}</style><div class="noscript-article"><article class="markdown-body" data-article data-title="写作文档" data-date="2026-09-28" data-file="写作指南.md">
   <header class="article-heading">
     <p class="eyebrow">BLANKTIME / NOTES</p>
-    <h1 class="post-title">Ubuntu部分</h1>
-    <div class="article-meta"><time datetime="2025-09-25T14:31:15.000Z">2025年09月25日</time><span># 部署</span></div>
+    <h1 class="post-title">写作文档</h1>
+    <div class="article-meta"><time datetime="2026-09-28T13:40:00.000Z">2026年09月28日</time><span># 记录</span><span># 写作文档</span></div>
   </header>
-  <div class="post-content"><p>Ubuntu 部署宝塔</p>
+  <div class="post-content"><p>面向在本站写新文章的语法参考。所有行为均以当前版本（Hexo 8 + <code>blanktime-desktop</code>）实测为准，示例都经过构建验证。</p>
 <span id="more"></span>
 
-<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><ul>
-<li>一台Ubuntu服务器</li>
-</ul>
-<h2 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h2><ol>
-<li><p>更新系统软件包（也许不需要）</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 更新软件包列表</span><br><span class="hljs-built_in">sudo</span> apt update<br><br><span class="hljs-comment"># 升级所有已安装的软件包</span><br><span class="hljs-built_in">sudo</span> apt upgrade -y<br></code></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="安装宝塔"><a href="#安装宝塔" class="headerlink" title="安装宝塔"></a>安装宝塔</h2><ol>
-<li><p>正式版：11.1.0</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs plaintext">if [ -f /usr/bin/curl ];then curl -sSO https://download.bt.cn/install/install_panel.sh;else wget -O install_panel.sh https://download.bt.cn/install/install_panel.sh;fi;bash install_panel.sh ed8484bec<br></code></pre></td></tr></table></figure>
+<p>由于本人之前使用 <a target="_blank" rel="noopener" href="https://volantis.js.org/">Volantis</a> 主题，一些插件标签会采用类似使用语法。</p>
+<h2 id="1-文章头信息"><a href="#1-文章头信息" class="headerlink" title="1.文章头信息"></a><strong>1.文章头信息</strong></h2><p><code>source/_posts/</code> 下每篇文章以 YAML front matter 开头：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><code class="hljs yaml"><span class="hljs-meta">---</span><br><span class="hljs-attr">title:</span> &#123;&#123; <span class="hljs-string">title</span> &#125;&#125; <span class="hljs-comment"># 文章标题</span><br><span class="hljs-attr">date:</span> &#123;&#123; <span class="hljs-string">date</span> &#125;&#125; <span class="hljs-comment"># 创建日期</span><br><span class="hljs-attr">plugins:</span>         <span class="hljs-comment"># 数学公式</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">mathjax</span><br><span class="hljs-attr">author:</span> <span class="hljs-string">η</span><br><span class="hljs-attr">published:</span> <span class="hljs-string">ture</span> <span class="hljs-comment"># 是否发布文章，false 表示只保留但不生成。</span><br><span class="hljs-comment"># 多半需要修改</span><br><span class="hljs-attr">tags:</span> <span class="hljs-string">未指定标签</span> <span class="hljs-comment"># 标签</span><br><span class="hljs-attr">category:</span> <span class="hljs-string">未指定分类</span> <span class="hljs-comment"># 分类</span><br><span class="hljs-attr">headimg:</span>  <span class="hljs-string">头图链接</span>  <span class="hljs-comment"># 头图链接</span><br><span class="hljs-string">pin：</span> <span class="hljs-comment"># 置顶文章 TURE 或数字（数值越大优先级越高）。</span><br><span class="hljs-meta">---</span><br></code></pre></td></tr></table></figure>
 
-<p>提示后 y 确认</p>
-<p>得到如下：</p>
-<blockquote>
-<p>面板账户登录信息</p>
-<p> 【云服务器】请在安全组放行 xxxxx 端口
- 外网ipv4面板地址: <code>https://ipv4</code>
- 内网面板地址:    <code>https://example.com</code>
- username: 生成的用户名
- password: 生成的密码</p>
-</blockquote>
-</li>
-<li><p>开放端口</p>
+<p>主题会读取的字段：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>title</code></td>
+<td>文章标题。</td>
+</tr>
+<tr>
+<td><code>date</code></td>
+<td>发布时间。</td>
+</tr>
+<tr>
+<td><code>updated</code></td>
+<td>更新时间。</td>
+</tr>
+<tr>
+<td><code>tags</code></td>
+<td>标签。</td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td>分类。</td>
+</tr>
+<tr>
+<td><code>headimg</code></td>
+<td>头图链接。</td>
+</tr>
+<tr>
+<td><code>plugins</code></td>
+<td>公式。</td>
+</tr>
+<tr>
+<td><code>author</code></td>
+<td>作者名称</td>
+</tr>
+</tbody></table>
+<h2 id="2-文本修饰标签"><a href="#2-文本修饰标签" class="headerlink" title="2.文本修饰标签"></a><strong>2.文本修饰标签</strong></h2><div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id001"><button type="button" role="tab" id="legacy-tabs-1-tab-0" aria-controls="legacy-tabs-1-panel-0">效果</button><button type="button" role="tab" id="legacy-tabs-1-tab-1" aria-controls="legacy-tabs-1-panel-1">源码</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-1-panel-0" aria-labelledby="legacy-tabs-1-tab-0"><p class="legacy-tab-fallback-label">效果</p><p>这是普通文本</p>&#10;<p><em>这是斜体</em></p>&#10;<p><strong>这是粗体文本</strong><br><u>这是带下划线文本</u></p>&#10;<p><del>这是删除线文本写法1</del></p>&#10;<p><del>这是删除线写法2</del></p>&#10;<p><code>这是行内代码样式</code></p>&#10;<p><span class="spoiler" tabindex="0">这是一段默认隐藏的文本</span></p>&#10;<p><kbd>键盘样式</kbd> <kbd>Win</kbd> + <kbd>R</kbd> </p>&#10;<p><kbd>Ctrl</kbd> + <kbd>C</kbd>，以及 <kbd>Ctrl</kbd> + <kbd>V</kbd></p>&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-1-panel-1" aria-labelledby="legacy-tabs-1-tab-1"><p class="legacy-tab-fallback-label">源码</p><p><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs markdown">这是普通文本<br><br><span class="hljs-emphasis"><em>这是斜体</em></span><br><span class="hljs-strong"><strong>这是粗体文本</strong></span><br><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">u</span>&gt;</span></span>这是带下划线文本<span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">u</span>&gt;</span></span><br><br><del>这是删除线文本写法1</del><br><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">del</span>&gt;</span></span>这是删除线写法2<span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">del</span>&gt;</span></span><br><br>这是行内代码样式<br><br>&#123;% psw 这是一段默认隐藏的文本 %&#125;<br>&#123;% kbd 键盘样式 %&#125; &#123;% kbd Win %&#125; + &#123;% kbd R %&#125; <br><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">kbd</span>&gt;</span></span>Ctrl<span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">kbd</span>&gt;</span></span> + <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">kbd</span>&gt;</span></span>C<span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">kbd</span>&gt;</span></span>，以及 <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">kbd</span>&gt;</span></span>Ctrl<span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">kbd</span>&gt;</span></span> + <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">kbd</span>&gt;</span></span>V<span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">kbd</span>&gt;</span></span><br></code></pre></td></tr></table></figure></p>&#10;<p>这是普通文本</p>&#10;<p><code>*这是斜体*</code></p>&#10;<p><code>**这是粗体文本**</code>&#10;<code>&lt;u&gt;这是带下划线文本&lt;/u&gt;</code></p>&#10;<p><code>~~这是删除线文本写法1~~</code></p>&#10;<p><code>&lt;del&gt;这是删除线写法2&lt;/del&gt;</code></p>&#10;<p>`这是行内代码样式`</p>&#10;</section></div>
+
+<h2 id="3-tab"><a href="#3-tab" class="headerlink" title="3.tab"></a><strong>3.tab</strong></h2><h3 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h3><div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id999"><button type="button" role="tab" id="legacy-tabs-2-tab-0" aria-controls="legacy-tabs-2-panel-0">这里是第一个栏目</button><button type="button" role="tab" id="legacy-tabs-2-tab-1" aria-controls="legacy-tabs-2-panel-1">这里是第二个栏目</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-2-panel-0" aria-labelledby="legacy-tabs-2-tab-0"><p class="legacy-tab-fallback-label">这里是第一个栏目</p><p>这里是第一个栏目的内容</p>&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-2-panel-1" aria-labelledby="legacy-tabs-2-tab-1"><p class="legacy-tab-fallback-label">这里是第二个栏目</p><p>这里是第二个栏目的内容</p>&#10;</section></div>
+
+<h3 id="tab源码"><a href="#tab源码" class="headerlink" title="tab源码"></a>tab源码</h3><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs Markdown">&#123;% tabs id999 %&#125;<br>&lt;!-- tab 这里是第一个栏目 --&gt;<br>这里是第一个栏目的内容<br>&lt;!-- endtab --&gt;<br>&lt;!-- tab 这里是第二个栏目 --&gt;<br>这里是第二个栏目的内容<br>&lt;!-- endtab --&gt;<br>&#123;% endtabs %&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="4-span"><a href="#4-span" class="headerlink" title="4.span"></a><strong>4.span</strong></h2><div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id002"><button type="button" role="tab" id="legacy-tabs-3-tab-0" aria-controls="legacy-tabs-3-panel-0">效果</button><button type="button" role="tab" id="legacy-tabs-3-tab-1" aria-controls="legacy-tabs-3-panel-1">源码</button><button type="button" role="tab" id="legacy-tabs-3-tab-2" aria-controls="legacy-tabs-3-panel-2">参数</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-3-panel-0" aria-labelledby="legacy-tabs-3-tab-0"><p class="legacy-tab-fallback-label">效果</p><p><span class="legacy-text legacy-text-red">红色文字</span></p>&#10;<p><span class="legacy-text legacy-text-green">绿色文字</span></p>&#10;<p><span class="legacy-text legacy-text-blue">蓝色文字</span></p>&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-3-panel-1" aria-labelledby="legacy-tabs-3-tab-1"><p class="legacy-tab-fallback-label">源码</p><p><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs markdown">&#123;% span red::红色文字 %&#125;<br>&#123;% span green::绿色文字 %&#125;<br>&#123;% span blue::蓝色文字 %&#125;<br></code></pre></td></tr></table></figure></p>&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-3-panel-2" aria-labelledby="legacy-tabs-3-tab-2"><p class="legacy-tab-fallback-label">参数</p><table>&#10;<thead>&#10;<tr>&#10;<th>属性</th>&#10;<th>可选项</th>&#10;</tr>&#10;</thead>&#10;<tbody><tr>&#10;<td>字体</td>&#10;<td><code>logo</code>, <code>code</code></td>&#10;</tr>&#10;<tr>&#10;<td>颜色</td>&#10;<td><code>red</code>, <code>yellow</code>, <code>green</code>, <code>cyan</code>, <code>blue</code>, <code>gray</code></td>&#10;</tr>&#10;<tr>&#10;<td>大小</td>&#10;<td><code>small</code>, <code>h4</code>, <code>h3</code>, <code>h2</code>, <code>h1</code>, <code>large</code>, <code>huge</code>, <code>ultra</code></td>&#10;</tr>&#10;<tr>&#10;<td>对齐方向</td>&#10;<td><code>left</code>, <code>center</code>, <code>right</code></td>&#10;</tr>&#10;</tbody></table>&#10;</section></div>
+
+<h2 id="5-p"><a href="#5-p" class="headerlink" title="5.p"></a><strong>5.p</strong></h2><div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id003"><button type="button" role="tab" id="legacy-tabs-4-tab-0" aria-controls="legacy-tabs-4-panel-0">效果</button><button type="button" role="tab" id="legacy-tabs-4-tab-1" aria-controls="legacy-tabs-4-panel-1">源码</button><button type="button" role="tab" id="legacy-tabs-4-tab-2" aria-controls="legacy-tabs-4-panel-2">参数</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-4-panel-0" aria-labelledby="legacy-tabs-4-tab-0"><p class="legacy-tab-fallback-label">效果</p><p><span class="legacy-text legacy-paragraph legacy-text-red">红色文本</span>&#10;<span class="legacy-text legacy-paragraph legacy-text-yellow">黄色文本</span>&#10;<span class="legacy-text legacy-paragraph legacy-text-green">绿色文本</span>&#10;<span class="legacy-text legacy-paragraph legacy-text-cyan">青色文本</span>&#10;<span class="legacy-text legacy-paragraph legacy-text-blue">蓝色文本</span>&#10;<span class="legacy-text legacy-paragraph legacy-text-gray">灰色文本</span></p>&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-4-panel-1" aria-labelledby="legacy-tabs-4-tab-1"><p class="legacy-tab-fallback-label">源码</p><p><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs markdown">&#123;% p red::红色文本 %&#125;<br>&#123;% p yellow::黄色文本 %&#125;<br>&#123;% p green::绿色文本 %&#125;<br>&#123;% p cyan::青色文本 %&#125;<br>&#123;% p blue::蓝色文本 %&#125;<br>&#123;% p gray::灰色文本 %&#125;<br></code></pre></td></tr></table></figure></p>&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-4-panel-2" aria-labelledby="legacy-tabs-4-tab-2"><p class="legacy-tab-fallback-label">参数</p><table>&#10;<thead>&#10;<tr>&#10;<th>属性</th>&#10;<th>可选项</th>&#10;</tr>&#10;</thead>&#10;<tbody><tr>&#10;<td>字体</td>&#10;<td><code>logo</code>, <code>code</code></td>&#10;</tr>&#10;<tr>&#10;<td>颜色</td>&#10;<td><code>red</code>, <code>yellow</code>, <code>green</code>, <code>cyan</code>, <code>blue</code>, <code>gray</code></td>&#10;</tr>&#10;<tr>&#10;<td>大小</td>&#10;<td><code>small</code>, <code>h4</code>, <code>h3</code>, <code>h2</code>, <code>h1</code>, <code>large</code>, <code>huge</code>, <code>ultra</code></td>&#10;</tr>&#10;<tr>&#10;<td>对齐方向</td>&#10;<td><code>left</code>, <code>center</code>, <code>right</code></td>&#10;</tr>&#10;</tbody></table>&#10;</section></div>
+
+<h2 id="6-note"><a href="#6-note" class="headerlink" title="6.note"></a><strong>6.note</strong></h2><div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id004"><button type="button" role="tab" id="legacy-tabs-5-tab-0" aria-controls="legacy-tabs-5-panel-0">效果</button><button type="button" role="tab" id="legacy-tabs-5-tab-1" aria-controls="legacy-tabs-5-panel-1">源码</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-5-panel-0" aria-labelledby="legacy-tabs-5-tab-0"><p class="legacy-tab-fallback-label">效果</p><div class="legacy-note"><p>note warning 默认黄色，适合警告性的信息</p>&#10;</div>&#10;&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-5-panel-1" aria-labelledby="legacy-tabs-5-tab-1"><p class="legacy-tab-fallback-label">源码</p><p><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs markdown">&#123;% note warning::note warning 默认黄色，适合警告性的信息 %&#125;<br></code></pre></td></tr></table></figure></p>&#10;</section></div>
+
+<h2 id="7-folding"><a href="#7-folding" class="headerlink" title="7.folding"></a><strong>7.folding</strong></h2><div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id005"><button type="button" role="tab" id="legacy-tabs-6-tab-0" aria-controls="legacy-tabs-6-panel-0">效果</button><button type="button" role="tab" id="legacy-tabs-6-tab-1" aria-controls="legacy-tabs-6-panel-1">参数</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-6-panel-0" aria-labelledby="legacy-tabs-6-tab-0"><p class="legacy-tab-fallback-label">效果</p><details><summary>点击展开：旧主题的折叠标签</summary><p><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs markdown">&#123;% folding::点击展开：旧主题的折叠标签 %&#125;<br><br>这里是这段folding的源码<br><br>&#123;% endfolding %&#125;<br></code></pre></td></tr></table></figure></p>&#10;</details>&#10;&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-6-panel-1" aria-labelledby="legacy-tabs-6-tab-1"><p class="legacy-tab-fallback-label">参数</p><p>参数位置可以填写颜色和状态，多个参数用空格隔开。</p>&#10;<table>&#10;<thead>&#10;<tr>&#10;<th>颜色</th>&#10;<th>状态</th>&#10;</tr>&#10;</thead>&#10;<tbody><tr>&#10;<td><code>blue</code>, <code>cyan</code>, <code>reen</code>, <code>yellow</code>, <code>red</code>(未实现)</td>&#10;<td><code>open</code> (默认打开)</td>&#10;</tr>&#10;</tbody></table>&#10;</section></div>
+
+<h2 id="8-link"><a href="#8-link" class="headerlink" title="8.link"></a><strong>8.link</strong></h2><div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id006"><button type="button" role="tab" id="legacy-tabs-7-tab-0" aria-controls="legacy-tabs-7-panel-0">效果</button><button type="button" role="tab" id="legacy-tabs-7-tab-1" aria-controls="legacy-tabs-7-panel-1">源码</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-7-panel-0" aria-labelledby="legacy-tabs-7-tab-0"><p class="legacy-tab-fallback-label">效果</p><p><a href="https://www.cloudflare.com/products/turnstile/" target="_blank" rel="noopener noreferrer">验证码Turnstile ↗</a></p>&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-7-panel-1" aria-labelledby="legacy-tabs-7-tab-1"><p class="legacy-tab-fallback-label">源码</p><p><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs markdown">&#123;% link 验证码Turnstile::<a target="_blank" rel="noopener" href="https://www.cloudflare.com/products/turnstile/::https://cf-assets.www.cloudflare.com/dzlvafdwdttg/69wNwfiY5mFmgpd9eQFW6j/d5131c08085a977aa70f19e7aada3fa9/1pixel-down">https://www.cloudflare.com/products/turnstile/::https://cf-assets.www.cloudflare.com/dzlvafdwdttg/69wNwfiY5mFmgpd9eQFW6j/d5131c08085a977aa70f19e7aada3fa9/1pixel-down</a><span class="hljs-strong">_<em>1<span class="hljs-emphasis"></em>.svg %&#125;</span></span><br></code></pre></td></tr></table></figure></p>&#10;</section></div>
+
+<h2 id="9-gallery"><a href="#9-gallery" class="headerlink" title="9.gallery"></a><strong>9.gallery</strong></h2><h3 id="效果-1"><a href="#效果-1" class="headerlink" title="效果"></a>效果</h3><div class="gallery"><p><img src="https://patchwiki.biligame.com/images/mcs/2/20/1tofwu9ldxh3bei2u8novj62u19rgnt.png" alt="逸风城">&#10;<img src="https://patchwiki.biligame.com/images/mcs/a/a9/hdlh2z13repbrcwtyr6be2apixh7zap.png" alt="武陵城">&#10;<img src="https://patchwiki.biligame.com/images/mcs/d/db/ibu9k8kngl8i9oeupjvo78w5g179w9r.png" alt="云汐城">&#10;<img src="https://patchwiki.biligame.com/images/mcs/f/f7/f86swad2k0c1w5ztjdx6sbu56stfuas.png" alt="天星城">&#10;<img src="https://patchwiki.biligame.com/images/mcs/c/cd/nyroc9orr2ljhzbt61tjp77b8449kr7.png" alt="广陵城"></p>&#10;</div>
+
+<h3 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h3><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs Markdown">&#123;% gallery::::one %&#125;<br>![<span class="hljs-string">逸风城</span>](<span class="hljs-link">https://</span>)<br>![<span class="hljs-string">武陵城</span>](<span class="hljs-link">https://</span>)<br>![<span class="hljs-string">云汐城</span>](<span class="hljs-link">https://</span>)<br>![<span class="hljs-string">天星城</span>](<span class="hljs-link">https://</span>)<br>![<span class="hljs-string">广陵城</span>](<span class="hljs-link">https://</span>)<br>&#123;% endgallery %&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="10-timeline"><a href="#10-timeline" class="headerlink" title="10.timeline"></a><strong>10.timeline</strong></h2><div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id007"><button type="button" role="tab" id="legacy-tabs-8-tab-0" aria-controls="legacy-tabs-8-panel-0">效果</button><button type="button" role="tab" id="legacy-tabs-8-tab-1" aria-controls="legacy-tabs-8-panel-1">源码</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-8-panel-0" aria-labelledby="legacy-tabs-8-tab-0"><p class="legacy-tab-fallback-label">效果</p><div class="legacy-timeline"><p class="legacy-timeline-title"></p><section class="legacy-timenode"><p class="legacy-time-label">2020-06-06</p><blockquote>&#10;<p>“有缘再见，强尼。”</p>&#10;</blockquote>&#10;</section>&#10;&#10;<section class="legacy-timenode"><p class="legacy-time-label">2020-05-15</p><blockquote>&#10;<p>“我是V，夜之城活着的传奇。”</p>&#10;</blockquote>&#10;</section>&#10;&#10;<section class="legacy-timenode"><p class="legacy-time-label">2077-04-15</p><blockquote>&#10;<p>“无名小卒，还是名扬天下？”</p>&#10;</blockquote>&#10;</section></div>&#10;&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-8-panel-1" aria-labelledby="legacy-tabs-8-tab-1"><p class="legacy-tab-fallback-label">源码</p><p><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs markdown">&#123;% timeline %&#125;<br><br>&#123;% timenode 2020-06-06 %&#125;<br><br><span class="hljs-quote">&gt; “有缘再见，强尼。”</span><br><br>&#123;% endtimenode %&#125;<br><br>&#123;% timenode 2020-05-15 %&#125;<br><br><span class="hljs-quote">&gt; “我是V，夜之城活着的传奇。”</span><br><br>&#123;% endtimenode %&#125;<br><br>&#123;% timenode 2077-04-15 %&#125;<br><br><span class="hljs-quote">&gt; “无名小卒，还是名扬天下？”</span><br><br>&#123;% endtimenode %&#125;<br><br>&#123;% endtimeline %&#125;<br></code></pre></td></tr></table></figure></p>&#10;</section></div>
+
+<h2 id="11-image"><a href="#11-image" class="headerlink" title="11.image"></a><strong>11.image</strong></h2><h3 id="效果-2"><a href="#效果-2" class="headerlink" title="效果"></a>效果</h3><p>添加描述：</p>
+<img src="https://cos.blanktime.cn/assets/images/149976844_p0.jpg" alt="那条路." loading="lazy">
+
+<p>指定宽度：</p>
+<img src="https://cos.blanktime.cn/assets/images/149976844_p0.jpg" alt="" loading="lazy" style="width:500px;max-width:100%">
+
+<p>指定宽度并添加描述：</p>
+<img src="https://cos.blanktime.cn/assets/images/149976844_p0.jpg" alt="没有什么故事。" loading="lazy" style="width:400px;max-width:100%">
+
+<p>设置占位背景色：</p>
+<img src="https://cos.blanktime.cn/assets/images/149976844_p0.jpg" alt="未实现" loading="lazy" style="width:300px;max-width:100%">
+
+<h3 id="源码-1"><a href="#源码-1" class="headerlink" title="源码"></a>源码</h3><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs markdown">&#123;% image https://::alt=那条路. %&#125;<br>指定宽度：<br>&#123;% image https://::width=500px %&#125;<br>指定宽度并添加描述：<br>&#123;% image https://::width=400px::alt=没有什么故事。 %&#125;<br>设置占位背景色：<br>&#123;% image https://::width=300px::bg=#1D0C04::alt=未实现 %&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h3><table>
+<thead>
+<tr>
+<th>宽高</th>
+<th>描述</th>
+<th>占位背景色</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>width=300px::height=32px</code></td>
+<td><code>alt=描述</code></td>
+<td><code>bg=#000</code></td>
+</tr>
+</tbody></table>
+<h2 id="12-尚未支持"><a href="#12-尚未支持" class="headerlink" title="12.尚未支持"></a><strong>12.尚未支持</strong></h2><p>以下旧 Volantis 能力当前<strong>没有实现</strong>，写了不会生效（部分会导致构建失败）：</p>
 <ul>
-<li>根据前面提示：<code>【云服务器】请在安全组放行 xxxxx 端口</code> 来开放端口</li>
-<li>多半是在 <code>安全组</code> ， <code>防火墙</code> 部分</li>
-<li>添加自定义规则 TCP  端口号  允许</li>
+<li><code>&#123;% note %&#125;</code> 的 type 差异化配色（所有 type 同款样式）</li>
+<li><code>&#123;% link %&#125;</code> 的第三段描述</li>
+<li><code>&#123;% tabs %&#125;</code> 的图标参数</li>
+<li><code>&#123;% gallery::::one %&#125;</code> 目前不支持点开图片</li>
+<li><code>&lt;img src=&quot;https://&quot; alt=&quot;那条路.&quot; loading=&quot;lazy&quot;&gt;</code> 未实现描述</li>
 </ul>
-</li>
-<li><p>宝塔部分</p>
-<ul>
-<li>根据前面提示：进入 <code>https://ipv4</code>链接</li>
-<li>账号：<code>前面生成的用户名</code></li>
-<li>密码：<code>前面生成的密码</code></li>
-<li>登录后选择：<code>站点</code> - <code>添加站点</code> - <code>填写域名/IP</code> 其余根据需求选择</li>
-</ul>
-</li>
-<li><p>Git</p>
-<ul>
-<li><p>打开终端进入创建站点位置，若无修改应为 <code>/www/wwwroot/xxxxxx</code></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> /www/wwwroot/xxxxxx<br>git <span class="hljs-built_in">clone</span> 你的仓库名  <span class="hljs-comment"># 例如github、gitee</span><br></code></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p>访问 <code>域名/IP</code> 地址若无异常会出现页面</p>
-</li>
-</ol>
 </div>
 </article>
 </div><p class="noscript-notice">启用 JavaScript 可使用桌面窗口交互。<a href="/">返回首页</a></p><ul class="noscript-posts"><li><a href="/2026/09/28/%E5%86%99%E4%BD%9C%E6%8C%87%E5%8D%97/">写作文档</a></li><li><a href="/2026/09/27/markdown-render-test/">Markdown 全功能显示测试</a></li><li><a href="/2026/09/26/markdown-style-test/">Markdown 样式测试</a></li><li><a href="/2026/06/02/OnePlus13-Rom/">OnePlus13刷入crDroid</a></li><li><a href="/2026/04/26/Roco/">关于洛克保底记录工具的杂谈</a></li><li><a href="/2026/03/04/pwd/">Bitwarden + Vaultwarden 自托管密码管理</a></li><li><a href="/2026/01/20/RX-9070-power/">RX 9070 功耗解锁</a></li><li><a href="/2026/01/13/NAS/">关于折腾 NAS 的记录</a></li><li><a href="/2025/10/20/root-modules/">Root管理器与一些模块链接</a></li><li><a href="/2025/10/15/Redmi-k40/">Redmi k40(alioth)刷入 Pixel OS</a></li><li><a href="/2025/10/03/pgzj/">文章鉴赏《潘嘎之交》</a></li><li><a href="/2025/10/02/MaBaoguo/">文章鉴赏 《偷袭》</a></li><li><a href="/2025/09/30/ollama/">ollama</a></li><li><a href="/2025/09/27/Artalk%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/">Artalk评论系统</a></li><li><a href="/2025/09/25/Ubuntu/">Ubuntu部分</a></li><li><a href="/2025/09/24/test/">显示测试</a></li><li><a href="/2025/09/23/Hexo/">Hexo</a></li><li><a href="/2025/09/22/Scrcpy_new/">Scrcpy</a></li><li><a href="/2025/09/22/Typora1.9.5/">Typora1.9.5</a></li></ul></noscript>
