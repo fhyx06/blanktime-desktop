@@ -49,12 +49,20 @@
   <script src="/js/desktop.js" defer></script>
   <link rel="stylesheet" href="/css/settings.css">
   <script src="/js/settings.js" defer></script>
+  <link rel="stylesheet" href="/css/browser.css">
+  <script src="/js/reading.js" defer></script>
+  <script src="/js/browser.js" defer></script>
+  <script src="/js/wallpaper.js" defer></script>
+  <link rel="stylesheet" href="/css/album.css">
+  <script src="/js/album.js" defer></script>
   <script src="/js/music.js" defer></script>
   <script src="/js/poetry.js" defer></script>
   <script src="/js/welcome-info.js" defer></script>
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-home="/" style="--wallpaper: url('/images/cover.jpg')">
   <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-browser" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18Z"/></symbol>
+    <symbol id="i-album" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="2"/><path d="m3 17 6-6 4 4 3-3 5 5"/></symbol>
     <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 8l12-2"/><ellipse cx="6" cy="18" rx="3" ry="3"/><ellipse cx="18" cy="16" rx="3" ry="3"/></symbol>
     <symbol id="i-home" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
     <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 3h12a3 3 0 0 1 3 3v15H6a3 3 0 0 1-3-3V4a1 1 0 0 1 1-1ZM3 17h16M7 7h7M7 11h5"/></symbol>
@@ -67,8 +75,9 @@
     <button class="dock-button" data-open="welcome" aria-label="欢迎窗口" title="欢迎窗口"><svg><use href="#i-home"/></svg><span class="running-dot"></span></button>
     <span class="dock-divider"></span>
     <button class="dock-button" data-open="files" aria-label="文件管理" title="文件管理"><span class="dock-app-icon" aria-hidden="true"><span class="folder-art"><span></span></span></span><span class="running-dot"></span></button>
-    <button class="dock-button" data-open="reader" aria-label="文章阅读器" title="文章阅读器"><svg><use href="#i-book"/></svg><span class="running-dot"></span></button>
     <button class="dock-button" data-open="music" aria-label="音乐播放器" title="音乐播放器"><span class="dock-app-icon" aria-hidden="true"><span class="music-icon-art"><svg><use href="#i-music"/></svg></span></span><span class="running-dot"></span></button>
+    <button class="dock-button" data-open="album" aria-label="相册" title="相册"><span class="album-icon-art" aria-hidden="true"><svg><use href="#i-album"/></svg></span><span class="running-dot"></span></button>
+    <button class="dock-button" data-open="browser" aria-label="博客浏览器" title="博客浏览器"><span class="browser-icon-art" aria-hidden="true"><svg><use href="#i-browser"/></svg></span><span class="running-dot"></span></button>
     <div class="dock-space"></div>
     <button class="dock-button desktop-toggle" aria-label="显示桌面" title="显示桌面"><svg><use href="#i-grid"/></svg></button>
     <button class="dock-button" id="settings-toggle" type="button" title="设置" aria-label="设置" aria-expanded="false" aria-controls="settings-panel" aria-haspopup="dialog"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m9 3-.6 2.3-2 .9-2.1-.6-2 3.4 1.6 1.8v2.4L2.3 15l2 3.4 2.1-.6 2 .9L9 21h6l.6-2.3 2-.9 2.1.6 2-3.4-1.6-1.8v-2.4L21.7 9l-2-3.4-2.1.6-2-.9L15 3Z"/><circle cx="12" cy="12" r="3"/></svg></button>
@@ -84,10 +93,12 @@
       <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20.5 14A9 9 0 0 1 10 3.5 9 9 0 1 0 20.5 14Z"/></svg>
       <span>阅读深色模式</span><span class="settings-switch" aria-hidden="true"></span>
     </button>
+    <button type="button" id="settings-wallpaper-toggle" aria-controls="album"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="2"/><path d="m3 17 6-6 4 4 3-3 5 5"/></svg><span>更换壁纸</span></button>
+
     <button type="button" id="settings-desktop"><svg aria-hidden="true"><use href="#i-home"/></svg><span>显示桌面</span></button>
     <button type="button" id="settings-about"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v1"/></svg><span>关于本站</span></button>
   </div>
-  <p class="settings-note">阅读偏好保存在当前浏览器</p>
+  <p class="settings-note">外观偏好保存在当前浏览器</p>
 </section>
 
   <div class="desktop-status"><span class="status-dot"></span><span>空白时间</span><span class="status-divider"></span><time id="clock"></time></div>
@@ -186,6 +197,30 @@
 </section>
 
     
+    <button class="desktop-file-icon desktop-album-icon" data-open="album" type="button" aria-label="打开相册" title="单击打开相册"><span class="album-icon-art" aria-hidden="true"><svg><use href="#i-album"/></svg></span><span>相册</span></button>
+    <section class="app-window album-window" id="album" aria-label="相册窗口" tabindex="-1" hidden>
+<header class="titlebar"><div class="window-caption"><svg aria-hidden="true"><use href="#i-album"/></svg><span>相册</span></div><div class="window-controls"><button data-action="minimize" aria-label="最小化" title="最小化"><svg viewBox="0 0 16 16"><path d="M3 8h10"/></svg></button><button data-action="maximize" aria-label="最大化" title="最大化"><svg viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8"/></svg></button><button data-action="close" aria-label="关闭" title="关闭"><svg viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></button></div>
+</header>
+<div class="album-content">
+ <div class="album-toolbar"><div><h2>我的相册</h2><p>壁纸与图片</p></div><button type="button" id="wallpaper-reset">恢复默认壁纸</button></div>
+
+<div class="album-grid" id="album-grid">
+ 
+  <button class="album-card" type="button" data-src="/images/wallpapers/cover.jpg" data-name="cover.jpg"><img src="/images/wallpapers/cover.jpg" alt="" loading="lazy"><span>cover.jpg</span></button>
+ 
+  <button class="album-card" type="button" data-src="https://cos.blanktime.cn/assets/images/moon%20hour%20w.png" data-name="124240893w"><img src="https://cos.blanktime.cn/assets/images/moon%20hour%20w.png" alt="" loading="lazy"><span>124240893w</span></button>
+ 
+  <button class="album-card" type="button" data-src="https://cos.blanktime.cn/assets/images/moon%20hour%20h.png" data-name="124240893h"><img src="https://cos.blanktime.cn/assets/images/moon%20hour%20h.png" alt="" loading="lazy"><span>124240893h</span></button>
+ 
+</div>
+<section class="album-preview" id="album-preview" aria-label="图片预览" hidden>
+ <div class="album-preview-toolbar"><button type="button" id="album-back">返回相册</button><strong id="album-name"></strong><button type="button" id="album-wallpaper">设为壁纸</button></div>
+ <div class="album-preview-image"><img id="album-image" alt=""></div>
+</section>
+</div>
+<footer class="window-status"><span id="album-status" role="status" aria-live="polite">选择图片查看大图</span><span>壁纸偏好保存在当前浏览器</span></footer>
+</section>
+
     
 <section class="app-window files-window" id="files" aria-label="文件管理窗口" tabindex="-1" hidden>
   <header class="titlebar"><div class="window-caption"><span class="folder-art folder-art-small" aria-hidden="true"><span></span></span><span>文件管理</span></div><div class="window-controls"><button data-action="minimize" aria-label="最小化" title="最小化"><svg viewBox="0 0 16 16"><path d="M3 8h10"/></svg></button><button data-action="maximize" aria-label="最大化" title="最大化"><svg viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8"/></svg></button><button data-action="close" aria-label="关闭" title="关闭"><svg viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></button></div>
@@ -195,23 +230,23 @@
       <button class="files-category is-selected" data-category="all" aria-current="page"><svg><use href="#i-folder"/></svg><span>所有帖子</span><small>18</small></button>
       <p class="files-sidebar-label">分类</p>
       
-        <button class="files-category" data-category="cuidXseen9mOx5k2xk3jPRvBs"><svg><use href="#i-folder"/></svg><span>Test</span><small>1</small></button>
+        <button class="files-category" data-category="cuidmaVV1bPNmT0kkSGh7hb2T"><svg><use href="#i-folder"/></svg><span>Test</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuid-G6i49vnaNIEs9ZDc0_XS"><svg><use href="#i-folder"/></svg><span>主题开发</span><small>1</small></button>
+        <button class="files-category" data-category="cuidnHz7UG2Fv_dThRsQGLzvD"><svg><use href="#i-folder"/></svg><span>主题开发</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidLlwRyhgIJEG0SaUpJpSkU"><svg><use href="#i-folder"/></svg><span>工具</span><small>3</small></button>
+        <button class="files-category" data-category="cuidqnLfgW_wle9-lulwrg8D8"><svg><use href="#i-folder"/></svg><span>工具</span><small>3</small></button>
       
-        <button class="files-category" data-category="cuidgjiFWdG23BMp27ZvM-ZVY"><svg><use href="#i-folder"/></svg><span>文章鉴赏</span><small>2</small></button>
+        <button class="files-category" data-category="cuidVoGmfViStQz7J-NoZoEBz"><svg><use href="#i-folder"/></svg><span>文章鉴赏</span><small>2</small></button>
       
-        <button class="files-category" data-category="cuidDMK9WQpiCjJA4Onma0SuB"><svg><use href="#i-folder"/></svg><span>测试</span><small>1</small></button>
+        <button class="files-category" data-category="cuidIG1oVDec4GKEl11XIeS3U"><svg><use href="#i-folder"/></svg><span>测试</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidUPL4OyNdh2zyNyPLLhzgG"><svg><use href="#i-folder"/></svg><span>硬件</span><small>1</small></button>
+        <button class="files-category" data-category="cuidcPLMmNufORwUj8qU0KYUn"><svg><use href="#i-folder"/></svg><span>硬件</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidl0b7Kloy1ZTxG1lTAGV4s"><svg><use href="#i-folder"/></svg><span>经验记录</span><small>1</small></button>
+        <button class="files-category" data-category="cuidzYUygxekbzayQs6jGaA5x"><svg><use href="#i-folder"/></svg><span>经验记录</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidwQiZh_fkgJfdR1nBg5BF8"><svg><use href="#i-folder"/></svg><span>记录</span><small>8</small></button>
+        <button class="files-category" data-category="cuidb1cvcfYj6Hi9s9aks-3CO"><svg><use href="#i-folder"/></svg><span>记录</span><small>8</small></button>
       
-        <button class="files-category" data-category="cuidI_41cTNUzLuDgYp_ybbly"><svg><use href="#i-folder"/></svg><span>链接</span><small>1</small></button>
+        <button class="files-category" data-category="cuidn_h6Ozqmj-Om70Xbe2rgH"><svg><use href="#i-folder"/></svg><span>链接</span><small>1</small></button>
       
       
     </nav>
@@ -223,126 +258,126 @@
           <thead><tr><th scope="col">文件名称</th><th scope="col">分类</th><th scope="col">发布时间</th><th scope="col">类型</th></tr></thead>
           <tbody id="files-list">
             
-            <tr class="post-file" data-title="Markdown 全功能显示测试" data-date="1790490000000" data-categories="[&#34;cuidDMK9WQpiCjJA4Onma0SuB&#34;]" data-search="Markdown 全功能显示测试 markdown-render-test 测试 Markdown Test">
+            <tr class="post-file" data-title="Markdown 全功能显示测试" data-date="1790490000000" data-categories="[&#34;cuidIG1oVDec4GKEl11XIeS3U&#34;]" data-search="Markdown 全功能显示测试 markdown-render-test 测试 Markdown Test">
               <td><a class="file-link" href="/2026/09/27/markdown-render-test/" title="Markdown 全功能显示测试.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Markdown 全功能显示测试<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">测试</td>
               <td><time datetime="2026-09-27T06:20:00.000Z">2026-09-27</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Markdown 样式测试" data-date="1790425800000" data-categories="[&#34;cuid-G6i49vnaNIEs9ZDc0_XS&#34;]" data-search="Markdown 样式测试 markdown-style-test 主题开发 Markdown 主题测试">
+            <tr class="post-file" data-title="Markdown 样式测试" data-date="1790425800000" data-categories="[&#34;cuidnHz7UG2Fv_dThRsQGLzvD&#34;]" data-search="Markdown 样式测试 markdown-style-test 主题开发 Markdown 主题测试">
               <td><a class="file-link" href="/2026/09/26/markdown-style-test/" title="Markdown 样式测试.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Markdown 样式测试<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">主题开发</td>
               <td><time datetime="2026-09-26T12:30:00.000Z">2026-09-26</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="OnePlus13刷入crDroid" data-date="1780392006000" data-categories="[&#34;cuidwQiZh_fkgJfdR1nBg5BF8&#34;]" data-search="OnePlus13刷入crDroid OnePlus13-Rom 记录 刷机">
+            <tr class="post-file" data-title="OnePlus13刷入crDroid" data-date="1780392006000" data-categories="[&#34;cuidb1cvcfYj6Hi9s9aks-3CO&#34;]" data-search="OnePlus13刷入crDroid OnePlus13-Rom 记录 刷机">
               <td><a class="file-link" href="/2026/06/02/OnePlus13-Rom/" title="OnePlus13刷入crDroid.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">OnePlus13刷入crDroid<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2026-06-02T09:20:06.000Z">2026-06-02</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="关于洛克保底记录工具的杂谈" data-date="1777208654000" data-categories="[&#34;cuidLlwRyhgIJEG0SaUpJpSkU&#34;]" data-search="关于洛克保底记录工具的杂谈 Roco 工具 洛克王国 工具">
+            <tr class="post-file" data-title="关于洛克保底记录工具的杂谈" data-date="1777208654000" data-categories="[&#34;cuidqnLfgW_wle9-lulwrg8D8&#34;]" data-search="关于洛克保底记录工具的杂谈 Roco 工具 洛克王国 工具">
               <td><a class="file-link" href="/2026/04/26/Roco/" title="关于洛克保底记录工具的杂谈.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">关于洛克保底记录工具的杂谈<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">工具</td>
               <td><time datetime="2026-04-26T13:04:14.000Z">2026-04-26</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Bitwarden + Vaultwarden 自托管密码管理" data-date="1772592850000" data-categories="[&#34;cuidwQiZh_fkgJfdR1nBg5BF8&#34;]" data-search="Bitwarden + Vaultwarden 自托管密码管理 pwd 记录 密码管理器 Bitwarden Vaultwarden">
+            <tr class="post-file" data-title="Bitwarden + Vaultwarden 自托管密码管理" data-date="1772592850000" data-categories="[&#34;cuidb1cvcfYj6Hi9s9aks-3CO&#34;]" data-search="Bitwarden + Vaultwarden 自托管密码管理 pwd 记录 密码管理器 Bitwarden Vaultwarden">
               <td><a class="file-link" href="/2026/03/04/pwd/" title="Bitwarden + Vaultwarden 自托管密码管理.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Bitwarden + Vaultwarden 自托管密码管理<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2026-03-04T02:54:10.000Z">2026-03-04</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="RX 9070 功耗解锁" data-date="1768883168000" data-categories="[&#34;cuidwQiZh_fkgJfdR1nBg5BF8&#34;]" data-search="RX 9070 功耗解锁 RX-9070-power 记录 RX9070 AMD显卡 Linux">
+            <tr class="post-file" data-title="RX 9070 功耗解锁" data-date="1768883168000" data-categories="[&#34;cuidb1cvcfYj6Hi9s9aks-3CO&#34;]" data-search="RX 9070 功耗解锁 RX-9070-power 记录 RX9070 AMD显卡 Linux">
               <td><a class="file-link" href="/2026/01/20/RX-9070-power/" title="RX 9070 功耗解锁.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">RX 9070 功耗解锁<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2026-01-20T04:26:08.000Z">2026-01-20</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="关于折腾 NAS 的记录" data-date="1768269069000" data-categories="[&#34;cuidl0b7Kloy1ZTxG1lTAGV4s&#34;,&#34;cuidUPL4OyNdh2zyNyPLLhzgG&#34;]" data-search="关于折腾 NAS 的记录 NAS 经验记录 硬件 NAS 飞牛OS 硬件折腾">
+            <tr class="post-file" data-title="关于折腾 NAS 的记录" data-date="1768269069000" data-categories="[&#34;cuidzYUygxekbzayQs6jGaA5x&#34;,&#34;cuidcPLMmNufORwUj8qU0KYUn&#34;]" data-search="关于折腾 NAS 的记录 NAS 经验记录 硬件 NAS 飞牛OS 硬件折腾">
               <td><a class="file-link" href="/2026/01/13/NAS/" title="关于折腾 NAS 的记录.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">关于折腾 NAS 的记录<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">经验记录 / 硬件</td>
               <td><time datetime="2026-01-13T01:51:09.000Z">2026-01-13</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Root管理器与一些模块链接" data-date="1760904426000" data-categories="[&#34;cuidI_41cTNUzLuDgYp_ybbly&#34;]" data-search="Root管理器与一些模块链接 root-modules 链接 刷机 root 模块">
+            <tr class="post-file" data-title="Root管理器与一些模块链接" data-date="1760904426000" data-categories="[&#34;cuidn_h6Ozqmj-Om70Xbe2rgH&#34;]" data-search="Root管理器与一些模块链接 root-modules 链接 刷机 root 模块">
               <td><a class="file-link" href="/2025/10/20/root-modules/" title="Root管理器与一些模块链接.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Root管理器与一些模块链接<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">链接</td>
               <td><time datetime="2025-10-19T20:07:06.000Z">2025-10-20</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Redmi k40(alioth)刷入 Pixel OS" data-date="1760530347000" data-categories="[&#34;cuidwQiZh_fkgJfdR1nBg5BF8&#34;]" data-search="Redmi k40(alioth)刷入 Pixel OS Redmi-k40 记录 刷机">
+            <tr class="post-file" data-title="Redmi k40(alioth)刷入 Pixel OS" data-date="1760530347000" data-categories="[&#34;cuidb1cvcfYj6Hi9s9aks-3CO&#34;]" data-search="Redmi k40(alioth)刷入 Pixel OS Redmi-k40 记录 刷机">
               <td><a class="file-link" href="/2025/10/15/Redmi-k40/" title="Redmi k40(alioth)刷入 Pixel OS.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Redmi k40(alioth)刷入 Pixel OS<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-10-15T12:12:27.000Z">2025-10-15</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="文章鉴赏《潘嘎之交》" data-date="1759501289000" data-categories="[&#34;cuidgjiFWdG23BMp27ZvM-ZVY&#34;]" data-search="文章鉴赏《潘嘎之交》 pgzj 文章鉴赏 课文《潘嘎之交》">
+            <tr class="post-file" data-title="文章鉴赏《潘嘎之交》" data-date="1759501289000" data-categories="[&#34;cuidVoGmfViStQz7J-NoZoEBz&#34;]" data-search="文章鉴赏《潘嘎之交》 pgzj 文章鉴赏 课文《潘嘎之交》">
               <td><a class="file-link" href="/2025/10/03/pgzj/" title="文章鉴赏《潘嘎之交》.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">文章鉴赏《潘嘎之交》<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">文章鉴赏</td>
               <td><time datetime="2025-10-03T14:21:29.000Z">2025-10-03</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="文章鉴赏 《偷袭》" data-date="1759415070000" data-categories="[&#34;cuidgjiFWdG23BMp27ZvM-ZVY&#34;]" data-search="文章鉴赏 《偷袭》 MaBaoguo 文章鉴赏 课文《偷袭》">
+            <tr class="post-file" data-title="文章鉴赏 《偷袭》" data-date="1759415070000" data-categories="[&#34;cuidVoGmfViStQz7J-NoZoEBz&#34;]" data-search="文章鉴赏 《偷袭》 MaBaoguo 文章鉴赏 课文《偷袭》">
               <td><a class="file-link" href="/2025/10/02/MaBaoguo/" title="文章鉴赏 《偷袭》.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">文章鉴赏 《偷袭》<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">文章鉴赏</td>
               <td><time datetime="2025-10-02T14:24:30.000Z">2025-10-02</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="ollama" data-date="1759240654000" data-categories="[&#34;cuidwQiZh_fkgJfdR1nBg5BF8&#34;]" data-search="ollama ollama 记录 ollama amd ai">
+            <tr class="post-file" data-title="ollama" data-date="1759240654000" data-categories="[&#34;cuidb1cvcfYj6Hi9s9aks-3CO&#34;]" data-search="ollama ollama 记录 ollama amd ai">
               <td><a class="file-link" href="/2025/09/30/ollama/" title="ollama.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">ollama<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-09-30T13:57:34.000Z">2025-09-30</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Artalk评论系统" data-date="1758966839000" data-categories="[&#34;cuidwQiZh_fkgJfdR1nBg5BF8&#34;]" data-search="Artalk评论系统 Artalk评论系统 记录 评论">
+            <tr class="post-file" data-title="Artalk评论系统" data-date="1758966839000" data-categories="[&#34;cuidb1cvcfYj6Hi9s9aks-3CO&#34;]" data-search="Artalk评论系统 Artalk评论系统 记录 评论">
               <td><a class="file-link" href="/2025/09/27/Artalk%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/" title="Artalk评论系统.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Artalk评论系统<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-09-27T09:53:59.000Z">2025-09-27</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Ubuntu部分" data-date="1758810675000" data-categories="[&#34;cuidwQiZh_fkgJfdR1nBg5BF8&#34;]" data-search="Ubuntu部分 Ubuntu 记录 部署">
+            <tr class="post-file" data-title="Ubuntu部分" data-date="1758810675000" data-categories="[&#34;cuidb1cvcfYj6Hi9s9aks-3CO&#34;]" data-search="Ubuntu部分 Ubuntu 记录 部署">
               <td><a class="file-link" href="/2025/09/25/Ubuntu/" title="Ubuntu部分.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Ubuntu部分<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-09-25T14:31:15.000Z">2025-09-25</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="显示测试" data-date="1758714000000" data-categories="[&#34;cuidXseen9mOx5k2xk3jPRvBs&#34;]" data-search="显示测试 test Test 测试">
+            <tr class="post-file" data-title="显示测试" data-date="1758714000000" data-categories="[&#34;cuidmaVV1bPNmT0kkSGh7hb2T&#34;]" data-search="显示测试 test Test 测试">
               <td><a class="file-link" href="/2025/09/24/test/" title="显示测试.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">显示测试<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">Test</td>
               <td><time datetime="2025-09-24T11:40:00.000Z">2025-09-24</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Hexo" data-date="1758593644000" data-categories="[&#34;cuidwQiZh_fkgJfdR1nBg5BF8&#34;]" data-search="Hexo Hexo 记录 部署Hexo">
+            <tr class="post-file" data-title="Hexo" data-date="1758593644000" data-categories="[&#34;cuidb1cvcfYj6Hi9s9aks-3CO&#34;]" data-search="Hexo Hexo 记录 部署Hexo">
               <td><a class="file-link" href="/2025/09/23/Hexo/" title="Hexo.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Hexo<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-09-23T02:14:04.000Z">2025-09-23</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Typora1.9.5" data-date="1758529624000" data-categories="[&#34;cuidLlwRyhgIJEG0SaUpJpSkU&#34;]" data-search="Typora1.9.5 Typora1.9.5 工具 markdown">
+            <tr class="post-file" data-title="Typora1.9.5" data-date="1758529624000" data-categories="[&#34;cuidqnLfgW_wle9-lulwrg8D8&#34;]" data-search="Typora1.9.5 Typora1.9.5 工具 markdown">
               <td><a class="file-link" href="/2025/09/22/Typora1.9.5/" title="Typora1.9.5.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Typora1.9.5<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">工具</td>
               <td><time datetime="2025-09-22T08:27:04.000Z">2025-09-22</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Scrcpy" data-date="1758529624000" data-categories="[&#34;cuidLlwRyhgIJEG0SaUpJpSkU&#34;]" data-search="Scrcpy Scrcpy_new 工具 Scrcpy">
+            <tr class="post-file" data-title="Scrcpy" data-date="1758529624000" data-categories="[&#34;cuidqnLfgW_wle9-lulwrg8D8&#34;]" data-search="Scrcpy Scrcpy_new 工具 Scrcpy">
               <td><a class="file-link" href="/2025/09/22/Scrcpy_new/" title="Scrcpy.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Scrcpy<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">工具</td>
               <td><time datetime="2025-09-22T08:27:04.000Z">2025-09-22</time></td>
@@ -381,9 +416,9 @@
     <h2 id="site-info-title"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="m8 14-1 7 5-3 5 3-1-7"/></svg>站点信息</h2>
     <dl>
       <div><dt>文章数目</dt><dd>18 篇</dd></div>
-      <div><dt>已运行时间</dt><dd id="site-runtime" data-start="2025-09-19T16:00:00.000Z">372 天</dd></div>
+      <div><dt>已运行时间</dt><dd id="site-runtime" data-start="2025-09-19T16:00:00.000Z">373 天</dd></div>
       <div><dt>本站总字数</dt><dd title="中文按字、英文和数字按词统计">19,859 字</dd></div>
-      <div><dt>最后活动时间</dt><dd><time id="site-last-update" datetime="2026-09-27T06:20:00.000Z" title="最近一篇文章的更新时间">2026-09-27</time></dd></div>
+      <div><dt>最近活动时间</dt><dd><time id="site-last-update" datetime="2026-09-27T06:20:00.000Z" title="最新帖子的发布时间">2026-09-27</time></dd></div>
     </dl>
   </section>
   <section class="welcome-card welcome-contact" aria-labelledby="contact-title">
@@ -402,20 +437,7 @@
 </div>
 
     </section>
-    <section class="app-window reader-window" id="reader" aria-label="文章阅读器" tabindex="-1" >
-      <header class="titlebar"><div class="window-caption"><span class="app-badge markdown-badge">M</span><span>文章阅读器</span></div><div class="window-controls"><button data-action="minimize" aria-label="最小化" title="最小化"><svg viewBox="0 0 16 16"><path d="M3 8h10"/></svg></button><button data-action="maximize" aria-label="最大化" title="最大化"><svg viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8"/></svg></button><button data-action="close" aria-label="关闭" title="关闭"><svg viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></button></div>
-</header>
-      <div class="file-bar"><strong id="filename">markdown-render-test.md</strong><span class="readonly-label">只读</span><span class="file-encoding">UTF-8 <span>LF</span></span></div>
-      <div class="reader-toolbar" role="group" aria-label="阅读工具栏">
-        <button class="reader-tool" id="reader-theme-toggle" type="button" aria-label="切换到深色模式" title="切换到深色模式" aria-pressed="false">
-          <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 13.1A9 9 0 0 1 10.9 3.2a9 9 0 1 0 9.9 9.9Z"/></svg>
-          <svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
-        </button>
-        <button class="reader-tool" id="reader-toc-toggle" type="button" aria-label="隐藏目录" title="隐藏目录" aria-controls="article-toc" aria-expanded="true">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16M9 6h11M9 12h11M9 18h11M4 6h1M4 12h1M4 18h1"/></svg>
-        </button>
-      </div>
-      <div class="reading-layout"><div class="article-scroll" tabindex="0" aria-label="文章正文"><article class="markdown-body" data-article data-title="Markdown 全功能显示测试" data-date="2026-09-27" data-file="markdown-render-test.md">
+    <template id="article-source"><article class="markdown-body" data-article data-title="Markdown 全功能显示测试" data-date="2026-09-27" data-file="markdown-render-test.md">
   <header class="article-heading">
     <p class="eyebrow">BLANKTIME / NOTES</p>
     <h1 class="post-title">Markdown 全功能显示测试</h1>
@@ -613,7 +635,7 @@
 <p><a target="_blank" rel="noopener" href="https://github.com/" title="GitHub Homepage">GitHub</a></p>
 <p>自动链接：</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/">https://github.com/</a></p>
-<p><a href="mailto:&#116;&#101;&#115;&#x74;&#64;&#x65;&#x78;&#x61;&#x6d;&#x70;&#x6c;&#101;&#46;&#x63;&#x6f;&#109;">test@example.com</a></p>
+<p><a href="mailto:&#x74;&#101;&#x73;&#116;&#x40;&#x65;&#120;&#x61;&#109;&#112;&#108;&#101;&#x2e;&#99;&#111;&#109;">test@example.com</a></p>
 <p>参考式链接：</p>
 <p>这是一个 <a target="_blank" rel="noopener" href="https://example.com/">参考链接</a>。</p>
 <p>这是另一个 <a target="_blank" rel="noopener" href="https://github.com/">GitHub</a>。</p>
@@ -1387,12 +1409,1095 @@ Left to Right: Hello World
 </blockquote>
 </div>
 </article>
-</div><aside class="toc-panel" id="article-toc" aria-label="文章目录"><div class="toc-heading">本文目录 <span>CONTENTS</span></div><nav id="toc"></nav></aside></div>
-      <footer class="window-status"><span id="word-count">文章阅读器</span><span id="reading-progress">已读 0%</span></footer>
-    </section>
+</template>
+    <button class="desktop-file-icon desktop-browser-icon" data-open="browser" aria-label="打开博客浏览器"><span class="browser-icon-art" aria-hidden="true"><svg><use href="#i-browser"/></svg></span><span>浏览器</span></button>
+    <section class="app-window reader-window browser-window" id="browser" aria-label="博客浏览器" tabindex="-1" hidden>
+  <header class="titlebar"><div class="window-caption"><span class="browser-icon-art" aria-hidden="true"><svg><use href="#i-browser"/></svg></span><span>博客浏览器</span></div><div class="window-controls"><button data-action="minimize" aria-label="最小化" title="最小化"><svg viewBox="0 0 16 16"><path d="M3 8h10"/></svg></button><button data-action="maximize" aria-label="最大化" title="最大化"><svg viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8"/></svg></button><button data-action="close" aria-label="关闭" title="关闭"><svg viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></button></div>
+</header>
+  <div class="browser-tabs" role="tablist" aria-label="浏览标签页"></div>
+  <div class="browser-toolbar">
+    <button type="button" class="browser-home-button" aria-label="返回文章首页" title="文章首页"><svg aria-hidden="true"><use href="#i-home"/></svg></button>
+    <span class="browser-location">空白时间 / 所有文章</span>
+    <button type="button" class="reader-tool browser-theme-button" aria-label="切换到深色模式" aria-pressed="false"><svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 13.1A9 9 0 0 1 10.9 3.2a9 9 0 1 0 9.9 9.9Z"/></svg><svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></button>
+    <button type="button" class="browser-toc-button" aria-label="显示目录" aria-expanded="false" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4v16M9 6h11M9 12h11M9 18h11"/></svg></button>
+  </div>
+  <div class="browser-pages">
+    <div class="browser-home browser-page" id="browser-home" role="tabpanel" tabindex="0">
+      <header class="browser-home-heading"><p>BLANKTIME / JOURNAL</p><h1>所有文章</h1><span>静默沉淀，向内而生。</span><label class="browser-search-label">搜索文章<input type="search" class="browser-search" placeholder="标题、摘要、分类…"></label></header>
+      <div class="browser-posts">
+      
+        <a class="browser-card" href="/2026/09/27/markdown-render-test/" data-title="Markdown 全功能显示测试">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>Markdown 全功能显示测试</h2><p>用途：测试 Markdown 渲染器、博客主题、CSS 样式、字体、代码高亮、排版细节与扩展语法兼容性。建议使用 UTF-8 编码保存。不同渲染器对扩展语法的支持程度可能不同。 用途：测试 Markdown 渲染器、博客主题、CSS 样式、字体、代码高亮、排版细节与扩展语法兼容性。建议使用 UTF-8 编码保存。不同渲染器对扩展语法的支持程度可能不同。 1.</p><footer><span>2026-09-27 · 测试</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2026/09/26/markdown-style-test/" data-title="Markdown 样式测试">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>Markdown 样式测试</h2><p>这是一篇用于检查 BlankTime 桌面主题的排版样本。你可以拖动窗口、调整大小、切换最大化，并点击右侧目录，观察不同宽度下的阅读效果。 文中包含基础 Markdown、常见 HTML 和现有 Volantis 标签的兼容示例。数学公式已启用渲染；Mermaid 仍保留为后续功能的测试样本。</p><footer><span>2026-09-26 · 主题开发</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2026/06/02/OnePlus13-Rom/" data-title="OnePlus13刷入crDroid">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span><img src="https://cos.blanktime.cn/assets/images/crDroid%20home.png" loading="lazy" alt=""></div>
+          <div class="browser-card-text"><h2>OnePlus13刷入crDroid</h2><p>一加13作为清朝的旗舰机型，其强悍的硬件配置如果配上纯净、轻量且高度可定制的类原生系统，体验究竟如何？本文将盘点目前一加13（dodge）主流的几个类原生ROM，并记录我最终选择刷入 crDroid 的全过程与初步上手体验。</p><footer><span>2026-06-02 · 记录</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2026/04/26/Roco/" data-title="关于洛克保底记录工具的杂谈">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span><img src="https://cos.blanktime.cn/assets/images/%E6%B0%B4%E8%93%9D%E8%93%9D.png" loading="lazy" alt=""></div>
+          <div class="browser-card-text"><h2>关于洛克保底记录工具的杂谈</h2><p>洛克S1赛季奇遇异色保底记录工具</p><footer><span>2026-04-26 · 工具</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2026/03/04/pwd/" data-title="Bitwarden + Vaultwarden 自托管密码管理">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span><img src="https://raw.githubusercontent.com/dani-garcia/vaultwarden/main/resources/vaultwarden-logo-auto.svg" loading="lazy" alt=""></div>
+          <div class="browser-card-text"><h2>Bitwarden + Vaultwarden 自托管密码管理</h2><p>Vaultwarden是Bitwarden的轻量化自建版本，支持Docker快速部署。它能让你在自己的服务器上安全存储密码，完美适配官方全平台客户端，并免费解锁TOTP等高级功能。部署时只需准备服务器和HTTPS域名，通过容器编排即可上线。</p><footer><span>2026-03-04 · 记录</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2026/01/20/RX-9070-power/" data-title="RX 9070 功耗解锁">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span><img src="https://www.amd.com/content/dam/amd/en/images/products/graphics/radeon-rx-9070/2922918-radeon-rx-9070-product.jpg" loading="lazy" alt=""></div>
+          <div class="browser-card-text"><h2>RX 9070 功耗解锁</h2><p>RX 9070 显卡功耗解锁与测试记录。</p><footer><span>2026-01-20 · 记录</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2026/01/13/NAS/" data-title="关于折腾 NAS 的记录">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span><img src="https://cos.blanktime.cn/assets/images/h110.png" loading="lazy" alt=""></div>
+          <div class="browser-card-text"><h2>关于折腾 NAS 的记录</h2><p>记录一次从 2009 年 AM3 老平台转向 Intel H110 平台组建 NAS 的过程。</p><footer><span>2026-01-13 · 经验记录 · 硬件</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/10/20/root-modules/" data-title="Root管理器与一些模块链接">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>Root管理器与一些模块链接</h2><p>本文汇总了Android系统核心管理工具与模块，主要包括：Root管理器（Magisk系列、内核系列）、功能模块（Zygisk组件、LSPosed框架及用于隐藏环境和绕过检测的模块）以及实用应用程序（如Shizuku、隐藏应用列表等）。</p><footer><span>2025-10-20 · 链接</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/10/15/Redmi-k40/" data-title="Redmi k40(alioth)刷入 Pixel OS">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span><img src="https://cos.blanktime.cn/assets/images/pixelOS.png" loading="lazy" alt=""></div>
+          <div class="browser-card-text"><h2>Redmi k40(alioth)刷入 Pixel OS</h2><p>本人手中的 Redmi k40 已吃灰良久，目前系统为 Paranoid Android，版本为Android 13。 本次刷入为：PixelOS 最新版（截止2025.10.15）</p><footer><span>2025-10-15 · 记录</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/10/03/pgzj/" data-title="文章鉴赏《潘嘎之交》">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>文章鉴赏《潘嘎之交》</h2><p>本文节选自《抖记·潘噶列传》，以简洁传神的笔触，记述了“潘嘎之交”的经典故事。文章分为前后两个对比鲜明的场景。前半部分，资深齐国学家潘子以长者姿态谆谆告诫晚辈嘎子，指出卖酒“水很深”，年轻的他“把握不住”，嘎子则虚心受教，场面诚恳动人。后半部分，情节陡然反转，潘子自己却投身于卖酒直播，并宣称“非长江不能握”，前后言行形成巨大反差。而嘎子对此只能无奈叹息，一句</p><footer><span>2025-10-03 · 文章鉴赏</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/10/02/MaBaoguo/" data-title="文章鉴赏 《偷袭》">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>文章鉴赏 《偷袭》</h2><p>文章摘要：本文是混元形意太极门掌门人马保国对一次个人经历的叙述。他提到有两个三十多岁的年轻人在健身房练功导致颈椎不适，前来请教浑元功法。在交流过程中，双方因对“死劲儿”与“化劲儿”的理解不同而产生分歧，最终发展为实战切磋。 马老师声称，在比试中自己迅速防住了对方的连续进攻（左正蹬、右鞭腿、左刺拳），并依循“点到为止”的传统武德，在击中对方面部后收力未发。然而</p><footer><span>2025-10-02 · 文章鉴赏</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/09/30/ollama/" data-title="ollama">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span><img src="https://ollama.com/public/ollama_cooking.png" loading="lazy" alt=""></div>
+          <div class="browser-card-text"><h2>ollama</h2><p>本文记录如何在 Windows 上为 AMD Radeon RX 9070（gfx1201）等新显卡启用 Ollama 的 GPU 加速：通过替换官方不支持新架构的 ROCm 库为社区提供的定制版本，实现从 CPU 到 GPU 的高效推理，并附验证方法和推荐图形客户端。</p><footer><span>2025-09-30 · 记录</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/09/27/Artalk%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/" data-title="Artalk评论系统">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>Artalk评论系统</h2><p>使用 Docker 部署 Artalk (Volantis主题)</p><footer><span>2025-09-27 · 记录</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/09/25/Ubuntu/" data-title="Ubuntu部分">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>Ubuntu部分</h2><p>Ubuntu 部署宝塔</p><footer><span>2025-09-25 · 记录</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/09/24/test/" data-title="显示测试">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span><img src="https://cos.blanktime.cn/assets/images/hh.jpg" loading="lazy" alt=""></div>
+          <div class="browser-card-text"><h2>显示测试</h2><p>此篇文章用于测试显示效果 :)</p><footer><span>2025-09-24 · Test</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/09/23/Hexo/" data-title="Hexo">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>Hexo</h2><p>梦开始的地方，Hexo基础搭建</p><footer><span>2025-09-23 · 记录</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/09/22/Typora1.9.5/" data-title="Typora1.9.5">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>Typora1.9.5</h2><p>Typora1.9.5食用方法，有能力建议支持正版</p><footer><span>2025-09-22 · 工具</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/09/22/Scrcpy_new/" data-title="Scrcpy">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>Scrcpy</h2><p>Scrcpy: 开源的高性能工具，它允许你通过 USB 数据线或 WiFi 网络，在电脑上实时显示并控制你的安卓手机或平板设备</p><footer><span>2025-09-22 · 工具</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+      </div>
+      <p class="browser-empty" hidden>没有找到匹配的文章。</p>
+    </div>
+  </div>
+  <footer class="window-status"><span class="browser-status" role="status">共 18 篇文章</span><span>空白时间</span></footer>
+</section>
+
   </main>
   <div id="announcement" class="toast" role="status" hidden></div>
-  <noscript><style>#welcome{display:none}.reader-window[hidden]{display:flex}.dock{display:none}</style><p class="noscript-notice">启用 JavaScript 可使用桌面窗口交互。<a href="/">返回首页</a></p><ul class="noscript-posts"><li><a href="/2026/09/27/markdown-render-test/">Markdown 全功能显示测试</a></li><li><a href="/2026/09/26/markdown-style-test/">Markdown 样式测试</a></li><li><a href="/2026/06/02/OnePlus13-Rom/">OnePlus13刷入crDroid</a></li><li><a href="/2026/04/26/Roco/">关于洛克保底记录工具的杂谈</a></li><li><a href="/2026/03/04/pwd/">Bitwarden + Vaultwarden 自托管密码管理</a></li><li><a href="/2026/01/20/RX-9070-power/">RX 9070 功耗解锁</a></li><li><a href="/2026/01/13/NAS/">关于折腾 NAS 的记录</a></li><li><a href="/2025/10/20/root-modules/">Root管理器与一些模块链接</a></li><li><a href="/2025/10/15/Redmi-k40/">Redmi k40(alioth)刷入 Pixel OS</a></li><li><a href="/2025/10/03/pgzj/">文章鉴赏《潘嘎之交》</a></li><li><a href="/2025/10/02/MaBaoguo/">文章鉴赏 《偷袭》</a></li><li><a href="/2025/09/30/ollama/">ollama</a></li><li><a href="/2025/09/27/Artalk%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/">Artalk评论系统</a></li><li><a href="/2025/09/25/Ubuntu/">Ubuntu部分</a></li><li><a href="/2025/09/24/test/">显示测试</a></li><li><a href="/2025/09/23/Hexo/">Hexo</a></li><li><a href="/2025/09/22/Typora1.9.5/">Typora1.9.5</a></li><li><a href="/2025/09/22/Scrcpy_new/">Scrcpy</a></li></ul></noscript>
+  <noscript><style>body{overflow:auto}.desktop,.dock{display:none}.noscript-article{background:white;margin:20px auto;max-width:1000px}</style><div class="noscript-article"><article class="markdown-body" data-article data-title="Markdown 全功能显示测试" data-date="2026-09-27" data-file="markdown-render-test.md">
+  <header class="article-heading">
+    <p class="eyebrow">BLANKTIME / NOTES</p>
+    <h1 class="post-title">Markdown 全功能显示测试</h1>
+    <div class="article-meta"><time datetime="2026-09-27T06:20:00.000Z">2026年09月27日</time><span># Markdown</span><span># Test</span></div>
+  </header>
+  <div class="post-content"><blockquote>
+<p>用途：测试 Markdown 渲染器、博客主题、CSS 样式、字体、代码高亮、排版细节与扩展语法兼容性。<br>建议使用 UTF-8 编码保存。不同渲染器对扩展语法的支持程度可能不同。</p>
+</blockquote>
+<blockquote>
+<p>用途：测试 Markdown 渲染器、博客主题、CSS 样式、字体、代码高亮、排版细节与扩展语法兼容性。<br>建议使用 UTF-8 编码保存。不同渲染器对扩展语法的支持程度可能不同。</p>
+</blockquote>
+<h1 id="1-标题测试"><a href="#1-标题测试" class="headerlink" title="1. 标题测试"></a>1. 标题测试</h1><h1 id="一级标题-H1"><a href="#一级标题-H1" class="headerlink" title="一级标题 H1"></a>一级标题 H1</h1><h2 id="二级标题-H2"><a href="#二级标题-H2" class="headerlink" title="二级标题 H2"></a>二级标题 H2</h2><h3 id="三级标题-H3"><a href="#三级标题-H3" class="headerlink" title="三级标题 H3"></a>三级标题 H3</h3><h4 id="四级标题-H4"><a href="#四级标题-H4" class="headerlink" title="四级标题 H4"></a>四级标题 H4</h4><h5 id="五级标题-H5"><a href="#五级标题-H5" class="headerlink" title="五级标题 H5"></a>五级标题 H5</h5><h6 id="六级标题-H6"><a href="#六级标题-H6" class="headerlink" title="六级标题 H6"></a>六级标题 H6</h6><p>普通正文紧跟标题，用于观察标题与正文之间的间距。</p>
+<hr>
+<h1 id="2-段落与换行"><a href="#2-段落与换行" class="headerlink" title="2. 段落与换行"></a>2. 段落与换行</h1><p>这是第一段。Markdown 中，段落通常由一个或多个空行分隔。</p>
+<p>这是第二段。<br>这一行末尾使用了两个空格，因此这里应该是一次强制换行。<br>这是同一段中的下一行。</p>
+<p>这是一个很长的段落，用于测试正文最大宽度、自动换行、中文标点、英文单词以及数字混排。The quick brown fox jumps over the lazy dog. 0123456789. 这是一段中文正文，用来观察字体、行高、字距、段落间距以及不同语言字符混排时的视觉效果。</p>
+<hr>
+<h1 id="3-文本强调"><a href="#3-文本强调" class="headerlink" title="3. 文本强调"></a>3. 文本强调</h1><p>普通文本</p>
+<p><em>斜体文本</em></p>
+<p><u>斜体文本（下划线）</u></p>
+<p><strong>粗体文本</strong></p>
+<p><u><strong>粗体文本（下划线）</strong></u></p>
+<p><em><strong>粗斜体文本</strong></em></p>
+<p><u><em><strong>粗斜体文本（下划线）</strong></em></u></p>
+<p><del>删除线文本</del></p>
+<p><strong>粗体中包含 <em>斜体</em></strong></p>
+<p><em><strong>粗斜体</strong></em> 与 <del>删除线</del> 混排。</p>
+<p><code>行内代码</code></p>
+<p>这是一个包含 <code>const foo = &quot;bar&quot;;</code> 的句子。</p>
+<hr>
+<h1 id="4-中英文与标点混排"><a href="#4-中英文与标点混排" class="headerlink" title="4. 中英文与标点混排"></a>4. 中英文与标点混排</h1><p>中文测试：空白时间，是一个用于记录技术、生活与折腾过程的网站。</p>
+<p>英文测试：Blanktime is a place for notes, experiments, and ideas.</p>
+<p>混排测试：使用 <code>Markdown</code> 编写内容，部署在 GitHub Pages、Cloudflare Pages 或其他平台。</p>
+<p>数字测试：0 1 2 3 4 5 6 7 8 9</p>
+<p>全角标点：，。！？；：“”‘’（）【】《》……</p>
+<p>半角标点：, . ! ? ; : “ ‘ ( ) [ ] &lt; &gt; …</p>
+<p>特殊符号：© ® ™ § ¶ † ‡ • · ° ± × ÷ ≈ ≠ ≤ ≥ ∞</p>
+<p>货币符号：¥ ￥ $ € £ ₩ ₽ ₹</p>
+<p>箭头：← ↑ → ↓ ↔ ↕ ↗ ↘ ↙ ↖</p>
+<p>数学字符：α β γ δ ε θ λ μ π σ φ ω ∑ ∏ √ ∫ ∆</p>
+<hr>
+<h1 id="5-引用块"><a href="#5-引用块" class="headerlink" title="5. 引用块"></a>5. 引用块</h1><blockquote>
+<p>这是一级引用。</p>
+<p>引用块可以包含多个段落。</p>
+</blockquote>
+<blockquote>
+<p>一级引用</p>
+<blockquote>
+<p>二级引用</p>
+<blockquote>
+<p>三级引用</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<blockquote>
+<p><strong>引用中的粗体</strong></p>
+<p><code>引用中的代码</code></p>
+<ul>
+<li>引用中的列表项目 1</li>
+<li>引用中的列表项目 2</li>
+</ul>
+</blockquote>
+<hr>
+<h1 id="6-无序列表"><a href="#6-无序列表" class="headerlink" title="6. 无序列表"></a>6. 无序列表</h1><ul>
+<li>项目 A</li>
+<li>项目 B</li>
+<li>项目 C</li>
+</ul>
+<ul>
+<li>星号项目 A</li>
+<li>星号项目 B</li>
+</ul>
+<ul>
+<li>加号项目 A</li>
+<li>加号项目 B</li>
+</ul>
+<p>嵌套列表：</p>
+<ul>
+<li>一级项目 A<ul>
+<li>二级项目 A.1</li>
+<li>二级项目 A.2<ul>
+<li>三级项目 A.2.1</li>
+<li>三级项目 A.2.2</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>一级项目 B</li>
+</ul>
+<p>复杂嵌套：</p>
+<ul>
+<li>系统<ul>
+<li>Windows<ul>
+<li>Windows 10</li>
+<li>Windows 11</li>
+</ul>
+</li>
+<li>Linux<ul>
+<li>Arch Linux</li>
+<li>Ubuntu</li>
+<li>Debian</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>移动设备<ul>
+<li>Android</li>
+<li>iOS</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h1 id="7-有序列表"><a href="#7-有序列表" class="headerlink" title="7. 有序列表"></a>7. 有序列表</h1><ol>
+<li>第一项</li>
+<li>第二项</li>
+<li>第三项</li>
+</ol>
+<p>嵌套：</p>
+<ol>
+<li>第一章<ol>
+<li>第一节</li>
+<li>第二节</li>
+</ol>
+</li>
+<li>第二章<ol>
+<li>第一节<ol>
+<li>小节 A</li>
+<li>小节 B</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>第三章</li>
+</ol>
+<p>自动编号测试：</p>
+<ol>
+<li>Apple</li>
+<li>Banana</li>
+<li>Cherry</li>
+<li>Dragonfruit</li>
+</ol>
+<p>从其他数字开始：</p>
+<ol start="5">
+<li>第五项</li>
+<li>第六项</li>
+<li>第七项</li>
+</ol>
+<hr>
+<h1 id="8-混合列表"><a href="#8-混合列表" class="headerlink" title="8. 混合列表"></a>8. 混合列表</h1><ol>
+<li>操作系统<ul>
+<li>Windows</li>
+<li>Linux</li>
+<li>macOS</li>
+</ul>
+</li>
+<li>编程语言<ul>
+<li>Python</li>
+<li>JavaScript</li>
+<li>Rust</li>
+</ul>
+</li>
+<li>工具<ul>
+<li>Git</li>
+<li>Docker</li>
+<li>VS Code</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h1 id="9-任务列表（GFM）"><a href="#9-任务列表（GFM）" class="headerlink" title="9. 任务列表（GFM）"></a>9. 任务列表（GFM）</h1><ul>
+<li><input checked="" disabled="" type="checkbox"> 已完成任务</li>
+<li><input disabled="" type="checkbox"> 未完成任务</li>
+<li><input checked="" disabled="" type="checkbox"> 支持中文</li>
+<li><input disabled="" type="checkbox"> 测试 Hover 效果</li>
+<li><input disabled="" type="checkbox"> 测试移动端显示<ul>
+<li><input checked="" disabled="" type="checkbox"> 子任务已完成</li>
+<li><input disabled="" type="checkbox"> 子任务未完成</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h1 id="10-分隔线"><a href="#10-分隔线" class="headerlink" title="10. 分隔线"></a>10. 分隔线</h1><p>上方文字</p>
+<hr>
+<p>下方文字</p>
+<hr>
+<p>另一种分隔线</p>
+<hr>
+<p>第三种分隔线</p>
+<hr>
+<h1 id="11-链接"><a href="#11-链接" class="headerlink" title="11. 链接"></a>11. 链接</h1><p>行内链接：</p>
+<p><a target="_blank" rel="noopener" href="https://openai.com/">OpenAI</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/">GitHub</a></p>
+<p><a target="_blank" rel="noopener" href="https://blanktime.cn/">空白时间</a></p>
+<p>带标题：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/" title="GitHub Homepage">GitHub</a></p>
+<p>自动链接：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/">https://github.com/</a></p>
+<p><a href="mailto:&#x74;&#101;&#x73;&#116;&#x40;&#x65;&#120;&#x61;&#109;&#112;&#108;&#101;&#x2e;&#99;&#111;&#109;">test@example.com</a></p>
+<p>参考式链接：</p>
+<p>这是一个 <a target="_blank" rel="noopener" href="https://example.com/">参考链接</a>。</p>
+<p>这是另一个 <a target="_blank" rel="noopener" href="https://github.com/">GitHub</a>。</p>
+<hr>
+<h1 id="12-图片"><a href="#12-图片" class="headerlink" title="12. 图片"></a>12. 图片</h1><p>普通图片：</p>
+<p><img src="https://picsum.photos/800/400" alt="示例图片"></p>
+<p>带标题：</p>
+<p><img src="https://picsum.photos/640/360" alt="示例图片" title="示例图片标题"></p>
+<blockquote>
+<p>若当前渲染环境禁止远程图片加载，图片可能无法显示。</p>
+</blockquote>
+<hr>
+<h1 id="13-行内代码"><a href="#13-行内代码" class="headerlink" title="13. 行内代码"></a>13. 行内代码</h1><p>这是 <code>inline code</code>。</p>
+<p>这是中文中的 <code>行内代码</code>。</p>
+<p>路径测试：<code>C:\Users\Test\Documents\example.md</code></p>
+<p>命令测试：<code>git status</code></p>
+<p>变量测试：<code>const themeColor = &quot;#6495ED&quot;;</code></p>
+<p>HTML 标签：<code>&lt;div class=&quot;container&quot;&gt;</code></p>
+<p>特殊字符：<code>&lt; &gt; &amp; &quot; &#39;</code></p>
+<hr>
+<h1 id="14-普通代码块"><a href="#14-普通代码块" class="headerlink" title="14. 普通代码块"></a>14. 普通代码块</h1><figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs plaintext">这是没有指定语言的代码块。<br><br>line 1<br>line 2<br>line 3<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="15-JavaScript-代码高亮"><a href="#15-JavaScript-代码高亮" class="headerlink" title="15. JavaScript 代码高亮"></a>15. JavaScript 代码高亮</h1><figure class="highlight javascript"><table><tr><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">const</span> site = &#123;<br>  <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;空白时间&quot;</span>,<br>  <span class="hljs-attr">domain</span>: <span class="hljs-string">&quot;blanktime.cn&quot;</span>,<br>  <span class="hljs-attr">themeColor</span>: <span class="hljs-string">&quot;#6495ED&quot;</span>,<br>&#125;;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">greet</span>(<span class="hljs-params">name</span>) &#123;<br>  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Hello, <span class="hljs-subst">$&#123;name&#125;</span>!`</span>);<br>&#125;<br><br><span class="hljs-title function_">greet</span>(site.<span class="hljs-property">name</span>);<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="16-TypeScript"><a href="#16-TypeScript" class="headerlink" title="16. TypeScript"></a>16. TypeScript</h1><figure class="highlight typescript"><table><tr><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">interface</span> <span class="hljs-title class_">User</span> &#123;<br>  <span class="hljs-attr">id</span>: <span class="hljs-built_in">number</span>;<br>  <span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span>;<br>  <span class="hljs-attr">active</span>: <span class="hljs-built_in">boolean</span>;<br>&#125;<br><br><span class="hljs-keyword">const</span> <span class="hljs-attr">user</span>: <span class="hljs-title class_">User</span> = &#123;<br>  <span class="hljs-attr">id</span>: <span class="hljs-number">1</span>,<br>  <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;Blanktime&quot;</span>,<br>  <span class="hljs-attr">active</span>: <span class="hljs-literal">true</span>,<br>&#125;;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">getUserName</span>(<span class="hljs-params"><span class="hljs-attr">user</span>: <span class="hljs-title class_">User</span></span>): <span class="hljs-built_in">string</span> &#123;<br>  <span class="hljs-keyword">return</span> user.<span class="hljs-property">name</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="17-Python"><a href="#17-Python" class="headerlink" title="17. Python"></a>17. Python</h1><figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> dataclasses <span class="hljs-keyword">import</span> dataclass<br><br><span class="hljs-meta">@dataclass</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Site</span>:<br>    name: <span class="hljs-built_in">str</span><br>    domain: <span class="hljs-built_in">str</span><br><br>site = Site(<br>    name=<span class="hljs-string">&quot;空白时间&quot;</span>,<br>    domain=<span class="hljs-string">&quot;blanktime.cn&quot;</span>,<br>)<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;site.name&#125;</span>: https://<span class="hljs-subst">&#123;site.domain&#125;</span>&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="18-Rust"><a href="#18-Rust" class="headerlink" title="18. Rust"></a>18. Rust</h1><figure class="highlight rust"><table><tr><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">site_name</span> = <span class="hljs-string">&quot;空白时间&quot;</span>;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">domain</span> = <span class="hljs-string">&quot;blanktime.cn&quot;</span>;<br><br>    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;&#125;: https://&#123;&#125;&quot;</span>, site_name, domain);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="19-C"><a href="#19-C" class="headerlink" title="19. C"></a>19. C</h1><figure class="highlight c"><table><tr><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span> &#123;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Hello, Markdown!\n&quot;</span>);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="20-C"><a href="#20-C" class="headerlink" title="20. C++"></a>20. C++</h1><figure class="highlight cpp"><table><tr><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string&gt;</span></span><br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    std::string site = <span class="hljs-string">&quot;Blanktime&quot;</span>;<br>    std::cout &lt;&lt; <span class="hljs-string">&quot;Hello, &quot;</span> &lt;&lt; site &lt;&lt; <span class="hljs-string">&quot;!&quot;</span> &lt;&lt; std::endl;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="21-Java"><a href="#21-Java" class="headerlink" title="21. Java"></a>21. Java</h1><figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Main</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        <span class="hljs-type">String</span> <span class="hljs-variable">site</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;Blanktime&quot;</span>;<br>        System.out.println(<span class="hljs-string">&quot;Hello, &quot;</span> + site + <span class="hljs-string">&quot;!&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="22-C"><a href="#22-C" class="headerlink" title="22. C#"></a>22. C#</h1><figure class="highlight csharp"><table><tr><td class="code"><pre><code class="hljs csharp"><span class="hljs-keyword">using</span> System;<br><br><span class="hljs-keyword">class</span> <span class="hljs-title">Program</span><br>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Main</span>()</span><br>    &#123;<br>        Console.WriteLine(<span class="hljs-string">&quot;Hello, Markdown!&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="23-Go"><a href="#23-Go" class="headerlink" title="23. Go"></a>23. Go</h1><figure class="highlight go"><table><tr><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;fmt&quot;</span><br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    fmt.Println(<span class="hljs-string">&quot;Hello, Markdown!&quot;</span>)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="24-PHP"><a href="#24-PHP" class="headerlink" title="24. PHP"></a>24. PHP</h1><figure class="highlight php"><table><tr><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><br><span class="hljs-variable">$site</span> = <span class="hljs-string">&quot;Blanktime&quot;</span>;<br><span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;Hello, <span class="hljs-subst">&#123;$site&#125;</span>!&quot;</span>;<br><br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="25-HTML"><a href="#25-HTML" class="headerlink" title="25. HTML"></a>25. HTML</h1><figure class="highlight html"><table><tr><td class="code"><pre><code class="hljs html"><span class="hljs-meta">&lt;!doctype <span class="hljs-keyword">html</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">html</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">&quot;zh-CN&quot;</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">&quot;UTF-8&quot;</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Markdown Test<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">main</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;container&quot;</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>空白时间<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Hello World!<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">main</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="26-CSS"><a href="#26-CSS" class="headerlink" title="26. CSS"></a>26. CSS</h1><figure class="highlight css"><table><tr><td class="code"><pre><code class="hljs css"><span class="hljs-selector-pseudo">:root</span> &#123;<br>  <span class="hljs-attr">--theme-color</span>: <span class="hljs-number">#6495ed</span>;<br>&#125;<br><br><span class="hljs-selector-tag">body</span> &#123;<br>  <span class="hljs-attribute">font-family</span>:<br>    <span class="hljs-string">&quot;LXGW WenKai&quot;</span>,<br>    <span class="hljs-string">&quot;Noto Serif SC&quot;</span>,<br>    serif;<br>  <span class="hljs-attribute">line-height</span>: <span class="hljs-number">1.8</span>;<br>&#125;<br><br><span class="hljs-selector-class">.post-title</span> &#123;<br>  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--theme-color);<br>  <span class="hljs-attribute">text-shadow</span>:<br>    <span class="hljs-number">0</span> <span class="hljs-number">1px</span> <span class="hljs-number">0</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">255</span>, <span class="hljs-number">255</span>, <span class="hljs-number">255</span>, <span class="hljs-number">0.8</span>),<br>    <span class="hljs-number">0</span> <span class="hljs-number">4px</span> <span class="hljs-number">10px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.18</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="27-SCSS"><a href="#27-SCSS" class="headerlink" title="27. SCSS"></a>27. SCSS</h1><figure class="highlight scss"><table><tr><td class="code"><pre><code class="hljs scss"><span class="hljs-variable">$theme-color</span>: <span class="hljs-number">#6495ed</span>;<br><br><span class="hljs-selector-class">.card</span> &#123;<br>  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">rgba</span>(<span class="hljs-variable">$theme-color</span>, <span class="hljs-number">0.25</span>);<br><br>  &amp;<span class="hljs-selector-pseudo">:hover</span> &#123;<br>    <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateY</span>(-<span class="hljs-number">2px</span>);<br>  &#125;<br><br>  <span class="hljs-selector-class">.title</span> &#123;<br>    <span class="hljs-attribute">color</span>: <span class="hljs-variable">$theme-color</span>;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="28-JSON"><a href="#28-JSON" class="headerlink" title="28. JSON"></a>28. JSON</h1><figure class="highlight json"><table><tr><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;blanktime&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;1.0.0&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;private&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;theme&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;color&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;#6495ED&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;darkMode&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="29-YAML"><a href="#29-YAML" class="headerlink" title="29. YAML"></a>29. YAML</h1><figure class="highlight yaml"><table><tr><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">site:</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">空白时间</span><br>  <span class="hljs-attr">domain:</span> <span class="hljs-string">blanktime.cn</span><br>  <span class="hljs-attr">theme_color:</span> <span class="hljs-string">&quot;#6495ED&quot;</span><br><br><span class="hljs-attr">features:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">search</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">comments</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">dark_mode</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="30-TOML"><a href="#30-TOML" class="headerlink" title="30. TOML"></a>30. TOML</h1><figure class="highlight toml"><table><tr><td class="code"><pre><code class="hljs toml"><span class="hljs-section">[site]</span><br><span class="hljs-attr">name</span> = <span class="hljs-string">&quot;空白时间&quot;</span><br><span class="hljs-attr">domain</span> = <span class="hljs-string">&quot;blanktime.cn&quot;</span><br><span class="hljs-attr">theme_color</span> = <span class="hljs-string">&quot;#6495ED&quot;</span><br><br><span class="hljs-section">[features]</span><br><span class="hljs-attr">search</span> = <span class="hljs-literal">true</span><br><span class="hljs-attr">comments</span> = <span class="hljs-literal">true</span><br><span class="hljs-attr">dark_mode</span> = <span class="hljs-literal">true</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="31-Bash-Shell"><a href="#31-Bash-Shell" class="headerlink" title="31. Bash &#x2F; Shell"></a>31. Bash &#x2F; Shell</h1><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash"><span class="hljs-meta">#!/usr/bin/env bash</span><br><br><span class="hljs-built_in">set</span> -euo pipefail<br><br>SITE_NAME=<span class="hljs-string">&quot;Blanktime&quot;</span><br><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Building <span class="hljs-variable">$&#123;SITE_NAME&#125;</span>...&quot;</span><br><br>git status<br>npm install<br>npm run build<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="32-PowerShell"><a href="#32-PowerShell" class="headerlink" title="32. PowerShell"></a>32. PowerShell</h1><figure class="highlight powershell"><table><tr><td class="code"><pre><code class="hljs powershell"><span class="hljs-variable">$SiteName</span> = <span class="hljs-string">&quot;Blanktime&quot;</span><br><br><span class="hljs-built_in">Write-Host</span> <span class="hljs-string">&quot;Building <span class="hljs-variable">$SiteName</span>...&quot;</span><br><br><span class="hljs-built_in">Get-ChildItem</span><br>git status<br>npm run build<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="33-SQL"><a href="#33-SQL" class="headerlink" title="33. SQL"></a>33. SQL</h1><figure class="highlight sql"><table><tr><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE TABLE</span> posts (<br>    id <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">PRIMARY KEY</span>,<br>    title TEXT <span class="hljs-keyword">NOT NULL</span>,<br>    created_at DATETIME <span class="hljs-keyword">DEFAULT</span> <span class="hljs-built_in">CURRENT_TIMESTAMP</span><br>);<br><br><span class="hljs-keyword">INSERT INTO</span> posts (title)<br><span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;Markdown 测试文章&#x27;</span>);<br><br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span><br><span class="hljs-keyword">FROM</span> posts<br><span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> created_at <span class="hljs-keyword">DESC</span>;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="34-XML"><a href="#34-XML" class="headerlink" title="34. XML"></a>34. XML</h1><figure class="highlight xml"><table><tr><td class="code"><pre><code class="hljs xml"><span class="hljs-meta">&lt;?xml version=<span class="hljs-string">&quot;1.0&quot;</span> encoding=<span class="hljs-string">&quot;UTF-8&quot;</span>?&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">site</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>空白时间<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">domain</span>&gt;</span>blanktime.cn<span class="hljs-tag">&lt;/<span class="hljs-name">domain</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">site</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="35-Diff"><a href="#35-Diff" class="headerlink" title="35. Diff"></a>35. Diff</h1><figure class="highlight diff"><table><tr><td class="code"><pre><code class="hljs diff"><span class="hljs-deletion">- const color = &quot;#42A5F5&quot;;</span><br><span class="hljs-addition">+ const color = &quot;#6495ED&quot;;</span><br><br><span class="hljs-deletion">- old line</span><br><span class="hljs-addition">+ new line</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="36-INI"><a href="#36-INI" class="headerlink" title="36. INI"></a>36. INI</h1><figure class="highlight ini"><table><tr><td class="code"><pre><code class="hljs ini"><span class="hljs-section">[site]</span><br><span class="hljs-attr">name</span>=Blanktime<br><span class="hljs-attr">domain</span>=blanktime.cn<br><br><span class="hljs-section">[theme]</span><br>color=<span class="hljs-comment">#6495ED</span><br><span class="hljs-attr">dark_mode</span>=<span class="hljs-literal">true</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="37-表格"><a href="#37-表格" class="headerlink" title="37. 表格"></a>37. 表格</h1><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hexo</td>
+<td>静态博客框架</td>
+<td>使用中</td>
+</tr>
+<tr>
+<td>Astro</td>
+<td>Web 框架</td>
+<td>测试中</td>
+</tr>
+<tr>
+<td>Git</td>
+<td>版本控制</td>
+<td>正常</td>
+</tr>
+<tr>
+<td>Docker</td>
+<td>容器</td>
+<td>正常</td>
+</tr>
+</tbody></table>
+<hr>
+<h1 id="38-表格对齐"><a href="#38-表格对齐" class="headerlink" title="38. 表格对齐"></a>38. 表格对齐</h1><table>
+<thead>
+<tr>
+<th align="left">左对齐</th>
+<th align="center">居中</th>
+<th align="right">右对齐</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Apple</td>
+<td align="center">100</td>
+<td align="right">1.23</td>
+</tr>
+<tr>
+<td align="left">Banana</td>
+<td align="center">200</td>
+<td align="right">45.67</td>
+</tr>
+<tr>
+<td align="left">Cherry is good good good good</td>
+<td align="center">300</td>
+<td align="right">3.14159265758</td>
+</tr>
+</tbody></table>
+<hr>
+<h1 id="39-长文本表格"><a href="#39-长文本表格" class="headerlink" title="39. 长文本表格"></a>39. 长文本表格</h1><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Markdown</td>
+<td>一种轻量级标记语言，可以使用纯文本语法编写结构化文档。</td>
+</tr>
+<tr>
+<td>HTML</td>
+<td>浏览器最终渲染页面时使用的标记语言，可以与 Markdown 混排。</td>
+</tr>
+<tr>
+<td>CSS</td>
+<td>用于控制页面视觉样式，包括颜色、字体、间距、动画与布局。</td>
+</tr>
+<tr>
+<td>JavaScript</td>
+<td>用于为页面增加交互逻辑和动态行为。</td>
+</tr>
+</tbody></table>
+<hr>
+<h1 id="40-表格中的格式"><a href="#40-表格中的格式" class="headerlink" title="40. 表格中的格式"></a>40. 表格中的格式</h1><table>
+<thead>
+<tr>
+<th>功能</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>粗体</td>
+<td><strong>Bold</strong></td>
+</tr>
+<tr>
+<td>斜体</td>
+<td><em>Italic</em></td>
+</tr>
+<tr>
+<td>删除线</td>
+<td><del>Delete</del></td>
+</tr>
+<tr>
+<td>代码</td>
+<td><code>code</code></td>
+</tr>
+<tr>
+<td>链接</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/">GitHub</a></td>
+</tr>
+</tbody></table>
+<hr>
+<h1 id="41-转义字符"><a href="#41-转义字符" class="headerlink" title="41. 转义字符"></a>41. 转义字符</h1><p>下面用于测试 Markdown 特殊字符转义：</p>
+<p>*不是斜体*</p>
+<p>*<em>不是粗体*</em></p>
+<p># 不是标题</p>
+<p>- 不是列表</p>
+<p>&gt; 不是引用</p>
+<p>`不是代码`</p>
+<p><span class="math-expression math-display" data-tex="不是链接"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>不是链接</mtext></mrow><annotation encoding="application/x-tex">不是链接</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">不是链接</span></span></span></span></span></span>(<a target="_blank" rel="noopener" href="https://example.com/">https://example.com/</a>)</p>
+<p>反斜杠：\</p>
+<hr>
+<h1 id="42-特殊符号与字符实体"><a href="#42-特殊符号与字符实体" class="headerlink" title="42. 特殊符号与字符实体"></a>42. 特殊符号与字符实体</h1><p>HTML 实体：</p>
+<p>&amp;</p>
+<p>&lt;</p>
+<p>&gt;</p>
+<p>&quot;</p>
+<p>&apos;</p>
+<p>&nbsp;</p>
+<p>&copy;</p>
+<p>&reg;</p>
+<p>&trade;</p>
+<hr>
+<h1 id="43-HTML-混排"><a href="#43-HTML-混排" class="headerlink" title="43. HTML 混排"></a>43. HTML 混排</h1><div class="markdown-test-box">
+  <strong>这是 HTML 中的粗体。</strong>
+  <p>这是一个 HTML 段落。</p>
+</div>
+
+<p><span style="font-size: 1.2em;">HTML 行内样式测试</span></p>
+<br>
+
+<hr>
+
+<hr>
+<h1 id="44-HTML-details-summary"><a href="#44-HTML-details-summary" class="headerlink" title="44. HTML details &#x2F; summary"></a>44. HTML details &#x2F; summary</h1><details>
+<summary>点击展开内容</summary>
+
+<p>这里是折叠区域。</p>
+<ul>
+<li>列表项目</li>
+<li><strong>粗体</strong></li>
+<li><code>代码</code></li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><code class="hljs javascript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;details test&quot;</span>);<br></code></pre></td></tr></table></figure>
+
+</details>
+
+<hr>
+<h1 id="45-HTML-mark"><a href="#45-HTML-mark" class="headerlink" title="45. HTML mark"></a>45. HTML mark</h1><p>普通文字 <mark>高亮文字</mark> 普通文字。</p>
+<hr>
+<h1 id="46-上标与下标"><a href="#46-上标与下标" class="headerlink" title="46. 上标与下标"></a>46. 上标与下标</h1><p>HTML 上标：</p>
+<p>E &#x3D; mc<sup>2</sup></p>
+<p>HTML 下标：</p>
+<p>H<sub>2</sub>O</p>
+<hr>
+<h1 id="47-键盘按键"><a href="#47-键盘按键" class="headerlink" title="47. 键盘按键"></a>47. 键盘按键</h1><p>按 <kbd>Ctrl</kbd> + <kbd>C</kbd> 复制。</p>
+<p>按 <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Esc</kbd> 打开任务管理器。</p>
+<hr>
+<h1 id="48-删除与插入"><a href="#48-删除与插入" class="headerlink" title="48. 删除与插入"></a>48. 删除与插入</h1><p><del>旧内容</del></p>
+<p><ins>新内容</ins></p>
+<hr>
+<h1 id="49-缩写"><a href="#49-缩写" class="headerlink" title="49. 缩写"></a>49. 缩写</h1><p><abbr title="HyperText Markup Language">HTML</abbr></p>
+<p><abbr title="Cascading Style Sheets">CSS</abbr></p>
+<hr>
+<h1 id="50-注释"><a href="#50-注释" class="headerlink" title="50. 注释"></a>50. 注释</h1><p>下面存在一条 HTML 注释，但通常不会显示：</p>
+<!-- 这是一条 HTML 注释 -->
+
+<p>注释结束后的正文。</p>
+<hr>
+<h1 id="51-脚注"><a href="#51-脚注" class="headerlink" title="51. 脚注"></a>51. 脚注</h1><p>这是一个带脚注的句子。<a href="%E8%BF%99%E6%98%AF%E7%AC%AC%E4%B8%80%E4%B8%AA%E8%84%9A%E6%B3%A8%E7%9A%84%E5%86%85%E5%AE%B9%E3%80%82">^1</a></p>
+<p>另一个脚注。[^markdown]</p>
+<p>[^markdown]: Markdown 的不同实现对脚注语法支持程度不同。</p>
+<hr>
+<h1 id="52-数学公式：行内"><a href="#52-数学公式：行内" class="headerlink" title="52. 数学公式：行内"></a>52. 数学公式：行内</h1><p>如果渲染器支持 LaTeX &#x2F; KaTeX &#x2F; MathJax：</p>
+<p>行内公式：<span class="math-expression math-inline" data-tex="E = mc^2"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo>=</mo><mi>m</mi><msup><mi>c</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">E = mc^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord mathnormal">m</span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></p>
+<p>勾股定理：<span class="math-expression math-inline" data-tex="a^2 + b^2 = c^2"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>a</mi><mn>2</mn></msup><mo>+</mo><msup><mi>b</mi><mn>2</mn></msup><mo>=</mo><msup><mi>c</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">a^2 + b^2 = c^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></p>
+<p>圆周率：<span class="math-expression math-inline" data-tex="\pi \approx 3.1415926"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>π</mi><mo>≈</mo><mn>3.1415926</mn></mrow><annotation encoding="application/x-tex">\pi \approx 3.1415926</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4831em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">3.1415926</span></span></span></span></span></p>
+<hr>
+<h1 id="53-数学公式：块级"><a href="#53-数学公式：块级" class="headerlink" title="53. 数学公式：块级"></a>53. 数学公式：块级</h1><span class="math-expression math-display" data-tex="E = mc^2"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>E</mi><mo>=</mo><mi>m</mi><msup><mi>c</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">E = mc^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8641em;"></span><span class="mord mathnormal">m</span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></span>
+<span class="math-expression math-display" data-tex="a^2 + b^2 = c^2"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msup><mi>a</mi><mn>2</mn></msup><mo>+</mo><msup><mi>b</mi><mn>2</mn></msup><mo>=</mo><msup><mi>c</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">a^2 + b^2 = c^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9474em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8641em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8641em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></span>
+<span class="math-expression math-display" data-tex="\frac{1}{n}\sum_{i=1}^{n}x_i"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mfrac><mn>1</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\frac{1}{n}\sum_{i=1}^{n}x_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.9291em;vertical-align:-1.2777em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">n</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6514em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.3em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2777em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></span>
+<span class="math-expression math-display" data-tex="\int_{-\infty}^{+\infty} e^{-x^2} \, dx = \sqrt{\pi}"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msubsup><mo>∫</mo><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mrow><mo>+</mo><mi mathvariant="normal">∞</mi></mrow></msubsup><msup><mi>e</mi><mrow><mo>−</mo><msup><mi>x</mi><mn>2</mn></msup></mrow></msup><mtext> </mtext><mi>d</mi><mi>x</mi><mo>=</mo><msqrt><mi>π</mi></msqrt></mrow><annotation encoding="application/x-tex">\int_{-\infty}^{+\infty} e^{-x^2} \, dx = \sqrt{\pi}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.4915em;vertical-align:-0.9703em;"></span><span class="mop"><span class="mop op-symbol large-op" style="margin-right:0.4445em;position:relative;top:-0.0011em;">∫</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.5212em;"><span style="top:-1.7881em;margin-left:-0.4445em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">∞</span></span></span></span><span style="top:-3.8129em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">+</span><span class="mord mtight">∞</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9703em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:1.0369em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight"><span class="mord mathnormal mtight">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8913em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">d</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.04em;vertical-align:-0.1908em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8492em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal" style="margin-right:0.0359em;">π</span></span></span><span style="top:-2.8092em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1908em;"><span></span></span></span></span></span></span></span></span></span></span>
+<hr>
+<h1 id="54-数学矩阵"><a href="#54-数学矩阵" class="headerlink" title="54. 数学矩阵"></a>54. 数学矩阵</h1><span class="math-expression math-display" data-tex="A =
+\begin{bmatrix}
+1 &amp; 2 &amp; 3 \\
+4 &amp; 5 &amp; 6 \\
+7 &amp; 8 &amp; 9
+\end{bmatrix}"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>5</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>6</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>7</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>8</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>9</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow><annotation encoding="application/x-tex">A =
+\begin{bmatrix}
+1 &amp; 2 &amp; 3 \\
+4 &amp; 5 &amp; 6 \\
+7 &amp; 8 &amp; 9
+\end{bmatrix}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:3.6em;vertical-align:-1.55em;"></span><span class="minner"><span class="mopen"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05em;"><span style="top:-4.05em;"><span class="pstrut" style="height:5.6em;"></span><span style="width:0.667em;height:3.6em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.667em" height="3.6em" viewBox="0 0 667 3600"><path d="M403 1759 V84 H666 V0 H319 V1759 v0 v1759 v84 h347 v-84
+H403z M403 1759 V0 H319 V1759 v0 v1759 v84 h84z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55em;"><span></span></span></span></span></span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05em;"><span style="top:-4.21em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span><span style="top:-3.01em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span></span></span><span style="top:-1.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">7</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05em;"><span style="top:-4.21em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.01em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">5</span></span></span><span style="top:-1.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">8</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05em;"><span style="top:-4.21em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">3</span></span></span><span style="top:-3.01em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">6</span></span></span><span style="top:-1.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">9</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55em;"><span></span></span></span></span></span></span></span><span class="mclose"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05em;"><span style="top:-4.05em;"><span class="pstrut" style="height:5.6em;"></span><span style="width:0.667em;height:3.6em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.667em" height="3.6em" viewBox="0 0 667 3600"><path d="M347 1759 V0 H0 V84 H263 V1759 v0 v1759 H0 v84 H347z
+M347 1759 V0 H263 V1759 v0 v1759 h84z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55em;"><span></span></span></span></span></span></span></span></span></span></span></span></span>
+<hr>
+<h1 id="55-数学分段函数"><a href="#55-数学分段函数" class="headerlink" title="55. 数学分段函数"></a>55. 数学分段函数</h1><span class="math-expression math-display" data-tex="f(x)=
+\begin{cases}
+x^2, &amp; x \ge 0 \\
+-x, &amp; x &lt; 0
+\end{cases}"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><msup><mi>x</mi><mn>2</mn></msup><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>x</mi><mo>≥</mo><mn>0</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo>−</mo><mi>x</mi><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>x</mi><mo>&lt;</mo><mn>0</mn></mrow></mstyle></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">f(x)=
+\begin{cases}
+x^2, &amp; x \ge 0 \\
+-x, &amp; x &lt; 0
+\end{cases}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:3em;vertical-align:-1.25em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size4">{</span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.69em;"><span style="top:-3.69em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mpunct">,</span></span></span><span style="top:-2.25em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord">−</span><span class="mord mathnormal">x</span><span class="mpunct">,</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.19em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:1em;"></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.69em;"><span style="top:-3.69em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span></span></span><span style="top:-2.25em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.19em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></span>
+<hr>
+<h1 id="56-删除线、粗体、代码混排"><a href="#56-删除线、粗体、代码混排" class="headerlink" title="56. 删除线、粗体、代码混排"></a>56. 删除线、粗体、代码混排</h1><p>这是一段 <del>被删除的文本</del>，这是 <strong>重要内容</strong>，这是 <code>code</code>，这是 <em>强调文字</em>。</p>
+<p><strong>粗体 <code>code</code> 粗体</strong></p>
+<p><del>删除线中的 <code>code</code></del></p>
+<hr>
+<h1 id="57-URL-长链接测试"><a href="#57-URL-长链接测试" class="headerlink" title="57. URL 长链接测试"></a>57. URL 长链接测试</h1><p><a target="_blank" rel="noopener" href="https://example.com/this/is/a/very/very/very/very/very/very/long/url/used/to/test/overflow/behavior/in/markdown/renderers?foo=bar&hello=world&theme=blanktime">https://example.com/this/is/a/very/very/very/very/very/very/long/url/used/to/test/overflow/behavior/in/markdown/renderers?foo=bar&amp;hello=world&amp;theme=blanktime</a></p>
+<hr>
+<h1 id="58-超长英文单词测试"><a href="#58-超长英文单词测试" class="headerlink" title="58. 超长英文单词测试"></a>58. 超长英文单词测试</h1><p>这是一个用于测试 overflow-wrap &#x2F; word-break 的超长字符串：</p>
+<p>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789</p>
+<p>超长单词：</p>
+<p>pneumonoultramicroscopicsilicovolcanoconiosis</p>
+<hr>
+<h1 id="59-文件路径测试"><a href="#59-文件路径测试" class="headerlink" title="59. 文件路径测试"></a>59. 文件路径测试</h1><p>Windows：</p>
+<p><code>C:\Users\Tom\Documents\Markdown\test.md</code></p>
+<p>Linux：</p>
+<p><code>/home/user/projects/blanktime/content/posts/test.md</code></p>
+<p>URL：</p>
+<p><code>https://blanktime.cn/posts/markdown-test/</code></p>
+<hr>
+<h1 id="60-Emoji"><a href="#60-Emoji" class="headerlink" title="60. Emoji"></a>60. Emoji</h1><p>😀 😃 😄 😁 😆 😅 😂 🤣 😊 😎</p>
+<p>🥹 😭 😿 🙃 🤔 🧐 😴 🫠 🫡</p>
+<p>❤️ 🧡 💛 💚 💙 💜 🖤 🤍</p>
+<p>🔥 ✨ ⭐ 🌙 ☀️ 🌧️ ⚡ ❄️</p>
+<p>🐱 🐶 🐼 🦊 🐧 🐉</p>
+<p>💻 🖥️ ⌨️ 🖱️ 📱 💾 🔧</p>
+<hr>
+<h1 id="61-Unicode"><a href="#61-Unicode" class="headerlink" title="61. Unicode"></a>61. Unicode</h1><p>中文：你好，世界。</p>
+<p>日文：こんにちは、世界。</p>
+<p>韩文：안녕하세요, 세계.</p>
+<p>俄文：Привет, мир.</p>
+<p>希腊文：Γειά σου Κόσμε.</p>
+<p>阿拉伯文：مرحبا بالعالم</p>
+<p>希伯来文：שלום עולם</p>
+<p>泰文：สวัสดีชาวโลก</p>
+<hr>
+<h1 id="62-中文生僻字与字体覆盖测试"><a href="#62-中文生僻字与字体覆盖测试" class="headerlink" title="62. 中文生僻字与字体覆盖测试"></a>62. 中文生僻字与字体覆盖测试</h1><p>龘 靐 齉 齾 爩 鱻 麤 灪 籲 靏 爨</p>
+<p>𠮷 𡃁 𪚥</p>
+<blockquote>
+<p>某些字体可能缺少部分扩展汉字字形。</p>
+</blockquote>
+<hr>
+<h1 id="63-CJK-标点测试"><a href="#63-CJK-标点测试" class="headerlink" title="63. CJK 标点测试"></a>63. CJK 标点测试</h1><p>「直角引号」</p>
+<p>『双直角引号』</p>
+<p>“中文双引号”</p>
+<p>‘中文单引号’</p>
+<p>《书名号》</p>
+<p>〈单书名号〉</p>
+<p>【方头括号】</p>
+<p>〔六角括号〕</p>
+<p>——破折号</p>
+<p>……省略号</p>
+<p>·间隔号</p>
+<hr>
+<h1 id="64-空格测试"><a href="#64-空格测试" class="headerlink" title="64. 空格测试"></a>64. 空格测试</h1><p>普通空格：A B</p>
+<p>多个普通空格：A    B</p>
+<p>不换行空格：A&nbsp;&nbsp;&nbsp;B</p>
+<p>全角空格：A　B</p>
+<hr>
+<h1 id="65-换行测试"><a href="#65-换行测试" class="headerlink" title="65. 换行测试"></a>65. 换行测试</h1><p>第一行<br>第二行<br>第三行</p>
+<p>第四行</p>
+<p>第五行</p>
+<hr>
+<h1 id="66-连续空行测试"><a href="#66-连续空行测试" class="headerlink" title="66. 连续空行测试"></a>66. 连续空行测试</h1><p>上方文本。</p>
+<p>中间存在多个空行。</p>
+<p>下方文本。</p>
+<hr>
+<h1 id="67-引用中的代码块"><a href="#67-引用中的代码块" class="headerlink" title="67. 引用中的代码块"></a>67. 引用中的代码块</h1><blockquote>
+<p>引用块：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs python"><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Hello from blockquote&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<p>引用结束。</p>
+</blockquote>
+<hr>
+<h1 id="68-列表中的代码块"><a href="#68-列表中的代码块" class="headerlink" title="68. 列表中的代码块"></a>68. 列表中的代码块</h1><ol>
+<li><p>第一步</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">git <span class="hljs-built_in">clone</span> https://github.com/example/example.git<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>第二步</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> example<br>npm install<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>第三步</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">npm run build<br></code></pre></td></tr></table></figure></li>
+</ol>
+<hr>
+<h1 id="69-列表中的引用"><a href="#69-列表中的引用" class="headerlink" title="69. 列表中的引用"></a>69. 列表中的引用</h1><ul>
+<li><p>项目 A</p>
+<blockquote>
+<p>这是项目 A 下的引用。</p>
+</blockquote>
+</li>
+<li><p>项目 B</p>
+<blockquote>
+<p>这是项目 B 下的引用。</p>
+</blockquote>
+</li>
+</ul>
+<hr>
+<h1 id="70-列表中的多段文字"><a href="#70-列表中的多段文字" class="headerlink" title="70. 列表中的多段文字"></a>70. 列表中的多段文字</h1><ol>
+<li><p>第一项的第一段。</p>
+<p>第一项的第二段。</p>
+</li>
+<li><p>第二项的第一段。</p>
+<p>第二项的第二段。</p>
+</li>
+</ol>
+<hr>
+<h1 id="71-代码块中的-Markdown-字符"><a href="#71-代码块中的-Markdown-字符" class="headerlink" title="71. 代码块中的 Markdown 字符"></a>71. 代码块中的 Markdown 字符</h1><figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text"># 这里不是标题<br><br>**这里不是粗体**<br><br>- 这里不是列表<br><br>[这里不是链接](https://example.com/)<br><br>&gt; 这里不是引用<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="72-Front-Matter：YAML"><a href="#72-Front-Matter：YAML" class="headerlink" title="72. Front Matter：YAML"></a>72. Front Matter：YAML</h1><figure class="highlight yaml"><table><tr><td class="code"><pre><code class="hljs yaml"><span class="hljs-meta">---</span><br><span class="hljs-attr">title:</span> <span class="hljs-string">Markdown</span> <span class="hljs-string">全功能显示测试</span><br><span class="hljs-attr">date:</span> <span class="hljs-number">2026-09-27 14:20:00</span><br><span class="hljs-attr">updated:</span> <span class="hljs-number">2026-09-27 14:20:00</span><br><span class="hljs-attr">tags:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">Markdown</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">Test</span><br><span class="hljs-attr">categories:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">测试</span><br><span class="hljs-attr">description:</span> <span class="hljs-string">用于测试</span> <span class="hljs-string">Markdown</span> <span class="hljs-string">渲染与主题样式。</span><br><span class="hljs-meta">---</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="73-Front-Matter：TOML"><a href="#73-Front-Matter：TOML" class="headerlink" title="73. Front Matter：TOML"></a>73. Front Matter：TOML</h1><figure class="highlight toml"><table><tr><td class="code"><pre><code class="hljs toml">+++<br><span class="hljs-attr">title</span> = <span class="hljs-string">&quot;Markdown 全功能显示测试&quot;</span><br><span class="hljs-attr">date</span> = <span class="hljs-number">2026</span>-<span class="hljs-number">09</span>-<span class="hljs-number">27</span>T14:<span class="hljs-number">20</span>:<span class="hljs-number">00</span>+<span class="hljs-number">08</span>:<span class="hljs-number">00</span><br><span class="hljs-attr">tags</span> = [<span class="hljs-string">&quot;Markdown&quot;</span>, <span class="hljs-string">&quot;Test&quot;</span>]<br><span class="hljs-attr">categories</span> = [<span class="hljs-string">&quot;测试&quot;</span>]<br>+++<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="74-Front-Matter：JSON"><a href="#74-Front-Matter：JSON" class="headerlink" title="74. Front Matter：JSON"></a>74. Front Matter：JSON</h1><figure class="highlight json"><table><tr><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;title&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Markdown 全功能显示测试&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2026-09-27T14:20:00+08:00&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;tags&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Markdown&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Test&quot;</span><span class="hljs-punctuation">]</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="75-Hexo-常见标签插件示意"><a href="#75-Hexo-常见标签插件示意" class="headerlink" title="75. Hexo 常见标签插件示意"></a>75. Hexo 常见标签插件示意</h1><blockquote>
+<p>以下内容只有安装并启用对应 Hexo 标签插件或主题扩展时才会生效。</p>
+</blockquote>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">&#123;% note info %&#125;<br>这是一个信息提示框。<br>&#123;% endnote %&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">&#123;% note warning %&#125;<br>这是一个警告提示框。<br>&#123;% endnote %&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">&#123;% codeblock lang:javascript %&#125;<br>console.log(&quot;Hexo tag plugin&quot;);<br>&#123;% endcodeblock %&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="76-常见-Admonition-扩展语法"><a href="#76-常见-Admonition-扩展语法" class="headerlink" title="76. 常见 Admonition 扩展语法"></a>76. 常见 Admonition 扩展语法</h1><blockquote>
+<p>不同 Markdown 引擎语法不同，这里仅用于兼容性测试。</p>
+</blockquote>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">::: note<br>这是 Note。<br>:::<br><br>::: tip<br>这是 Tip。<br>:::<br><br>::: warning<br>这是 Warning。<br>:::<br><br>::: danger<br>这是 Danger。<br>:::<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="77-GitHub-风格-Alert"><a href="#77-GitHub-风格-Alert" class="headerlink" title="77. GitHub 风格 Alert"></a>77. GitHub 风格 Alert</h1><blockquote>
+<p>[!NOTE]
+这是一个 NOTE。</p>
+</blockquote>
+<blockquote>
+<p>[!TIP]
+这是一个 TIP。</p>
+</blockquote>
+<blockquote>
+<p>[!IMPORTANT]
+这是一个 IMPORTANT。</p>
+</blockquote>
+<blockquote>
+<p>[!WARNING]
+这是一个 WARNING。</p>
+</blockquote>
+<blockquote>
+<p>[!CAUTION]
+这是一个 CAUTION。</p>
+</blockquote>
+<hr>
+<h1 id="78-Definition-List-扩展"><a href="#78-Definition-List-扩展" class="headerlink" title="78. Definition List 扩展"></a>78. Definition List 扩展</h1><p>某些 Markdown 引擎支持定义列表：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">Markdown<br>: 一种轻量级标记语言。<br><br>HTML<br>: 超文本标记语言。<br><br>CSS<br>: 层叠样式表。<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="79-Mermaid-流程图"><a href="#79-Mermaid-流程图" class="headerlink" title="79. Mermaid 流程图"></a>79. Mermaid 流程图</h1><p>如果渲染器支持 Mermaid：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">flowchart TD<br>    A[开始] --&gt; B&#123;是否支持 Mermaid&#125;<br>    B --&gt;|是| C[渲染流程图]<br>    B --&gt;|否| D[显示代码块]<br>    C --&gt; E[结束]<br>    D --&gt; E<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="80-Mermaid-时序图"><a href="#80-Mermaid-时序图" class="headerlink" title="80. Mermaid 时序图"></a>80. Mermaid 时序图</h1><figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">sequenceDiagram<br>    participant U as User<br>    participant B as Browser<br>    participant S as Server<br><br>    U-&gt;&gt;B: 打开页面<br>    B-&gt;&gt;S: HTTP Request<br>    S--&gt;&gt;B: HTML Response<br>    B--&gt;&gt;U: 渲染页面<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="81-Mermaid-类图"><a href="#81-Mermaid-类图" class="headerlink" title="81. Mermaid 类图"></a>81. Mermaid 类图</h1><figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">classDiagram<br>    class Site &#123;<br>        +String name<br>        +String domain<br>        +build()<br>        +deploy()<br>    &#125;<br><br>    class Theme &#123;<br>        +String color<br>        +Boolean darkMode<br>    &#125;<br><br>    Site --&gt; Theme<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="82-Mermaid-饼图"><a href="#82-Mermaid-饼图" class="headerlink" title="82. Mermaid 饼图"></a>82. Mermaid 饼图</h1><figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">pie title 技术栈<br>    &quot;HTML&quot; : 25<br>    &quot;CSS&quot; : 25<br>    &quot;JavaScript&quot; : 25<br>    &quot;Markdown&quot; : 25<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="83-Mermaid-Git-Graph"><a href="#83-Mermaid-Git-Graph" class="headerlink" title="83. Mermaid Git Graph"></a>83. Mermaid Git Graph</h1><figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">gitGraph<br>    commit<br>    branch develop<br>    checkout develop<br>    commit<br>    commit<br>    checkout main<br>    merge develop<br>    commit<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="84-HTML-表格"><a href="#84-HTML-表格" class="headerlink" title="84. HTML 表格"></a>84. HTML 表格</h1><table>
+  <thead>
+    <tr>
+      <th>名称</th>
+      <th>值</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Site</td>
+      <td>Blanktime</td>
+    </tr>
+    <tr>
+      <td>Theme</td>
+      <td>#6495ED</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+<h1 id="85-HTML-图片尺寸"><a href="#85-HTML-图片尺寸" class="headerlink" title="85. HTML 图片尺寸"></a>85. HTML 图片尺寸</h1><img src="https://picsum.photos/500/200" alt="测试图片" width="500">
+
+<hr>
+<h1 id="86-HTML-居中测试"><a href="#86-HTML-居中测试" class="headerlink" title="86. HTML 居中测试"></a>86. HTML 居中测试</h1><div align="center">
+
+<h1 id="居中的标题"><a href="#居中的标题" class="headerlink" title="居中的标题"></a>居中的标题</h1><p>这段文字使用 HTML <code>align=&quot;center&quot;</code>。</p>
+</div>
+
+<hr>
+<h1 id="87-HTML-字体颜色测试"><a href="#87-HTML-字体颜色测试" class="headerlink" title="87. HTML 字体颜色测试"></a>87. HTML 字体颜色测试</h1><p><span style="color:#6495ED">主题色文字 #6495ED</span></p>
+<p><span style="color:#ff4d4f">红色文字</span></p>
+<p><span style="color:#52c41a">绿色文字</span></p>
+<hr>
+<h1 id="88-CSS-类测试"><a href="#88-CSS-类测试" class="headerlink" title="88. CSS 类测试"></a>88. CSS 类测试</h1><div class="custom-card">
+
+<h2 id="自定义卡片"><a href="#自定义卡片" class="headerlink" title="自定义卡片"></a>自定义卡片</h2><p>如果主题中定义了 <code>.custom-card</code>，这里可以测试自定义组件样式。</p>
+</div>
+
+<hr>
+<h1 id="89-锚点测试"><a href="#89-锚点测试" class="headerlink" title="89. 锚点测试"></a>89. 锚点测试</h1><p><a id="custom-anchor"></a></p>
+<h2 id="自定义锚点位置"><a href="#自定义锚点位置" class="headerlink" title="自定义锚点位置"></a>自定义锚点位置</h2><p><a href="#custom-anchor">跳转到自定义锚点</a></p>
+<p><a href="#1-%E6%A0%87%E9%A2%98%E6%B5%8B%E8%AF%95">跳转到一级标题</a></p>
+<hr>
+<h1 id="90-标题中包含格式"><a href="#90-标题中包含格式" class="headerlink" title="90. 标题中包含格式"></a>90. 标题中包含格式</h1><h2 id="粗体标题"><a href="#粗体标题" class="headerlink" title="粗体标题"></a><strong>粗体标题</strong></h2><h2 id="斜体标题"><a href="#斜体标题" class="headerlink" title="斜体标题"></a><em>斜体标题</em></h2><h2 id="代码标题"><a href="#代码标题" class="headerlink" title="代码标题"></a><code>代码标题</code></h2><h2 id="标题中包含-Emoji-😼"><a href="#标题中包含-Emoji-😼" class="headerlink" title="标题中包含 Emoji 😼"></a>标题中包含 Emoji 😼</h2><h2 id="中文-English-123-混排标题"><a href="#中文-English-123-混排标题" class="headerlink" title="中文 English 123 混排标题"></a>中文 English 123 混排标题</h2><hr>
+<h1 id="91-标题超长测试"><a href="#91-标题超长测试" class="headerlink" title="91. 标题超长测试"></a>91. 标题超长测试</h1><h2 id="这是一个非常非常非常非常非常非常非常非常非常非常非常非常非常非常长的二级标题用于测试标题换行与锚点生成以及响应式布局表现"><a href="#这是一个非常非常非常非常非常非常非常非常非常非常非常非常非常非常长的二级标题用于测试标题换行与锚点生成以及响应式布局表现" class="headerlink" title="这是一个非常非常非常非常非常非常非常非常非常非常非常非常非常非常长的二级标题用于测试标题换行与锚点生成以及响应式布局表现"></a>这是一个非常非常非常非常非常非常非常非常非常非常非常非常非常非常长的二级标题用于测试标题换行与锚点生成以及响应式布局表现</h2><hr>
+<h1 id="92-极短段落"><a href="#92-极短段落" class="headerlink" title="92. 极短段落"></a>92. 极短段落</h1><p>A</p>
+<p>中</p>
+<p>1</p>
+<p>。</p>
+<hr>
+<h1 id="93-超长段落"><a href="#93-超长段落" class="headerlink" title="93. 超长段落"></a>93. 超长段落</h1><p>这是一个专门用于测试正文排版宽度和阅读体验的超长段落。Markdown 渲染器通常会将普通文本放置在固定宽度或最大宽度容器中，因此长段落非常适合观察行高、字体大小、字间距、段落宽度、中文断行、英文单词换行、标点挤压以及移动端响应式布局。The purpose of this paragraph is also to test mixed Chinese and English typography, including punctuation, inline code such as <code>Markdown</code>, numbers like 1234567890, URLs, and various Unicode characters. 如果页面主题启用了首行缩进、两端对齐、字体平滑、字重调整或阅读模式，这一段也很容易暴露问题。为了进一步增加长度，我们继续补充文字，让浏览器产生足够多的自动换行，从而更清楚地观察段落在桌面端、平板端和手机端的显示差异。</p>
+<hr>
+<h1 id="94-多层嵌套综合测试"><a href="#94-多层嵌套综合测试" class="headerlink" title="94. 多层嵌套综合测试"></a>94. 多层嵌套综合测试</h1><ol>
+<li>一级有序列表<ul>
+<li>二级无序列表<ol>
+<li>三级有序列表<ul>
+<li>四级无序列表<blockquote>
+<p>五级引用</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><code class="hljs js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Nested!&quot;</span>);<br></code></pre></td></tr></table></figure></blockquote>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h1 id="95-表格中的长-URL"><a href="#95-表格中的长-URL" class="headerlink" title="95. 表格中的长 URL"></a>95. 表格中的长 URL</h1><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Example</td>
+<td><a target="_blank" rel="noopener" href="https://example.com/a/very/very/very/very/very/long/path/used/to/test/table-overflow">https://example.com/a/very/very/very/very/very/long/path/used/to/test/table-overflow</a></td>
+</tr>
+<tr>
+<td>Blanktime</td>
+<td><a target="_blank" rel="noopener" href="https://blanktime.cn/">https://blanktime.cn/</a></td>
+</tr>
+</tbody></table>
+<hr>
+<h1 id="96-空表格单元格"><a href="#96-空表格单元格" class="headerlink" title="96. 空表格单元格"></a>96. 空表格单元格</h1><table>
+<thead>
+<tr>
+<th>A</th>
+<th>B</th>
+<th>C</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td></td>
+<td>3</td>
+</tr>
+<tr>
+<td></td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>1</td>
+<td>2</td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+<h1 id="97-表格中的中文换行测试"><a href="#97-表格中的中文换行测试" class="headerlink" title="97. 表格中的中文换行测试"></a>97. 表格中的中文换行测试</h1><table>
+<thead>
+<tr>
+<th>标题</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>短文本</td>
+<td>简短内容</td>
+</tr>
+<tr>
+<td>长文本</td>
+<td>这是一段很长很长很长很长很长很长很长很长的中文表格单元格内容，用于观察自动换行以及单元格宽度策略。</td>
+</tr>
+</tbody></table>
+<hr>
+<h1 id="98-代码行长度测试"><a href="#98-代码行长度测试" class="headerlink" title="98. 代码行长度测试"></a>98. 代码行长度测试</h1><figure class="highlight javascript"><table><tr><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">const</span> veryLongVariableNameUsedForTestingOverflowBehaviorInCodeBlocks = <span class="hljs-string">&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&quot;</span>;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="99-Tab-与缩进测试"><a href="#99-Tab-与缩进测试" class="headerlink" title="99. Tab 与缩进测试"></a>99. Tab 与缩进测试</h1><figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">空格缩进：<br>    四个空格<br><br>Tab 缩进：<br>	一个 Tab<br><br>混合：<br>	    Tab + 空格<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="100-终端输出测试"><a href="#100-终端输出测试" class="headerlink" title="100. 终端输出测试"></a>100. 终端输出测试</h1><figure class="highlight console"><table><tr><td class="code"><pre><code class="hljs console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">git status</span><br>On branch main<br>Your branch is up to date with &#x27;origin/main&#x27;.<br><br>nothing to commit, working tree clean<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="101-日志测试"><a href="#101-日志测试" class="headerlink" title="101. 日志测试"></a>101. 日志测试</h1><figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs log">2026-09-27 14:20:00 [INFO] Application started<br>2026-09-27 14:20:01 [DEBUG] Loading configuration<br>2026-09-27 14:20:02 [WARN] Cache is empty<br>2026-09-27 14:20:03 [ERROR] Example error message<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="102-HTTP-测试"><a href="#102-HTTP-测试" class="headerlink" title="102. HTTP 测试"></a>102. HTTP 测试</h1><figure class="highlight http"><table><tr><td class="code"><pre><code class="hljs http"><span class="hljs-keyword">GET</span> <span class="hljs-string">/api/posts</span> <span class="hljs-meta">HTTP/1.1</span><br><span class="hljs-attribute">Host</span><span class="hljs-punctuation">: </span>blanktime.cn<br><span class="hljs-attribute">Accept</span><span class="hljs-punctuation">: </span>application/json<br><span class="hljs-attribute">User-Agent</span><span class="hljs-punctuation">: </span>Markdown-Test/1.0<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="103-URL-编码测试"><a href="#103-URL-编码测试" class="headerlink" title="103. URL 编码测试"></a>103. URL 编码测试</h1><figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">https://example.com/search?q=%E7%A9%BA%E7%99%BD%E6%97%B6%E9%97%B4<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="104-正则表达式"><a href="#104-正则表达式" class="headerlink" title="104. 正则表达式"></a>104. 正则表达式</h1><figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs regex">^[a-zA-Z0-9_-]&#123;3,32&#125;$<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs regex">https?:\/\/[^\s]+<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="105-Dockerfile"><a href="#105-Dockerfile" class="headerlink" title="105. Dockerfile"></a>105. Dockerfile</h1><figure class="highlight dockerfile"><table><tr><td class="code"><pre><code class="hljs dockerfile"><span class="hljs-keyword">FROM</span> node:<span class="hljs-number">22</span>-alpine<br><br><span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app</span><br><br><span class="hljs-keyword">COPY</span><span class="language-bash"> package*.json ./</span><br><span class="hljs-keyword">RUN</span><span class="language-bash"> npm ci</span><br><br><span class="hljs-keyword">COPY</span><span class="language-bash"> . .</span><br><br><span class="hljs-keyword">CMD</span><span class="language-bash"> [<span class="hljs-string">&quot;npm&quot;</span>, <span class="hljs-string">&quot;run&quot;</span>, <span class="hljs-string">&quot;start&quot;</span>]</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="106-Docker-Compose"><a href="#106-Docker-Compose" class="headerlink" title="106. Docker Compose"></a>106. Docker Compose</h1><figure class="highlight yaml"><table><tr><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">services:</span><br>  <span class="hljs-attr">app:</span><br>    <span class="hljs-attr">image:</span> <span class="hljs-string">example/app:latest</span><br>    <span class="hljs-attr">restart:</span> <span class="hljs-string">unless-stopped</span><br>    <span class="hljs-attr">ports:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;8080:8080&quot;</span><br>    <span class="hljs-attr">environment:</span><br>      <span class="hljs-attr">NODE_ENV:</span> <span class="hljs-string">production</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="107-Nginx"><a href="#107-Nginx" class="headerlink" title="107. Nginx"></a>107. Nginx</h1><figure class="highlight nginx"><table><tr><td class="code"><pre><code class="hljs nginx"><span class="hljs-section">server</span> &#123;<br>    <span class="hljs-attribute">listen</span> <span class="hljs-number">80</span>;<br>    <span class="hljs-attribute">server_name</span> blanktime.cn;<br><br>    <span class="hljs-section">location</span> / &#123;<br>        <span class="hljs-attribute">proxy_pass</span> http://127.0.0.1:8080;<br>        <span class="hljs-attribute">proxy_set_header</span> Host <span class="hljs-variable">$host</span>;<br>        <span class="hljs-attribute">proxy_set_header</span> X-Real-IP <span class="hljs-variable">$remote_addr</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="108-Git-配置"><a href="#108-Git-配置" class="headerlink" title="108. Git 配置"></a>108. Git 配置</h1><figure class="highlight ini"><table><tr><td class="code"><pre><code class="hljs ini"><span class="hljs-section">[user]</span><br>    <span class="hljs-attr">name</span> = Blanktime<br>    <span class="hljs-attr">email</span> = test@example.com<br><br><span class="hljs-section">[core]</span><br>    <span class="hljs-attr">autocrlf</span> = <span class="hljs-literal">false</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="109-Git-命令"><a href="#109-Git-命令" class="headerlink" title="109. Git 命令"></a>109. Git 命令</h1><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">git init<br>git add .<br>git commit -m <span class="hljs-string">&quot;Initial commit&quot;</span><br>git branch -M main<br>git remote add origin git@github.com:example/example.git<br>git push -u origin main<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="110-Markdown-源码自身测试"><a href="#110-Markdown-源码自身测试" class="headerlink" title="110. Markdown 源码自身测试"></a>110. Markdown 源码自身测试</h1><figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs markdown"><span class="hljs-section"># 标题</span><br><br><span class="hljs-strong">**粗体**</span><br><br><span class="hljs-emphasis">*斜体*</span><br><br><span class="hljs-bullet">-</span> 列表<br><br><span class="hljs-quote">&gt; 引用</span><br><br>[<span class="hljs-string">链接</span>](<span class="hljs-link">https://example.com/</span>)<br><br><span class="hljs-code">`代码`</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="111-双反引号行内代码"><a href="#111-双反引号行内代码" class="headerlink" title="111. 双反引号行内代码"></a>111. 双反引号行内代码</h1><p>如果代码内容本身包含反引号，可以使用双反引号：</p>
+<p><code>`code`</code></p>
+<hr>
+<h1 id="112-行内-HTML-与-Markdown-混排"><a href="#112-行内-HTML-与-Markdown-混排" class="headerlink" title="112. 行内 HTML 与 Markdown 混排"></a>112. 行内 HTML 与 Markdown 混排</h1><div>
+
+<p><strong>某些渲染器允许 HTML 块内部继续解析 Markdown。</strong></p>
+<ul>
+<li>项目 A</li>
+<li>项目 B</li>
+</ul>
+</div>
+
+<hr>
+<h1 id="113-HTML-pre-code"><a href="#113-HTML-pre-code" class="headerlink" title="113. HTML pre&#x2F;code"></a>113. HTML pre&#x2F;code</h1><pre><code>const foo = "bar";
+console.log(foo);</code></pre>
+
+<hr>
+<h1 id="114-方向性文本测试"><a href="#114-方向性文本测试" class="headerlink" title="114. 方向性文本测试"></a>114. 方向性文本测试</h1><p>LTR:</p>
+<div dir="ltr">
+Left to Right: Hello World
+</div>
+
+<p>RTL:</p>
+<div dir="rtl">
+مرحبا بالعالم
+</div>
+
+<hr>
+<h1 id="115-时间与日期"><a href="#115-时间与日期" class="headerlink" title="115. 时间与日期"></a>115. 时间与日期</h1><p>日期：2026-09-27</p>
+<p>时间：14:20:00</p>
+<p>ISO 8601：2026-09-27T14:20:00+08:00</p>
+<hr>
+<h1 id="116-各种数字格式"><a href="#116-各种数字格式" class="headerlink" title="116. 各种数字格式"></a>116. 各种数字格式</h1><p>整数：123456789</p>
+<p>负数：-123</p>
+<p>小数：3.1415926</p>
+<p>科学计数法：1.23e10</p>
+<p>百分数：99.99%</p>
+<p>十六进制：0xFF</p>
+<p>二进制：0b101010</p>
+<hr>
+<h1 id="117-Checkbox-HTML"><a href="#117-Checkbox-HTML" class="headerlink" title="117. Checkbox HTML"></a>117. Checkbox HTML</h1><label>
+  <input type="checkbox" checked>
+  HTML checkbox checked
+</label>
+
+<br>
+
+<label>
+  <input type="checkbox">
+  HTML checkbox unchecked
+</label>
+
+<hr>
+<h1 id="118-Progress-HTML"><a href="#118-Progress-HTML" class="headerlink" title="118. Progress HTML"></a>118. Progress HTML</h1><p><progress value="70" max="100">70%</progress></p>
+<hr>
+<h1 id="119-Meter-HTML"><a href="#119-Meter-HTML" class="headerlink" title="119. Meter HTML"></a>119. Meter HTML</h1><p><meter min="0" max="100" value="75">75%</meter></p>
+<hr>
+<h1 id="120-Summary-综合测试"><a href="#120-Summary-综合测试" class="headerlink" title="120. Summary 综合测试"></a>120. Summary 综合测试</h1><h2 id="最终综合组件"><a href="#最终综合组件" class="headerlink" title="最终综合组件"></a>最终综合组件</h2><blockquote>
+<p>[!NOTE]
+如果你能看到样式化提示框，说明当前渲染器支持 GitHub 风格 Alert 或主题进行了兼容。</p>
+</blockquote>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> 标题</li>
+<li><input checked="" disabled="" type="checkbox"> 段落</li>
+<li><input checked="" disabled="" type="checkbox"> 列表</li>
+<li><input checked="" disabled="" type="checkbox"> 表格</li>
+<li><input checked="" disabled="" type="checkbox"> 代码</li>
+<li><input checked="" disabled="" type="checkbox"> 引用</li>
+<li><input checked="" disabled="" type="checkbox"> HTML</li>
+<li><input checked="" disabled="" type="checkbox"> 数学公式</li>
+<li><input checked="" disabled="" type="checkbox"> Mermaid</li>
+<li><input checked="" disabled="" type="checkbox"> Unicode</li>
+<li><input checked="" disabled="" type="checkbox"> Emoji</li>
+<li><input checked="" disabled="" type="checkbox"> 长文本</li>
+<li><input checked="" disabled="" type="checkbox"> 响应式溢出测试</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">const</span> markdownTest = &#123;<br>  <span class="hljs-attr">headings</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">paragraphs</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">lists</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">tables</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">code</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">html</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">math</span>: <span class="hljs-literal">true</span>,<br>  <span class="hljs-attr">mermaid</span>: <span class="hljs-literal">true</span>,<br>&#125;;<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">table</span>(markdownTest);<br></code></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">测试项目</th>
+<th align="center">结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">基础 Markdown</td>
+<td align="center">✅</td>
+</tr>
+<tr>
+<td align="left">GFM</td>
+<td align="center">✅ &#x2F; 视渲染器而定</td>
+</tr>
+<tr>
+<td align="left">HTML</td>
+<td align="center">✅ &#x2F; 视安全策略而定</td>
+</tr>
+<tr>
+<td align="left">LaTeX</td>
+<td align="center">✅ &#x2F; 需 KaTeX 或 MathJax</td>
+</tr>
+<tr>
+<td align="left">Mermaid</td>
+<td align="center">✅ &#x2F; 需 Mermaid 支持</td>
+</tr>
+<tr>
+<td align="left">自定义扩展</td>
+<td align="center">✅ &#x2F; 取决于主题</td>
+</tr>
+</tbody></table>
+<hr>
+<h1 id="121-最后测试"><a href="#121-最后测试" class="headerlink" title="121. 最后测试"></a>121. 最后测试</h1><p><strong>如果你能正常看到这里，说明这份 Markdown 至少成功走完了长文档渲染。</strong> 😼</p>
+<blockquote>
+<p>End of Markdown Rendering Test.</p>
+</blockquote>
+</div>
+</article>
+</div><p class="noscript-notice">启用 JavaScript 可使用桌面窗口交互。<a href="/">返回首页</a></p><ul class="noscript-posts"><li><a href="/2026/09/27/markdown-render-test/">Markdown 全功能显示测试</a></li><li><a href="/2026/09/26/markdown-style-test/">Markdown 样式测试</a></li><li><a href="/2026/06/02/OnePlus13-Rom/">OnePlus13刷入crDroid</a></li><li><a href="/2026/04/26/Roco/">关于洛克保底记录工具的杂谈</a></li><li><a href="/2026/03/04/pwd/">Bitwarden + Vaultwarden 自托管密码管理</a></li><li><a href="/2026/01/20/RX-9070-power/">RX 9070 功耗解锁</a></li><li><a href="/2026/01/13/NAS/">关于折腾 NAS 的记录</a></li><li><a href="/2025/10/20/root-modules/">Root管理器与一些模块链接</a></li><li><a href="/2025/10/15/Redmi-k40/">Redmi k40(alioth)刷入 Pixel OS</a></li><li><a href="/2025/10/03/pgzj/">文章鉴赏《潘嘎之交》</a></li><li><a href="/2025/10/02/MaBaoguo/">文章鉴赏 《偷袭》</a></li><li><a href="/2025/09/30/ollama/">ollama</a></li><li><a href="/2025/09/27/Artalk%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/">Artalk评论系统</a></li><li><a href="/2025/09/25/Ubuntu/">Ubuntu部分</a></li><li><a href="/2025/09/24/test/">显示测试</a></li><li><a href="/2025/09/23/Hexo/">Hexo</a></li><li><a href="/2025/09/22/Typora1.9.5/">Typora1.9.5</a></li><li><a href="/2025/09/22/Scrcpy_new/">Scrcpy</a></li></ul></noscript>
 </body>
 </html>
 

@@ -42,6 +42,7 @@
 }
 .welcome-home .welcome-intro h1 {
   font-size: 38px;
+  text-shadow: 0 4px 4px rgba(0, 0, 0, 0.3);
   font-weight: 700;
   letter-spacing: 3px;
   line-height: 1.4;

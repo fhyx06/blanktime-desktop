@@ -2,8 +2,8 @@
   const toggle = document.getElementById('settings-toggle');
   const panel = document.getElementById('settings-panel');
   const themeSwitch = document.getElementById('settings-reader-theme');
-  const reader = document.getElementById('reader');
-  const sync = () => themeSwitch.setAttribute('aria-checked',String(reader.dataset.theme === 'dark'));
+  const browser = document.getElementById('browser');
+  const sync = () => themeSwitch.setAttribute('aria-checked',String(browser.dataset.theme === 'dark'));
   function show(open, restoreFocus = false) {
     panel.hidden = !open;
     toggle.setAttribute('aria-expanded',String(open));
@@ -21,10 +21,10 @@
     if (event.key === 'Escape' && !panel.hidden) {event.preventDefault();show(false,true);}
   });
   themeSwitch.addEventListener('click',() => {
-    document.getElementById('reader-theme-toggle').click();
+    document.querySelector('.browser-theme-button').click();
     sync();
   });
-  new MutationObserver(sync).observe(reader,{attributes:true,attributeFilter:['data-theme']});
+  new MutationObserver(sync).observe(browser,{attributes:true,attributeFilter:['data-theme']});
   document.getElementById('settings-desktop').addEventListener('click',() => {
     show(false,true);
     document.querySelector('.desktop-toggle').click();
@@ -32,6 +32,10 @@
   document.getElementById('settings-about').addEventListener('click',() => {
     show(false);
     document.querySelector('.dock-button[data-open="welcome"]').click();
+  });
+  document.getElementById('settings-wallpaper-toggle').addEventListener('click',() => {
+    show(false);
+    document.querySelector('.dock-button[data-open="album"]').click();
   });
   sync();
 })();

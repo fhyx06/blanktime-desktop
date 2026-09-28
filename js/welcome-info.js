@@ -9,7 +9,7 @@
     const timestamp = Date.parse(update.dateTime);
     if (!Number.isFinite(timestamp)) return;
     const days = Math.max(0, Math.floor((Date.now() - timestamp) / 86400000));
-    update.title = '最近文章更新于 ' + new Date(timestamp).toLocaleString('zh-CN');
+    update.title = '最新帖子发布于 ' + new Date(timestamp).toLocaleString('zh-CN');
     update.textContent = days === 0 ? '今天' : days < 30 ? days + ' 天前' : days < 365 ? Math.floor(days / 30) + ' 个月前' : Math.floor(days / 365) + ' 年前';
   }
   updateSiteInfo();

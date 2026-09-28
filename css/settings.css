@@ -14,3 +14,4 @@
 [aria-checked="true"] > .settings-switch::after {transform:translateX(12px);}
 .settings-note {margin:0;padding:11px 16px;text-align:center;font-size:10px;color:#92979c;border-top:1px solid #edeef0;}
 @media(max-width:760px) {.settings-panel {left:58px;bottom:8px;max-width:calc(100vw - 66px);max-height:calc(100dvh - 16px);} .settings-items > button {padding:14px 16px;gap:10px;}}
+

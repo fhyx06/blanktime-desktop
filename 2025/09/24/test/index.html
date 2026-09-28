@@ -49,12 +49,20 @@
   <script src="/js/desktop.js" defer></script>
   <link rel="stylesheet" href="/css/settings.css">
   <script src="/js/settings.js" defer></script>
+  <link rel="stylesheet" href="/css/browser.css">
+  <script src="/js/reading.js" defer></script>
+  <script src="/js/browser.js" defer></script>
+  <script src="/js/wallpaper.js" defer></script>
+  <link rel="stylesheet" href="/css/album.css">
+  <script src="/js/album.js" defer></script>
   <script src="/js/music.js" defer></script>
   <script src="/js/poetry.js" defer></script>
   <script src="/js/welcome-info.js" defer></script>
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-home="/" style="--wallpaper: url('/images/cover.jpg')">
   <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-browser" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18Z"/></symbol>
+    <symbol id="i-album" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="2"/><path d="m3 17 6-6 4 4 3-3 5 5"/></symbol>
     <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 8l12-2"/><ellipse cx="6" cy="18" rx="3" ry="3"/><ellipse cx="18" cy="16" rx="3" ry="3"/></symbol>
     <symbol id="i-home" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
     <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 3h12a3 3 0 0 1 3 3v15H6a3 3 0 0 1-3-3V4a1 1 0 0 1 1-1ZM3 17h16M7 7h7M7 11h5"/></symbol>
@@ -67,8 +75,9 @@
     <button class="dock-button" data-open="welcome" aria-label="欢迎窗口" title="欢迎窗口"><svg><use href="#i-home"/></svg><span class="running-dot"></span></button>
     <span class="dock-divider"></span>
     <button class="dock-button" data-open="files" aria-label="文件管理" title="文件管理"><span class="dock-app-icon" aria-hidden="true"><span class="folder-art"><span></span></span></span><span class="running-dot"></span></button>
-    <button class="dock-button" data-open="reader" aria-label="文章阅读器" title="文章阅读器"><svg><use href="#i-book"/></svg><span class="running-dot"></span></button>
     <button class="dock-button" data-open="music" aria-label="音乐播放器" title="音乐播放器"><span class="dock-app-icon" aria-hidden="true"><span class="music-icon-art"><svg><use href="#i-music"/></svg></span></span><span class="running-dot"></span></button>
+    <button class="dock-button" data-open="album" aria-label="相册" title="相册"><span class="album-icon-art" aria-hidden="true"><svg><use href="#i-album"/></svg></span><span class="running-dot"></span></button>
+    <button class="dock-button" data-open="browser" aria-label="博客浏览器" title="博客浏览器"><span class="browser-icon-art" aria-hidden="true"><svg><use href="#i-browser"/></svg></span><span class="running-dot"></span></button>
     <div class="dock-space"></div>
     <button class="dock-button desktop-toggle" aria-label="显示桌面" title="显示桌面"><svg><use href="#i-grid"/></svg></button>
     <button class="dock-button" id="settings-toggle" type="button" title="设置" aria-label="设置" aria-expanded="false" aria-controls="settings-panel" aria-haspopup="dialog"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m9 3-.6 2.3-2 .9-2.1-.6-2 3.4 1.6 1.8v2.4L2.3 15l2 3.4 2.1-.6 2 .9L9 21h6l.6-2.3 2-.9 2.1.6 2-3.4-1.6-1.8v-2.4L21.7 9l-2-3.4-2.1.6-2-.9L15 3Z"/><circle cx="12" cy="12" r="3"/></svg></button>
@@ -84,10 +93,12 @@
       <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20.5 14A9 9 0 0 1 10 3.5 9 9 0 1 0 20.5 14Z"/></svg>
       <span>阅读深色模式</span><span class="settings-switch" aria-hidden="true"></span>
     </button>
+    <button type="button" id="settings-wallpaper-toggle" aria-controls="album"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="2"/><path d="m3 17 6-6 4 4 3-3 5 5"/></svg><span>更换壁纸</span></button>
+
     <button type="button" id="settings-desktop"><svg aria-hidden="true"><use href="#i-home"/></svg><span>显示桌面</span></button>
     <button type="button" id="settings-about"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v1"/></svg><span>关于本站</span></button>
   </div>
-  <p class="settings-note">阅读偏好保存在当前浏览器</p>
+  <p class="settings-note">外观偏好保存在当前浏览器</p>
 </section>
 
   <div class="desktop-status"><span class="status-dot"></span><span>空白时间</span><span class="status-divider"></span><time id="clock"></time></div>
@@ -186,6 +197,30 @@
 </section>
 
     
+    <button class="desktop-file-icon desktop-album-icon" data-open="album" type="button" aria-label="打开相册" title="单击打开相册"><span class="album-icon-art" aria-hidden="true"><svg><use href="#i-album"/></svg></span><span>相册</span></button>
+    <section class="app-window album-window" id="album" aria-label="相册窗口" tabindex="-1" hidden>
+<header class="titlebar"><div class="window-caption"><svg aria-hidden="true"><use href="#i-album"/></svg><span>相册</span></div><div class="window-controls"><button data-action="minimize" aria-label="最小化" title="最小化"><svg viewBox="0 0 16 16"><path d="M3 8h10"/></svg></button><button data-action="maximize" aria-label="最大化" title="最大化"><svg viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8"/></svg></button><button data-action="close" aria-label="关闭" title="关闭"><svg viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></button></div>
+</header>
+<div class="album-content">
+ <div class="album-toolbar"><div><h2>我的相册</h2><p>壁纸与图片</p></div><button type="button" id="wallpaper-reset">恢复默认壁纸</button></div>
+
+<div class="album-grid" id="album-grid">
+ 
+  <button class="album-card" type="button" data-src="/images/wallpapers/cover.jpg" data-name="cover.jpg"><img src="/images/wallpapers/cover.jpg" alt="" loading="lazy"><span>cover.jpg</span></button>
+ 
+  <button class="album-card" type="button" data-src="https://cos.blanktime.cn/assets/images/moon%20hour%20w.png" data-name="124240893w"><img src="https://cos.blanktime.cn/assets/images/moon%20hour%20w.png" alt="" loading="lazy"><span>124240893w</span></button>
+ 
+  <button class="album-card" type="button" data-src="https://cos.blanktime.cn/assets/images/moon%20hour%20h.png" data-name="124240893h"><img src="https://cos.blanktime.cn/assets/images/moon%20hour%20h.png" alt="" loading="lazy"><span>124240893h</span></button>
+ 
+</div>
+<section class="album-preview" id="album-preview" aria-label="图片预览" hidden>
+ <div class="album-preview-toolbar"><button type="button" id="album-back">返回相册</button><strong id="album-name"></strong><button type="button" id="album-wallpaper">设为壁纸</button></div>
+ <div class="album-preview-image"><img id="album-image" alt=""></div>
+</section>
+</div>
+<footer class="window-status"><span id="album-status" role="status" aria-live="polite">选择图片查看大图</span><span>壁纸偏好保存在当前浏览器</span></footer>
+</section>
+
     
 <section class="app-window files-window" id="files" aria-label="文件管理窗口" tabindex="-1" hidden>
   <header class="titlebar"><div class="window-caption"><span class="folder-art folder-art-small" aria-hidden="true"><span></span></span><span>文件管理</span></div><div class="window-controls"><button data-action="minimize" aria-label="最小化" title="最小化"><svg viewBox="0 0 16 16"><path d="M3 8h10"/></svg></button><button data-action="maximize" aria-label="最大化" title="最大化"><svg viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8"/></svg></button><button data-action="close" aria-label="关闭" title="关闭"><svg viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></button></div>
@@ -195,23 +230,23 @@
       <button class="files-category is-selected" data-category="all" aria-current="page"><svg><use href="#i-folder"/></svg><span>所有帖子</span><small>18</small></button>
       <p class="files-sidebar-label">分类</p>
       
-        <button class="files-category" data-category="cuidXseen9mOx5k2xk3jPRvBs"><svg><use href="#i-folder"/></svg><span>Test</span><small>1</small></button>
+        <button class="files-category" data-category="cuidmaVV1bPNmT0kkSGh7hb2T"><svg><use href="#i-folder"/></svg><span>Test</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuid-G6i49vnaNIEs9ZDc0_XS"><svg><use href="#i-folder"/></svg><span>主题开发</span><small>1</small></button>
+        <button class="files-category" data-category="cuidnHz7UG2Fv_dThRsQGLzvD"><svg><use href="#i-folder"/></svg><span>主题开发</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidLlwRyhgIJEG0SaUpJpSkU"><svg><use href="#i-folder"/></svg><span>工具</span><small>3</small></button>
+        <button class="files-category" data-category="cuidqnLfgW_wle9-lulwrg8D8"><svg><use href="#i-folder"/></svg><span>工具</span><small>3</small></button>
       
-        <button class="files-category" data-category="cuidgjiFWdG23BMp27ZvM-ZVY"><svg><use href="#i-folder"/></svg><span>文章鉴赏</span><small>2</small></button>
+        <button class="files-category" data-category="cuidVoGmfViStQz7J-NoZoEBz"><svg><use href="#i-folder"/></svg><span>文章鉴赏</span><small>2</small></button>
       
-        <button class="files-category" data-category="cuidDMK9WQpiCjJA4Onma0SuB"><svg><use href="#i-folder"/></svg><span>测试</span><small>1</small></button>
+        <button class="files-category" data-category="cuidIG1oVDec4GKEl11XIeS3U"><svg><use href="#i-folder"/></svg><span>测试</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidUPL4OyNdh2zyNyPLLhzgG"><svg><use href="#i-folder"/></svg><span>硬件</span><small>1</small></button>
+        <button class="files-category" data-category="cuidcPLMmNufORwUj8qU0KYUn"><svg><use href="#i-folder"/></svg><span>硬件</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidl0b7Kloy1ZTxG1lTAGV4s"><svg><use href="#i-folder"/></svg><span>经验记录</span><small>1</small></button>
+        <button class="files-category" data-category="cuidzYUygxekbzayQs6jGaA5x"><svg><use href="#i-folder"/></svg><span>经验记录</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidwQiZh_fkgJfdR1nBg5BF8"><svg><use href="#i-folder"/></svg><span>记录</span><small>8</small></button>
+        <button class="files-category" data-category="cuidb1cvcfYj6Hi9s9aks-3CO"><svg><use href="#i-folder"/></svg><span>记录</span><small>8</small></button>
       
-        <button class="files-category" data-category="cuidI_41cTNUzLuDgYp_ybbly"><svg><use href="#i-folder"/></svg><span>链接</span><small>1</small></button>
+        <button class="files-category" data-category="cuidn_h6Ozqmj-Om70Xbe2rgH"><svg><use href="#i-folder"/></svg><span>链接</span><small>1</small></button>
       
       
     </nav>
@@ -223,126 +258,126 @@
           <thead><tr><th scope="col">文件名称</th><th scope="col">分类</th><th scope="col">发布时间</th><th scope="col">类型</th></tr></thead>
           <tbody id="files-list">
             
-            <tr class="post-file" data-title="Markdown 全功能显示测试" data-date="1790490000000" data-categories="[&#34;cuidDMK9WQpiCjJA4Onma0SuB&#34;]" data-search="Markdown 全功能显示测试 markdown-render-test 测试 Markdown Test">
+            <tr class="post-file" data-title="Markdown 全功能显示测试" data-date="1790490000000" data-categories="[&#34;cuidIG1oVDec4GKEl11XIeS3U&#34;]" data-search="Markdown 全功能显示测试 markdown-render-test 测试 Markdown Test">
               <td><a class="file-link" href="/2026/09/27/markdown-render-test/" title="Markdown 全功能显示测试.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Markdown 全功能显示测试<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">测试</td>
               <td><time datetime="2026-09-27T06:20:00.000Z">2026-09-27</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Markdown 样式测试" data-date="1790425800000" data-categories="[&#34;cuid-G6i49vnaNIEs9ZDc0_XS&#34;]" data-search="Markdown 样式测试 markdown-style-test 主题开发 Markdown 主题测试">
+            <tr class="post-file" data-title="Markdown 样式测试" data-date="1790425800000" data-categories="[&#34;cuidnHz7UG2Fv_dThRsQGLzvD&#34;]" data-search="Markdown 样式测试 markdown-style-test 主题开发 Markdown 主题测试">
               <td><a class="file-link" href="/2026/09/26/markdown-style-test/" title="Markdown 样式测试.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Markdown 样式测试<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">主题开发</td>
               <td><time datetime="2026-09-26T12:30:00.000Z">2026-09-26</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="OnePlus13刷入crDroid" data-date="1780392006000" data-categories="[&#34;cuidwQiZh_fkgJfdR1nBg5BF8&#34;]" data-search="OnePlus13刷入crDroid OnePlus13-Rom 记录 刷机">
+            <tr class="post-file" data-title="OnePlus13刷入crDroid" data-date="1780392006000" data-categories="[&#34;cuidb1cvcfYj6Hi9s9aks-3CO&#34;]" data-search="OnePlus13刷入crDroid OnePlus13-Rom 记录 刷机">
               <td><a class="file-link" href="/2026/06/02/OnePlus13-Rom/" title="OnePlus13刷入crDroid.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">OnePlus13刷入crDroid<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2026-06-02T09:20:06.000Z">2026-06-02</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="关于洛克保底记录工具的杂谈" data-date="1777208654000" data-categories="[&#34;cuidLlwRyhgIJEG0SaUpJpSkU&#34;]" data-search="关于洛克保底记录工具的杂谈 Roco 工具 洛克王国 工具">
+            <tr class="post-file" data-title="关于洛克保底记录工具的杂谈" data-date="1777208654000" data-categories="[&#34;cuidqnLfgW_wle9-lulwrg8D8&#34;]" data-search="关于洛克保底记录工具的杂谈 Roco 工具 洛克王国 工具">
               <td><a class="file-link" href="/2026/04/26/Roco/" title="关于洛克保底记录工具的杂谈.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">关于洛克保底记录工具的杂谈<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">工具</td>
               <td><time datetime="2026-04-26T13:04:14.000Z">2026-04-26</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Bitwarden + Vaultwarden 自托管密码管理" data-date="1772592850000" data-categories="[&#34;cuidwQiZh_fkgJfdR1nBg5BF8&#34;]" data-search="Bitwarden + Vaultwarden 自托管密码管理 pwd 记录 密码管理器 Bitwarden Vaultwarden">
+            <tr class="post-file" data-title="Bitwarden + Vaultwarden 自托管密码管理" data-date="1772592850000" data-categories="[&#34;cuidb1cvcfYj6Hi9s9aks-3CO&#34;]" data-search="Bitwarden + Vaultwarden 自托管密码管理 pwd 记录 密码管理器 Bitwarden Vaultwarden">
               <td><a class="file-link" href="/2026/03/04/pwd/" title="Bitwarden + Vaultwarden 自托管密码管理.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Bitwarden + Vaultwarden 自托管密码管理<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2026-03-04T02:54:10.000Z">2026-03-04</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="RX 9070 功耗解锁" data-date="1768883168000" data-categories="[&#34;cuidwQiZh_fkgJfdR1nBg5BF8&#34;]" data-search="RX 9070 功耗解锁 RX-9070-power 记录 RX9070 AMD显卡 Linux">
+            <tr class="post-file" data-title="RX 9070 功耗解锁" data-date="1768883168000" data-categories="[&#34;cuidb1cvcfYj6Hi9s9aks-3CO&#34;]" data-search="RX 9070 功耗解锁 RX-9070-power 记录 RX9070 AMD显卡 Linux">
               <td><a class="file-link" href="/2026/01/20/RX-9070-power/" title="RX 9070 功耗解锁.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">RX 9070 功耗解锁<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2026-01-20T04:26:08.000Z">2026-01-20</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="关于折腾 NAS 的记录" data-date="1768269069000" data-categories="[&#34;cuidl0b7Kloy1ZTxG1lTAGV4s&#34;,&#34;cuidUPL4OyNdh2zyNyPLLhzgG&#34;]" data-search="关于折腾 NAS 的记录 NAS 经验记录 硬件 NAS 飞牛OS 硬件折腾">
+            <tr class="post-file" data-title="关于折腾 NAS 的记录" data-date="1768269069000" data-categories="[&#34;cuidzYUygxekbzayQs6jGaA5x&#34;,&#34;cuidcPLMmNufORwUj8qU0KYUn&#34;]" data-search="关于折腾 NAS 的记录 NAS 经验记录 硬件 NAS 飞牛OS 硬件折腾">
               <td><a class="file-link" href="/2026/01/13/NAS/" title="关于折腾 NAS 的记录.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">关于折腾 NAS 的记录<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">经验记录 / 硬件</td>
               <td><time datetime="2026-01-13T01:51:09.000Z">2026-01-13</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Root管理器与一些模块链接" data-date="1760904426000" data-categories="[&#34;cuidI_41cTNUzLuDgYp_ybbly&#34;]" data-search="Root管理器与一些模块链接 root-modules 链接 刷机 root 模块">
+            <tr class="post-file" data-title="Root管理器与一些模块链接" data-date="1760904426000" data-categories="[&#34;cuidn_h6Ozqmj-Om70Xbe2rgH&#34;]" data-search="Root管理器与一些模块链接 root-modules 链接 刷机 root 模块">
               <td><a class="file-link" href="/2025/10/20/root-modules/" title="Root管理器与一些模块链接.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Root管理器与一些模块链接<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">链接</td>
               <td><time datetime="2025-10-19T20:07:06.000Z">2025-10-20</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Redmi k40(alioth)刷入 Pixel OS" data-date="1760530347000" data-categories="[&#34;cuidwQiZh_fkgJfdR1nBg5BF8&#34;]" data-search="Redmi k40(alioth)刷入 Pixel OS Redmi-k40 记录 刷机">
+            <tr class="post-file" data-title="Redmi k40(alioth)刷入 Pixel OS" data-date="1760530347000" data-categories="[&#34;cuidb1cvcfYj6Hi9s9aks-3CO&#34;]" data-search="Redmi k40(alioth)刷入 Pixel OS Redmi-k40 记录 刷机">
               <td><a class="file-link" href="/2025/10/15/Redmi-k40/" title="Redmi k40(alioth)刷入 Pixel OS.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Redmi k40(alioth)刷入 Pixel OS<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-10-15T12:12:27.000Z">2025-10-15</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="文章鉴赏《潘嘎之交》" data-date="1759501289000" data-categories="[&#34;cuidgjiFWdG23BMp27ZvM-ZVY&#34;]" data-search="文章鉴赏《潘嘎之交》 pgzj 文章鉴赏 课文《潘嘎之交》">
+            <tr class="post-file" data-title="文章鉴赏《潘嘎之交》" data-date="1759501289000" data-categories="[&#34;cuidVoGmfViStQz7J-NoZoEBz&#34;]" data-search="文章鉴赏《潘嘎之交》 pgzj 文章鉴赏 课文《潘嘎之交》">
               <td><a class="file-link" href="/2025/10/03/pgzj/" title="文章鉴赏《潘嘎之交》.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">文章鉴赏《潘嘎之交》<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">文章鉴赏</td>
               <td><time datetime="2025-10-03T14:21:29.000Z">2025-10-03</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="文章鉴赏 《偷袭》" data-date="1759415070000" data-categories="[&#34;cuidgjiFWdG23BMp27ZvM-ZVY&#34;]" data-search="文章鉴赏 《偷袭》 MaBaoguo 文章鉴赏 课文《偷袭》">
+            <tr class="post-file" data-title="文章鉴赏 《偷袭》" data-date="1759415070000" data-categories="[&#34;cuidVoGmfViStQz7J-NoZoEBz&#34;]" data-search="文章鉴赏 《偷袭》 MaBaoguo 文章鉴赏 课文《偷袭》">
               <td><a class="file-link" href="/2025/10/02/MaBaoguo/" title="文章鉴赏 《偷袭》.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">文章鉴赏 《偷袭》<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">文章鉴赏</td>
               <td><time datetime="2025-10-02T14:24:30.000Z">2025-10-02</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="ollama" data-date="1759240654000" data-categories="[&#34;cuidwQiZh_fkgJfdR1nBg5BF8&#34;]" data-search="ollama ollama 记录 ollama amd ai">
+            <tr class="post-file" data-title="ollama" data-date="1759240654000" data-categories="[&#34;cuidb1cvcfYj6Hi9s9aks-3CO&#34;]" data-search="ollama ollama 记录 ollama amd ai">
               <td><a class="file-link" href="/2025/09/30/ollama/" title="ollama.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">ollama<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-09-30T13:57:34.000Z">2025-09-30</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Artalk评论系统" data-date="1758966839000" data-categories="[&#34;cuidwQiZh_fkgJfdR1nBg5BF8&#34;]" data-search="Artalk评论系统 Artalk评论系统 记录 评论">
+            <tr class="post-file" data-title="Artalk评论系统" data-date="1758966839000" data-categories="[&#34;cuidb1cvcfYj6Hi9s9aks-3CO&#34;]" data-search="Artalk评论系统 Artalk评论系统 记录 评论">
               <td><a class="file-link" href="/2025/09/27/Artalk%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/" title="Artalk评论系统.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Artalk评论系统<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-09-27T09:53:59.000Z">2025-09-27</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Ubuntu部分" data-date="1758810675000" data-categories="[&#34;cuidwQiZh_fkgJfdR1nBg5BF8&#34;]" data-search="Ubuntu部分 Ubuntu 记录 部署">
+            <tr class="post-file" data-title="Ubuntu部分" data-date="1758810675000" data-categories="[&#34;cuidb1cvcfYj6Hi9s9aks-3CO&#34;]" data-search="Ubuntu部分 Ubuntu 记录 部署">
               <td><a class="file-link" href="/2025/09/25/Ubuntu/" title="Ubuntu部分.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Ubuntu部分<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-09-25T14:31:15.000Z">2025-09-25</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="显示测试" data-date="1758714000000" data-categories="[&#34;cuidXseen9mOx5k2xk3jPRvBs&#34;]" data-search="显示测试 test Test 测试">
+            <tr class="post-file" data-title="显示测试" data-date="1758714000000" data-categories="[&#34;cuidmaVV1bPNmT0kkSGh7hb2T&#34;]" data-search="显示测试 test Test 测试">
               <td><a class="file-link" href="/2025/09/24/test/" title="显示测试.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">显示测试<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">Test</td>
               <td><time datetime="2025-09-24T11:40:00.000Z">2025-09-24</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Hexo" data-date="1758593644000" data-categories="[&#34;cuidwQiZh_fkgJfdR1nBg5BF8&#34;]" data-search="Hexo Hexo 记录 部署Hexo">
+            <tr class="post-file" data-title="Hexo" data-date="1758593644000" data-categories="[&#34;cuidb1cvcfYj6Hi9s9aks-3CO&#34;]" data-search="Hexo Hexo 记录 部署Hexo">
               <td><a class="file-link" href="/2025/09/23/Hexo/" title="Hexo.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Hexo<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-09-23T02:14:04.000Z">2025-09-23</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Typora1.9.5" data-date="1758529624000" data-categories="[&#34;cuidLlwRyhgIJEG0SaUpJpSkU&#34;]" data-search="Typora1.9.5 Typora1.9.5 工具 markdown">
+            <tr class="post-file" data-title="Typora1.9.5" data-date="1758529624000" data-categories="[&#34;cuidqnLfgW_wle9-lulwrg8D8&#34;]" data-search="Typora1.9.5 Typora1.9.5 工具 markdown">
               <td><a class="file-link" href="/2025/09/22/Typora1.9.5/" title="Typora1.9.5.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Typora1.9.5<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">工具</td>
               <td><time datetime="2025-09-22T08:27:04.000Z">2025-09-22</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Scrcpy" data-date="1758529624000" data-categories="[&#34;cuidLlwRyhgIJEG0SaUpJpSkU&#34;]" data-search="Scrcpy Scrcpy_new 工具 Scrcpy">
+            <tr class="post-file" data-title="Scrcpy" data-date="1758529624000" data-categories="[&#34;cuidqnLfgW_wle9-lulwrg8D8&#34;]" data-search="Scrcpy Scrcpy_new 工具 Scrcpy">
               <td><a class="file-link" href="/2025/09/22/Scrcpy_new/" title="Scrcpy.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Scrcpy<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">工具</td>
               <td><time datetime="2025-09-22T08:27:04.000Z">2025-09-22</time></td>
@@ -381,9 +416,9 @@
     <h2 id="site-info-title"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="m8 14-1 7 5-3 5 3-1-7"/></svg>站点信息</h2>
     <dl>
       <div><dt>文章数目</dt><dd>18 篇</dd></div>
-      <div><dt>已运行时间</dt><dd id="site-runtime" data-start="2025-09-19T16:00:00.000Z">372 天</dd></div>
+      <div><dt>已运行时间</dt><dd id="site-runtime" data-start="2025-09-19T16:00:00.000Z">373 天</dd></div>
       <div><dt>本站总字数</dt><dd title="中文按字、英文和数字按词统计">19,859 字</dd></div>
-      <div><dt>最后活动时间</dt><dd><time id="site-last-update" datetime="2026-09-27T06:20:00.000Z" title="最近一篇文章的更新时间">2026-09-27</time></dd></div>
+      <div><dt>最近活动时间</dt><dd><time id="site-last-update" datetime="2026-09-27T06:20:00.000Z" title="最新帖子的发布时间">2026-09-27</time></dd></div>
     </dl>
   </section>
   <section class="welcome-card welcome-contact" aria-labelledby="contact-title">
@@ -402,20 +437,7 @@
 </div>
 
     </section>
-    <section class="app-window reader-window" id="reader" aria-label="文章阅读器" tabindex="-1" >
-      <header class="titlebar"><div class="window-caption"><span class="app-badge markdown-badge">M</span><span>文章阅读器</span></div><div class="window-controls"><button data-action="minimize" aria-label="最小化" title="最小化"><svg viewBox="0 0 16 16"><path d="M3 8h10"/></svg></button><button data-action="maximize" aria-label="最大化" title="最大化"><svg viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8"/></svg></button><button data-action="close" aria-label="关闭" title="关闭"><svg viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></button></div>
-</header>
-      <div class="file-bar"><strong id="filename">test.md</strong><span class="readonly-label">只读</span><span class="file-encoding">UTF-8 <span>LF</span></span></div>
-      <div class="reader-toolbar" role="group" aria-label="阅读工具栏">
-        <button class="reader-tool" id="reader-theme-toggle" type="button" aria-label="切换到深色模式" title="切换到深色模式" aria-pressed="false">
-          <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 13.1A9 9 0 0 1 10.9 3.2a9 9 0 1 0 9.9 9.9Z"/></svg>
-          <svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
-        </button>
-        <button class="reader-tool" id="reader-toc-toggle" type="button" aria-label="隐藏目录" title="隐藏目录" aria-controls="article-toc" aria-expanded="true">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16M9 6h11M9 12h11M9 18h11M4 6h1M4 12h1M4 18h1"/></svg>
-        </button>
-      </div>
-      <div class="reading-layout"><div class="article-scroll" tabindex="0" aria-label="文章正文"><article class="markdown-body" data-article data-title="显示测试" data-date="2025-09-24" data-file="test.md">
+    <template id="article-source"><article class="markdown-body" data-article data-title="显示测试" data-date="2025-09-24" data-file="test.md">
   <header class="article-heading">
     <p class="eyebrow">BLANKTIME / NOTES</p>
     <h1 class="post-title">显示测试</h1>
@@ -557,12 +579,265 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 <p><br><br><br><br></p>
 <h2 id="完"><a href="#完" class="headerlink" title="完"></a><strong>完</strong></h2></div>
 </article>
-</div><aside class="toc-panel" id="article-toc" aria-label="文章目录"><div class="toc-heading">本文目录 <span>CONTENTS</span></div><nav id="toc"></nav></aside></div>
-      <footer class="window-status"><span id="word-count">文章阅读器</span><span id="reading-progress">已读 0%</span></footer>
-    </section>
+</template>
+    <button class="desktop-file-icon desktop-browser-icon" data-open="browser" aria-label="打开博客浏览器"><span class="browser-icon-art" aria-hidden="true"><svg><use href="#i-browser"/></svg></span><span>浏览器</span></button>
+    <section class="app-window reader-window browser-window" id="browser" aria-label="博客浏览器" tabindex="-1" hidden>
+  <header class="titlebar"><div class="window-caption"><span class="browser-icon-art" aria-hidden="true"><svg><use href="#i-browser"/></svg></span><span>博客浏览器</span></div><div class="window-controls"><button data-action="minimize" aria-label="最小化" title="最小化"><svg viewBox="0 0 16 16"><path d="M3 8h10"/></svg></button><button data-action="maximize" aria-label="最大化" title="最大化"><svg viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8"/></svg></button><button data-action="close" aria-label="关闭" title="关闭"><svg viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></button></div>
+</header>
+  <div class="browser-tabs" role="tablist" aria-label="浏览标签页"></div>
+  <div class="browser-toolbar">
+    <button type="button" class="browser-home-button" aria-label="返回文章首页" title="文章首页"><svg aria-hidden="true"><use href="#i-home"/></svg></button>
+    <span class="browser-location">空白时间 / 所有文章</span>
+    <button type="button" class="reader-tool browser-theme-button" aria-label="切换到深色模式" aria-pressed="false"><svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 13.1A9 9 0 0 1 10.9 3.2a9 9 0 1 0 9.9 9.9Z"/></svg><svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></button>
+    <button type="button" class="browser-toc-button" aria-label="显示目录" aria-expanded="false" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4v16M9 6h11M9 12h11M9 18h11"/></svg></button>
+  </div>
+  <div class="browser-pages">
+    <div class="browser-home browser-page" id="browser-home" role="tabpanel" tabindex="0">
+      <header class="browser-home-heading"><p>BLANKTIME / JOURNAL</p><h1>所有文章</h1><span>静默沉淀，向内而生。</span><label class="browser-search-label">搜索文章<input type="search" class="browser-search" placeholder="标题、摘要、分类…"></label></header>
+      <div class="browser-posts">
+      
+        <a class="browser-card" href="/2026/09/27/markdown-render-test/" data-title="Markdown 全功能显示测试">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>Markdown 全功能显示测试</h2><p>用途：测试 Markdown 渲染器、博客主题、CSS 样式、字体、代码高亮、排版细节与扩展语法兼容性。建议使用 UTF-8 编码保存。不同渲染器对扩展语法的支持程度可能不同。 用途：测试 Markdown 渲染器、博客主题、CSS 样式、字体、代码高亮、排版细节与扩展语法兼容性。建议使用 UTF-8 编码保存。不同渲染器对扩展语法的支持程度可能不同。 1.</p><footer><span>2026-09-27 · 测试</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2026/09/26/markdown-style-test/" data-title="Markdown 样式测试">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>Markdown 样式测试</h2><p>这是一篇用于检查 BlankTime 桌面主题的排版样本。你可以拖动窗口、调整大小、切换最大化，并点击右侧目录，观察不同宽度下的阅读效果。 文中包含基础 Markdown、常见 HTML 和现有 Volantis 标签的兼容示例。数学公式已启用渲染；Mermaid 仍保留为后续功能的测试样本。</p><footer><span>2026-09-26 · 主题开发</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2026/06/02/OnePlus13-Rom/" data-title="OnePlus13刷入crDroid">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span><img src="https://cos.blanktime.cn/assets/images/crDroid%20home.png" loading="lazy" alt=""></div>
+          <div class="browser-card-text"><h2>OnePlus13刷入crDroid</h2><p>一加13作为清朝的旗舰机型，其强悍的硬件配置如果配上纯净、轻量且高度可定制的类原生系统，体验究竟如何？本文将盘点目前一加13（dodge）主流的几个类原生ROM，并记录我最终选择刷入 crDroid 的全过程与初步上手体验。</p><footer><span>2026-06-02 · 记录</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2026/04/26/Roco/" data-title="关于洛克保底记录工具的杂谈">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span><img src="https://cos.blanktime.cn/assets/images/%E6%B0%B4%E8%93%9D%E8%93%9D.png" loading="lazy" alt=""></div>
+          <div class="browser-card-text"><h2>关于洛克保底记录工具的杂谈</h2><p>洛克S1赛季奇遇异色保底记录工具</p><footer><span>2026-04-26 · 工具</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2026/03/04/pwd/" data-title="Bitwarden + Vaultwarden 自托管密码管理">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span><img src="https://raw.githubusercontent.com/dani-garcia/vaultwarden/main/resources/vaultwarden-logo-auto.svg" loading="lazy" alt=""></div>
+          <div class="browser-card-text"><h2>Bitwarden + Vaultwarden 自托管密码管理</h2><p>Vaultwarden是Bitwarden的轻量化自建版本，支持Docker快速部署。它能让你在自己的服务器上安全存储密码，完美适配官方全平台客户端，并免费解锁TOTP等高级功能。部署时只需准备服务器和HTTPS域名，通过容器编排即可上线。</p><footer><span>2026-03-04 · 记录</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2026/01/20/RX-9070-power/" data-title="RX 9070 功耗解锁">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span><img src="https://www.amd.com/content/dam/amd/en/images/products/graphics/radeon-rx-9070/2922918-radeon-rx-9070-product.jpg" loading="lazy" alt=""></div>
+          <div class="browser-card-text"><h2>RX 9070 功耗解锁</h2><p>RX 9070 显卡功耗解锁与测试记录。</p><footer><span>2026-01-20 · 记录</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2026/01/13/NAS/" data-title="关于折腾 NAS 的记录">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span><img src="https://cos.blanktime.cn/assets/images/h110.png" loading="lazy" alt=""></div>
+          <div class="browser-card-text"><h2>关于折腾 NAS 的记录</h2><p>记录一次从 2009 年 AM3 老平台转向 Intel H110 平台组建 NAS 的过程。</p><footer><span>2026-01-13 · 经验记录 · 硬件</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/10/20/root-modules/" data-title="Root管理器与一些模块链接">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>Root管理器与一些模块链接</h2><p>本文汇总了Android系统核心管理工具与模块，主要包括：Root管理器（Magisk系列、内核系列）、功能模块（Zygisk组件、LSPosed框架及用于隐藏环境和绕过检测的模块）以及实用应用程序（如Shizuku、隐藏应用列表等）。</p><footer><span>2025-10-20 · 链接</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/10/15/Redmi-k40/" data-title="Redmi k40(alioth)刷入 Pixel OS">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span><img src="https://cos.blanktime.cn/assets/images/pixelOS.png" loading="lazy" alt=""></div>
+          <div class="browser-card-text"><h2>Redmi k40(alioth)刷入 Pixel OS</h2><p>本人手中的 Redmi k40 已吃灰良久，目前系统为 Paranoid Android，版本为Android 13。 本次刷入为：PixelOS 最新版（截止2025.10.15）</p><footer><span>2025-10-15 · 记录</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/10/03/pgzj/" data-title="文章鉴赏《潘嘎之交》">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>文章鉴赏《潘嘎之交》</h2><p>本文节选自《抖记·潘噶列传》，以简洁传神的笔触，记述了“潘嘎之交”的经典故事。文章分为前后两个对比鲜明的场景。前半部分，资深齐国学家潘子以长者姿态谆谆告诫晚辈嘎子，指出卖酒“水很深”，年轻的他“把握不住”，嘎子则虚心受教，场面诚恳动人。后半部分，情节陡然反转，潘子自己却投身于卖酒直播，并宣称“非长江不能握”，前后言行形成巨大反差。而嘎子对此只能无奈叹息，一句</p><footer><span>2025-10-03 · 文章鉴赏</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/10/02/MaBaoguo/" data-title="文章鉴赏 《偷袭》">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>文章鉴赏 《偷袭》</h2><p>文章摘要：本文是混元形意太极门掌门人马保国对一次个人经历的叙述。他提到有两个三十多岁的年轻人在健身房练功导致颈椎不适，前来请教浑元功法。在交流过程中，双方因对“死劲儿”与“化劲儿”的理解不同而产生分歧，最终发展为实战切磋。 马老师声称，在比试中自己迅速防住了对方的连续进攻（左正蹬、右鞭腿、左刺拳），并依循“点到为止”的传统武德，在击中对方面部后收力未发。然而</p><footer><span>2025-10-02 · 文章鉴赏</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/09/30/ollama/" data-title="ollama">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span><img src="https://ollama.com/public/ollama_cooking.png" loading="lazy" alt=""></div>
+          <div class="browser-card-text"><h2>ollama</h2><p>本文记录如何在 Windows 上为 AMD Radeon RX 9070（gfx1201）等新显卡启用 Ollama 的 GPU 加速：通过替换官方不支持新架构的 ROCm 库为社区提供的定制版本，实现从 CPU 到 GPU 的高效推理，并附验证方法和推荐图形客户端。</p><footer><span>2025-09-30 · 记录</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/09/27/Artalk%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/" data-title="Artalk评论系统">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>Artalk评论系统</h2><p>使用 Docker 部署 Artalk (Volantis主题)</p><footer><span>2025-09-27 · 记录</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/09/25/Ubuntu/" data-title="Ubuntu部分">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>Ubuntu部分</h2><p>Ubuntu 部署宝塔</p><footer><span>2025-09-25 · 记录</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/09/24/test/" data-title="显示测试">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span><img src="https://cos.blanktime.cn/assets/images/hh.jpg" loading="lazy" alt=""></div>
+          <div class="browser-card-text"><h2>显示测试</h2><p>此篇文章用于测试显示效果 :)</p><footer><span>2025-09-24 · Test</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/09/23/Hexo/" data-title="Hexo">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>Hexo</h2><p>梦开始的地方，Hexo基础搭建</p><footer><span>2025-09-23 · 记录</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/09/22/Typora1.9.5/" data-title="Typora1.9.5">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>Typora1.9.5</h2><p>Typora1.9.5食用方法，有能力建议支持正版</p><footer><span>2025-09-22 · 工具</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/09/22/Scrcpy_new/" data-title="Scrcpy">
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span></div>
+          <div class="browser-card-text"><h2>Scrcpy</h2><p>Scrcpy: 开源的高性能工具，它允许你通过 USB 数据线或 WiFi 网络，在电脑上实时显示并控制你的安卓手机或平板设备</p><footer><span>2025-09-22 · 工具</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+      </div>
+      <p class="browser-empty" hidden>没有找到匹配的文章。</p>
+    </div>
+  </div>
+  <footer class="window-status"><span class="browser-status" role="status">共 18 篇文章</span><span>空白时间</span></footer>
+</section>
+
   </main>
   <div id="announcement" class="toast" role="status" hidden></div>
-  <noscript><style>#welcome{display:none}.reader-window[hidden]{display:flex}.dock{display:none}</style><p class="noscript-notice">启用 JavaScript 可使用桌面窗口交互。<a href="/">返回首页</a></p><ul class="noscript-posts"><li><a href="/2026/09/27/markdown-render-test/">Markdown 全功能显示测试</a></li><li><a href="/2026/09/26/markdown-style-test/">Markdown 样式测试</a></li><li><a href="/2026/06/02/OnePlus13-Rom/">OnePlus13刷入crDroid</a></li><li><a href="/2026/04/26/Roco/">关于洛克保底记录工具的杂谈</a></li><li><a href="/2026/03/04/pwd/">Bitwarden + Vaultwarden 自托管密码管理</a></li><li><a href="/2026/01/20/RX-9070-power/">RX 9070 功耗解锁</a></li><li><a href="/2026/01/13/NAS/">关于折腾 NAS 的记录</a></li><li><a href="/2025/10/20/root-modules/">Root管理器与一些模块链接</a></li><li><a href="/2025/10/15/Redmi-k40/">Redmi k40(alioth)刷入 Pixel OS</a></li><li><a href="/2025/10/03/pgzj/">文章鉴赏《潘嘎之交》</a></li><li><a href="/2025/10/02/MaBaoguo/">文章鉴赏 《偷袭》</a></li><li><a href="/2025/09/30/ollama/">ollama</a></li><li><a href="/2025/09/27/Artalk%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/">Artalk评论系统</a></li><li><a href="/2025/09/25/Ubuntu/">Ubuntu部分</a></li><li><a href="/2025/09/24/test/">显示测试</a></li><li><a href="/2025/09/23/Hexo/">Hexo</a></li><li><a href="/2025/09/22/Typora1.9.5/">Typora1.9.5</a></li><li><a href="/2025/09/22/Scrcpy_new/">Scrcpy</a></li></ul></noscript>
+  <noscript><style>body{overflow:auto}.desktop,.dock{display:none}.noscript-article{background:white;margin:20px auto;max-width:1000px}</style><div class="noscript-article"><article class="markdown-body" data-article data-title="显示测试" data-date="2025-09-24" data-file="test.md">
+  <header class="article-heading">
+    <p class="eyebrow">BLANKTIME / NOTES</p>
+    <h1 class="post-title">显示测试</h1>
+    <div class="article-meta"><time datetime="2025-09-24T11:40:00.000Z">2025年09月24日</time><span># 测试</span></div>
+  </header>
+  <div class="post-content"><p>此篇文章用于测试显示效果  :)</p>
+<span id="more"></span>
+
+<h1 id="一级标题效果"><a href="#一级标题效果" class="headerlink" title="一级标题效果"></a>一级标题效果</h1><h2 id="二级标题效果"><a href="#二级标题效果" class="headerlink" title="二级标题效果"></a>二级标题效果</h2><h3 id="三级标题效果"><a href="#三级标题效果" class="headerlink" title="三级标题效果"></a>三级标题效果</h3><h4 id="四级标题效果"><a href="#四级标题效果" class="headerlink" title="四级标题效果"></a>四级标题效果</h4><h5 id="五级标题效果"><a href="#五级标题效果" class="headerlink" title="五级标题效果"></a>五级标题效果</h5><h6 id="六级标题效果"><a href="#六级标题效果" class="headerlink" title="六级标题效果"></a>六级标题效果</h6><h2 id="写累了，休息一下，看一季动画"><a href="#写累了，休息一下，看一季动画" class="headerlink" title="写累了，休息一下，看一季动画 :)"></a>写累了，休息一下，看一季动画 :)</h2><div style="position: relative; padding-bottom: 56.25%; height: 0;">
+  <iframe
+    src="//player.bilibili.com/player.html?isOutside=true&aid=116741841623687&bvid=BV13mJn68EjM&cid=39071714402&p=1&autoplay=false"
+    scrolling="no"
+    border="0"
+    frameborder="no"
+    allowfullscreen="true"
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+  </iframe>
+</div>
+
+
+<h2 id="列表"><a href="#列表" class="headerlink" title="列表"></a><strong>列表</strong></h2><ul>
+<li>无序列表效果</li>
+<li>巴山楚水凄凉地</li>
+<li>二十三年弃置身</li>
+<li>怀旧空吟闻笛赋</li>
+<li>到乡翻似烂柯人</li>
+</ul>
+<ol>
+<li>有序列表效果  </li>
+<li>坐和放宽，头抬起</li>
+<li>是的，你正在成功</li>
+<li>幸福倒计时结束</li>
+<li>新的寡妇11系统正在安装</li>
+<li>升级前请确认硬盘有充足免费空间</li>
+</ol>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a><strong>引用</strong></h2><blockquote>
+<p>引用部分效果</p>
+<p>莫听穿林打叶声，何妨吟啸且徐行。</p>
+<p>竹杖芒鞋轻胜马，谁怕？一蓑烟雨任平生。</p>
+</blockquote>
+<h2 id="超链接"><a href="#超链接" class="headerlink" title="超链接"></a><strong>超链接</strong></h2><p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1Fk4y1V7Lf/?share_source=copy_web&vd_source=a907c6b6e87fce59e96ee0bbb80e9a6d">超链接</a></p>
+<h2 id="代码块"><a href="#代码块" class="headerlink" title="代码块"></a><strong>代码块</strong></h2><figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># Python代码块效果</span><br>T =<span class="hljs-string">&quot;NwLto&quot;</span><br>i=<span class="hljs-string">&quot;aGehL&quot;</span><br>t =<span class="hljs-string">&quot;raaUi&quot;</span><br>a=<span class="hljs-string">&quot;rtdnf&quot;</span><br>n=<span class="hljs-string">&quot;oeete&quot;</span><br><br>plianList = [T, i ,t, a, n]<br>passWord = <span class="hljs-string">&quot;&quot;</span><br><br><span class="hljs-keyword">for</span> index <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(plianList)):<br>     <span class="hljs-keyword">for</span> <span class="hljs-built_in">str</span> <span class="hljs-keyword">in</span> plianList:<br>        passWord = passWord + <span class="hljs-built_in">str</span>[index]<br><br><span class="hljs-built_in">print</span>(passWord)<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight markdown"><table><tr><td class="code"><pre><code class="hljs markdown"><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;position: relative; padding-bottom: 56.25%; height: 0;&quot;</span>&gt;</span></span><br>  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">iframe</span></span></span><br><span class="hljs-tag"><span class="language-xml">    <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;//player.bilibili.com/player.html?isOutside=true&amp;aid=115088212106510&amp;bvid=BV1eveRz2ETJ&amp;cid=31929076671&amp;p=1&amp;autoplay=false&quot;</span></span></span><br><span class="hljs-tag"><span class="language-xml">    <span class="hljs-attr">scrolling</span>=<span class="hljs-string">&quot;no&quot;</span></span></span><br><span class="hljs-tag"><span class="language-xml">    <span class="hljs-attr">border</span>=<span class="hljs-string">&quot;0&quot;</span></span></span><br><span class="hljs-tag"><span class="language-xml">    <span class="hljs-attr">frameborder</span>=<span class="hljs-string">&quot;no&quot;</span></span></span><br><span class="hljs-tag"><span class="language-xml">    <span class="hljs-attr">allowfullscreen</span>=<span class="hljs-string">&quot;true&quot;</span></span></span><br><span class="hljs-tag"><span class="language-xml">    <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;position: absolute; top: 0; left: 0; width: 100%; height: 100%;&quot;</span>&gt;</span></span><br>  <span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">iframe</span>&gt;</span></span><br><span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span><br></code></pre></td></tr></table></figure>
+
+<h2 id="行内代码"><a href="#行内代码" class="headerlink" title="行内代码"></a><strong>行内代码</strong></h2><p>行内代码样式： <code>print(&quot;行内代码&quot;)</code> </p>
+<h2 id="数学公式"><a href="#数学公式" class="headerlink" title="数学公式"></a><strong>数学公式</strong></h2><span class="math-expression math-display" data-tex="x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>x</mi><mo>=</mo><mfrac><mrow><mo>−</mo><mi>b</mi><mo>±</mo><msqrt><mrow><msup><mi>b</mi><mn>2</mn></msup><mo>−</mo><mn>4</mn><mi>a</mi><mi>c</mi></mrow></msqrt></mrow><mrow><mn>2</mn><mi>a</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.2764em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.5904em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mord mathnormal">a</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">−</span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">±</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9134em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">4</span><span class="mord mathnormal">a</span><span class="mord mathnormal">c</span></span></span><span style="top:-2.8734em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1266em;"><span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></span>
+<span class="math-expression math-display" data-tex="t+1=2"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>t</mi><mo>+</mo><mn>1</mn><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">t+1=2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6984em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span></span></span>
+<span class="math-expression math-display" data-tex="\mbox{积累因子}=\begin{cases}
+1+ni &amp; \mbox{单利}\\\\
+(1+i)^n &amp; \mbox{复利}
+\end{cases}"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>积累因子</mtext><mo>=</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>1</mn><mo>+</mo><mi>n</mi><mi>i</mi></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>单利</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><mi>i</mi><msup><mo stretchy="false">)</mo><mi>n</mi></msup></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>复利</mtext></mstyle></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">\mbox{积累因子}=\begin{cases}
+1+ni &amp; \mbox{单利}\\\\
+(1+i)^n &amp; \mbox{复利}
+\end{cases}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord cjk_fallback">积累因子</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:4.32em;vertical-align:-1.91em;"></span><span class="minner"><span class="mopen"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.35em;"><span style="top:-2.2em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎩</span></span></span><span style="top:-2.192em;"><span class="pstrut" style="height:3.15em;"></span><span style="height:0.316em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="0.316em" style="width:0.8889em" viewBox="0 0 888.89 316" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V316 H384z M384 0 H504 V316 H384z"/></svg></span></span><span style="top:-3.15em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎨</span></span></span><span style="top:-4.292em;"><span class="pstrut" style="height:3.15em;"></span><span style="height:0.316em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="0.316em" style="width:0.8889em" viewBox="0 0 888.89 316" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V316 H384z M384 0 H504 V316 H384z"/></svg></span></span><span style="top:-4.6em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎧</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.85em;"><span></span></span></span></span></span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.41em;"><span style="top:-4.41em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">ni</span></span></span><span style="top:-2.97em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"></span></span><span style="top:-1.53em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">i</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.91em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:1em;"></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.41em;"><span style="top:-4.41em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord text"><span class="mord cjk_fallback">单利</span></span></span></span><span style="top:-1.53em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord text"><span class="mord cjk_fallback">复利</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.91em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></span>
+<span class="math-expression math-display" data-tex="\begin{equation}
+\sum_{i=0}^n F_i \cdot \phi (H, p_i) - \sum_{i=1}^n a_i \cdot ( \tilde{x_i}, \tilde{y_i}) + b_i \cdot ( \tilde{x_i}^2 , \tilde{y_i}^2 )
+\end{equation}"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.16em" columnspacing="1em"><mtr><mtd class ="mtr-glue"></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>0</mn></mrow><mi>n</mi></munderover><msub><mi>F</mi><mi>i</mi></msub><mo>⋅</mo><mi>ϕ</mi><mo stretchy="false">(</mo><mi>H</mi><mo separator="true">,</mo><msub><mi>p</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo>−</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>a</mi><mi>i</mi></msub><mo>⋅</mo><mo stretchy="false">(</mo><mover accent="true"><msub><mi>x</mi><mi>i</mi></msub><mo>~</mo></mover><mo separator="true">,</mo><mover accent="true"><msub><mi>y</mi><mi>i</mi></msub><mo>~</mo></mover><mo stretchy="false">)</mo><mo>+</mo><msub><mi>b</mi><mi>i</mi></msub><mo>⋅</mo><mo stretchy="false">(</mo><msup><mover accent="true"><msub><mi>x</mi><mi>i</mi></msub><mo>~</mo></mover><mn>2</mn></msup><mo separator="true">,</mo><msup><mover accent="true"><msub><mi>y</mi><mi>i</mi></msub><mo>~</mo></mover><mn>2</mn></msup><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd class ="mtr-glue"></mtd><mtd class ="mml-eqn-num"></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{equation}
+\sum_{i=0}^n F_i \cdot \phi (H, p_i) - \sum_{i=1}^n a_i \cdot ( \tilde{x_i}, \tilde{y_i}) + b_i \cdot ( \tilde{x_i}^2 , \tilde{y_i}^2 )
+\end{equation}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.9291em;vertical-align:-1.2145em;"></span><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.7145em;"><span style="top:-3.7145em;"><span class="pstrut" style="height:3.6514em;"></span><span class="mord"><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6514em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">0</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.3em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2777em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">ϕ</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6514em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.3em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2777em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mopen">(</span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.35em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">~</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.35em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">~</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mopen">(</span><span class="mord"><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.35em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">~</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8719em;"><span style="top:-3.1208em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.35em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">~</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8719em;"><span style="top:-3.1208em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2145em;"><span></span></span></span></span></span></span></span><span class="katex-tag"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.7145em;"><span style="top:-3.7145em;"><span class="pstrut" style="height:3.6514em;"></span><span class="eqn-num"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2145em;"><span></span></span></span></span></span></span></span></span></span>
+<span class="math-expression math-display" data-tex="\begin{equation}
+\beta^*(D) = \mathop{argmin} \limits_{\beta} \lambda {||\beta||}^2 + \sum_{i=1}^n max(0, 1 - y_i f_{\beta}(x_i))
+\end{equation}"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.16em" columnspacing="1em"><mtr><mtd class ="mtr-glue"></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><msup><mi>β</mi><mo>∗</mo></msup><mo stretchy="false">(</mo><mi>D</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mo><mi>a</mi><mi>r</mi><mi>g</mi><mi>m</mi><mi>i</mi><mi>n</mi></mo><mi>β</mi></munder><mi>λ</mi><msup><mrow><mi mathvariant="normal">∣</mi><mi mathvariant="normal">∣</mi><mi>β</mi><mi mathvariant="normal">∣</mi><mi mathvariant="normal">∣</mi></mrow><mn>2</mn></msup><mo>+</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mi>m</mi><mi>a</mi><mi>x</mi><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo>−</mo><msub><mi>y</mi><mi>i</mi></msub><msub><mi>f</mi><mi>β</mi></msub><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow></mstyle></mtd><mtd class ="mtr-glue"></mtd><mtd class ="mml-eqn-num"></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{equation}
+\beta^*(D) = \mathop{argmin} \limits_{\beta} \lambda {||\beta||}^2 + \sum_{i=1}^n max(0, 1 - y_i f_{\beta}(x_i))
+\end{equation}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.9291em;vertical-align:-1.2145em;"></span><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.7145em;"><span style="top:-3.7145em;"><span class="pstrut" style="height:3.6514em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.0528em;">β</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7387em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mbin mtight">∗</span></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6595em;"><span style="top:-2.1535em;margin-left:0em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0528em;">β</span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span><span class="mop"><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord mathnormal">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.0827em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">λ</span><span class="mord"><span class="mord"><span class="mord">∣∣</span><span class="mord mathnormal" style="margin-right:0.0528em;">β</span><span class="mord">∣∣</span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.954em;"><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6514em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.3em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2777em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">ma</span><span class="mord mathnormal">x</span><span class="mopen">(</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0528em;">β</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">))</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2145em;"><span></span></span></span></span></span></span></span><span class="katex-tag"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.7145em;"><span style="top:-3.7145em;"><span class="pstrut" style="height:3.6514em;"></span><span class="eqn-num"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2145em;"><span></span></span></span></span></span></span></span></span></span>
+<h2 id="任务列表"><a href="#任务列表" class="headerlink" title="任务列表"></a><strong>任务列表</strong></h2><ul>
+<li><input disabled="" type="checkbox"> 吃了吗</li>
+<li><input disabled="" type="checkbox"> 还没有</li>
+<li><input checked="" disabled="" type="checkbox"> 当然吃了</li>
+<li><input disabled="" type="checkbox"> 未选中为 - [ ]</li>
+<li><input checked="" disabled="" type="checkbox"> 选中为 - [x]</li>
+</ul>
+<h2 id="表格"><a href="#表格" class="headerlink" title="表格"></a><strong>表格</strong></h2><table>
+<thead>
+<tr>
+<th>上午</th>
+<th>中午</th>
+<th>下午</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>睡觉</td>
+<td>睡觉</td>
+<td>吃完饭睡觉</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th align="left">左对齐</th>
+<th align="center">居中对齐</th>
+<th align="right">右对齐</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">好的</td>
+<td align="center">雀食</td>
+<td align="right">我在右边</td>
+</tr>
+</tbody></table>
+<h2 id="横线"><a href="#横线" class="headerlink" title="横线"></a><strong>横线</strong></h2><hr>
+<h2 id="URL"><a href="#URL" class="headerlink" title="URL"></a><strong>URL</strong></h2><p><a href="https://bilibili.com" target="_blank" rel="noopener noreferrer">哔了哔了 ↗</a></p>
+<h2 id="图片"><a href="#图片" class="headerlink" title="图片"></a><strong>图片</strong></h2><center> <a target="_blank" rel="noopener" href="https://store.steampowered.com/app/1189490/_/"><img src="https://patchwiki.biligame.com/images/mcs/5/55/f9u9moi5t9eno58hvv8g6nkmrr16ucw.png" alt="林沐心"></a> </center>
+
+<center><del>觅长生</del>寻短见 </center>
+
+<h2 id="字体"><a href="#字体" class="headerlink" title="字体"></a><strong>字体</strong></h2><p><em>斜体</em></p>
+<p><strong>加粗</strong></p>
+<p><del>不是</del></p>
+<p><del>哥们</del></p>
+<p> <code>行内代码</code>  </p>
+<p><u>下划线</u></p>
+<p>☝️🤓    </p>
+<p>可能失效：&#x3D;&#x3D;小亮&#x3D;&#x3D;</p>
+<p><mark>另一种小亮</mark>    </p>
+<p>H<del>2</del>O</p>
+<p>另一种：H<sub>2</sub>O</p>
+<p>还有：<span class="math-expression math-display" data-tex="H_2O"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></mrow><annotation encoding="application/x-tex">H_2O</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0813em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span></span></span></span></span></span></p>
+<p>b^2^-4ac</p>
+<p>另一种：<span class="math-expression math-display" data-tex="b^2 - 4ac"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msup><mi>b</mi><mn>2</mn></msup><mo>−</mo><mn>4</mn><mi>a</mi><mi>c</mi></mrow><annotation encoding="application/x-tex">b^2 - 4ac</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9474em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span><span class="mord mathnormal">a</span><span class="mord mathnormal">c</span></span></span></span></span></span></p>
+<p>可能显示错误的：:joy:</p>
+<p><span class="spoiler" tabindex="0">看啥呢？你知道的太多了</span></p>
+<br>
+
+<p><kbd>↑</kbd>  <kbd>↑</kbd>  <kbd>↓</kbd>  <kbd>↓</kbd>  <kbd>←</kbd> <kbd>→</kbd>  <kbd>←</kbd> <kbd>→</kbd> <kbd>B</kbd> <kbd>A</kbd></p>
+<br>
+
+<p><br><br><br><br></p>
+<h2 id="完"><a href="#完" class="headerlink" title="完"></a><strong>完</strong></h2></div>
+</article>
+</div><p class="noscript-notice">启用 JavaScript 可使用桌面窗口交互。<a href="/">返回首页</a></p><ul class="noscript-posts"><li><a href="/2026/09/27/markdown-render-test/">Markdown 全功能显示测试</a></li><li><a href="/2026/09/26/markdown-style-test/">Markdown 样式测试</a></li><li><a href="/2026/06/02/OnePlus13-Rom/">OnePlus13刷入crDroid</a></li><li><a href="/2026/04/26/Roco/">关于洛克保底记录工具的杂谈</a></li><li><a href="/2026/03/04/pwd/">Bitwarden + Vaultwarden 自托管密码管理</a></li><li><a href="/2026/01/20/RX-9070-power/">RX 9070 功耗解锁</a></li><li><a href="/2026/01/13/NAS/">关于折腾 NAS 的记录</a></li><li><a href="/2025/10/20/root-modules/">Root管理器与一些模块链接</a></li><li><a href="/2025/10/15/Redmi-k40/">Redmi k40(alioth)刷入 Pixel OS</a></li><li><a href="/2025/10/03/pgzj/">文章鉴赏《潘嘎之交》</a></li><li><a href="/2025/10/02/MaBaoguo/">文章鉴赏 《偷袭》</a></li><li><a href="/2025/09/30/ollama/">ollama</a></li><li><a href="/2025/09/27/Artalk%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/">Artalk评论系统</a></li><li><a href="/2025/09/25/Ubuntu/">Ubuntu部分</a></li><li><a href="/2025/09/24/test/">显示测试</a></li><li><a href="/2025/09/23/Hexo/">Hexo</a></li><li><a href="/2025/09/22/Typora1.9.5/">Typora1.9.5</a></li><li><a href="/2025/09/22/Scrcpy_new/">Scrcpy</a></li></ul></noscript>
 </body>
 </html>
 

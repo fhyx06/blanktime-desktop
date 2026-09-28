@@ -1,0 +1,41 @@
+.desktop-album-icon {top:259px;}
+.album-icon-art {width:46px;height:46px;display:grid;place-items:center;flex-shrink:0;border-radius:12px;background:linear-gradient(145deg,#b581ef,#7061dd);color:#fff;box-shadow:inset 0 1px 1px #fff8,0 3px 8px #0002;}
+.album-icon-art svg {width:28px;height:28px;stroke-width:1.8;}
+.dock-button > .album-icon-art {width:28px;height:28px;border-radius:8px;}
+.dock-button > .album-icon-art svg {width:19px;height:19px;}
+.album-window {width:min(940px,calc(100vw - 112px));height:min(720px,calc(100dvh - 64px));left:max(85px,calc(50vw - 430px));top:32px;}
+.album-content {position:relative;flex:1;min-height:0;overflow:auto;background:#fff;margin:0 8px;border-radius:8px;}
+.album-toolbar {display:flex;align-items:center;justify-content:space-between;padding:22px 24px 14px;}
+.album-toolbar h2 {font-size:22px;margin:0 0 5px;}
+.album-toolbar p {font-size:12px;color:#92979c;margin:0;}
+.album-toolbar button,.album-preview-toolbar button {padding:8px 13px;border:1px solid #e1e5ea;border-radius:6px;font-size:12px;background:#fff;}
+.album-toolbar button:hover,.album-preview-toolbar button:hover {background:#f2f5fa;}
+.album-grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:18px;padding:10px 24px 24px;}
+.album-card {min-width:0;text-align:left;padding:0;border:1px solid #e8ebef;border-radius:8px;overflow:hidden;background:#f7f8fa;}
+.album-card:hover {border-color:var(--accent);box-shadow:0 3px 12px #0001;}
+.album-card img {display:block;width:100%;height:130px;object-fit:cover;}
+.album-card span {display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:10px 12px;font-size:12px;}
+.album-preview {position:absolute;inset:0;display:flex;flex-direction:column;background:#f6f7f9;z-index:1;}
+.album-preview-toolbar {display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fff;border-bottom:1px solid #e8ebef;}
+.album-preview-toolbar strong {flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;}
+.album-preview-toolbar button {flex-shrink:0;}
+#album-wallpaper {background:var(--accent);color:#fff;border-color:transparent;}
+.album-preview-image {position:relative;flex:1;min-height:0;display:grid;place-items:center;padding:20px;}
+.album-preview-image img {position:absolute;inset:20px;width:calc(100% - 40px);height:calc(100% - 40px);object-fit:contain;}
+.album-content:has(.album-preview:not([hidden])) {overflow:hidden;}
+.album-window .window-status {height:auto;min-height:30px;gap:12px;padding:7px 12px;}
+#album-status {min-width:0;overflow-wrap:anywhere;}
+@media(max-width:760px) {
+ .desktop-album-icon {top:260px;}
+ .album-window,.album-window.is-maximized {left:58px!important;top:8px!important;width:calc(100vw - 66px)!important;height:calc(100dvh - 16px)!important;min-width:0;min-height:0;}
+ .album-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:10px 12px 16px;}
+ .album-card img {height:95px;}
+ .album-toolbar {padding:18px 12px 12px;}
+ .album-toolbar h2 {font-size:20px;}
+ .album-preview-toolbar {flex-wrap:wrap;padding:10px;}
+ .album-preview-toolbar strong {order:3;flex-basis:100%;}
+ .album-preview-toolbar button:last-child {margin-left:auto;}
+ .album-window .window-status > span:last-child {display:none;}
+}
+
+.album-empty {grid-column:1/-1;text-align:center;padding:60px 12px;color:#93989d;}
