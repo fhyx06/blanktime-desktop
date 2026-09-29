@@ -12,6 +12,10 @@
 .legacy-text-bold { font-weight: 700; }
 .legacy-paragraph { display: block; }
 .post-content .legacy-text img { width: 1.2em; height: 1.2em; object-fit: contain; vertical-align: -.18em; border-radius: 0; }
+.post-content .legacy-image { margin: 20px 0; text-align: center; }
+.post-content .legacy-image img { display: block; margin-inline: auto; }
+.post-content .legacy-image figcaption { margin-top: 8px; font-size: .85em; line-height: 1.6; color: inherit; opacity: .7; overflow-wrap: anywhere; }
+.post-content .gallery > .legacy-image { flex: 1 1 220px; min-width: 0; }
 .legacy-tabs { margin: 20px 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
 .legacy-tab-list { display: none; gap: 4px; padding: 8px; overflow: auto; border-bottom: 1px solid var(--line); }
 .legacy-tabs.is-enhanced .legacy-tab-list { display: flex; }
@@ -32,6 +36,10 @@
 .post-content a:focus-visible {
   color: var(--md-link-hover-color, #67c23a);
   text-decoration: underline;
+}
+.post-content u {
+  text-decoration-color: var(--md-underline-color, #67c23a);
+  text-underline-offset: .22em;
 }
 .post-content :not(pre) > code {
   color: var(--md-inline-code-color, #7850a8);
