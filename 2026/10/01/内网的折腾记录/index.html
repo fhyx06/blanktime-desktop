@@ -7,8 +7,8 @@
   <meta name="description" content="文字、折腾记录，以及一些突发奇想。">
   <meta name="theme-color" content="#1270FE">
   <link rel="icon" href="/images/icon/favicon.ico" type="image/x-icon">
-  <title>文章鉴赏 《偷袭》 · 空白时间</title>
-  <link rel="canonical" href="https://blog.blanktime.cn/2025/10/02/MaBaoguo/">
+  <title>内网的折腾记录 · 空白时间</title>
+  <link rel="canonical" href="https://blog.blanktime.cn/2026/10/01/%E5%86%85%E7%BD%91%E7%9A%84%E6%8A%98%E8%85%BE%E8%AE%B0%E5%BD%95/">
   <link rel="stylesheet" href="/css/desktop.css">
   <link rel="stylesheet" href="/css/markdown.css">
   <link rel="stylesheet" href="/css/reader.css">
@@ -459,70 +459,185 @@
 </div>
 
     </section>
-    <template id="article-source"><article class="markdown-body" data-article data-title="文章鉴赏 《偷袭》" data-date="2025-10-02" data-file="MaBaoguo.md">
+    <template id="article-source"><article class="markdown-body" data-article data-title="内网的折腾记录" data-date="2026-10-01" data-file="内网的折腾记录.md">
   <header class="article-heading">
     <p class="eyebrow">BLANKTIME / NOTES</p>
-    <h1 class="post-title">文章鉴赏 《偷袭》</h1>
-    <div class="article-meta"><time datetime="2025-10-02T14:24:30.000Z">2025年10月02日</time><span># 课文《偷袭》</span></div>
+    <h1 class="post-title">内网的折腾记录</h1>
+    <div class="article-meta"><time datetime="2026-10-01T07:40:00.000Z">2026年10月01日</time><span># NAS</span><span># 2.5G</span><span># 局域网</span><span># Wi-Fi 7</span><span># 家庭网络</span></div>
   </header>
-  <div class="post-content"><p>文章摘要：本文是混元形意太极门掌门人马保国对一次个人经历的叙述。他提到有两个三十多岁的年轻人在健身房练功导致颈椎不适，前来请教浑元功法。在交流过程中，双方因对“死劲儿”与“化劲儿”的理解不同而产生分歧，最终发展为实战切磋。</p>
-<p>马老师声称，在比试中自己迅速防住了对方的连续进攻（左正蹬、右鞭腿、左刺拳），并依循“点到为止”的传统武德，在击中对方面部后收力未发。然而，在他收拳之际，对方却突然偷袭，用左刺拳打中他的右眼，导致他一时受伤。</p>
-<p>文章结尾，马老师批评这两位年轻人“不讲武德”，指责他们用“骗”和“偷袭”的方式对待一位老同志，行为“不好”。他劝诫对方要“耗子尾汁”，好好反思，并强调武林应以和为贵，要讲武德，不要搞窝里斗。</p>
+  <div class="post-content"><p>家里的网络其实已经用了挺长时间。</p>
+<p>平时上网没有什么问题，NAS 也能正常访问。直到最近折腾 NAS 和局域网文件传输时，我突然发现了一个非常朴素的问题：</p>
+<p><strong>千兆网，好像开始不太够用了。</strong>🤔</p>
+<p>倒不是说千兆有多慢。</p>
+<p>对于互联网来说，日常上网完全够用。</p>
+<p>真正的问题出现在内网。</p>
+<p>NAS、PC、手机之间的数据传输，并不需要经过互联网。既然设备本身已经具备更高的性能，那让所有内网流量继续堵在千兆网口上，就多少有点可惜了。</p>
+<p>于是，一场 2.5G 局域网改造开始了。</p>
 <span id="more"></span>
 
-<h3 id="阅读"><a href="#阅读" class="headerlink" title="    阅读"></a><span>  <span class="legacy-text legacy-text-green"><img src="https://cos.blanktime.cn/assets/images/le4.svg">  阅读</span></h3><h2 id="1-偷袭"><a href="#1-偷袭" class="headerlink" title="1 偷袭 "></a><center>1 偷袭 </center></h2><center> 马保国 </center>
+<h2 id="原来的网络结构"><a href="#原来的网络结构" class="headerlink" title="原来的网络结构"></a>原来的网络结构</h2><p>最初的结构其实非常普通：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">graph TD<br>    A[Internet] --&gt; B[光猫]<br>    B -- 千兆 --&gt; C[路由器]<br>    C -- 千兆 --&gt; D[PC]<br>    C -- 千兆 --&gt; E[NAS]<br></code></pre></td></tr></table></figure>
 
-
-<h3 id="预习："><a href="#预习：" class="headerlink" title="预习："></a>预习：</h3><ul>
-<li><span class="legacy-text legacy-text-green">了解马老师的背景故事，说说马老师为什么要说年轻人不讲武德？</span></li>
-<li><span class="legacy-text legacy-text-green">快速阅读课文，感受马老师的语言风格</span></li>
+<p>千兆以太网理论速率是：<code>1000 Mbps</code></p>
+<p>换算成字节大约是：<code>125 MB/s</code></p>
+<p>再扣除以协议开销之后，实际文件传输一般也就是：<code>110 MB/s 左右</code></p>
+<p>放在以前，这已经很快了。</p>
+<p>但随着 NAS、大文件、本地备份越来越多，110 MB&#x2F;s 这个数字开始变得有点碍眼。</p>
+<p>尤其是 NAS 里的文件动辄几十 GB 时。</p>
+<p>这个时候，千兆网就开始散发出一种：</p>
+<blockquote>
+<p>“你在教我做事啊？我就这个速率，嫌慢自己升级啊。”</p>
+</blockquote>
+<p>的气息。</p>
+<h2 id="路由器设备信息"><a href="#路由器设备信息" class="headerlink" title="路由器设备信息"></a>路由器设备信息</h2><p>目前使用的路由器是腾达云霄 BE5100 &#x2F; BE6L Pro。</p>
+<p>主要规格大概是：</p>
+<ul>
+<li>Wi-Fi 7</li>
+<li>160 MHz 频宽</li>
+<li>无线理论速率 5011 Mbps</li>
+<li>1 个 2.5G WAN&#x2F;LAN 自适应网口</li>
+<li>3 个千兆 WAN&#x2F;LAN 自适应网口</li>
 </ul>
-<hr>
-<br>
+<p>也就是说，虽然大部分有线接口还是千兆，但它至少给了一个 2.5G 口。</p>
+<p>这就有操作空间了。但是实现起来方案也有许多种。</p>
+<p>于是我先把 NAS 接到了路由器的 2.5G 网口。</p>
+<p>PC 则暂时继续使用主板自带的千兆网口连接路由器。</p>
+<p>结构变成：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">flowchart TB<br>    Internet[&quot;Internet&quot;]<br>    ONU[&quot;光猫&quot;]<br>    Router[&quot;Wi-Fi 7 路由器&quot;]<br>    NAS[&quot;NAS&quot;]<br>    PC[&quot;PC&quot;]<br><br>    Internet --&gt; ONU<br>    ONU --&gt;|&quot;千兆 WAN&quot;| Router<br>    Router --&gt;|&quot;2.5G LAN&quot;| NAS<br>    Router --&gt;|&quot;千兆 LAN&quot;| PC<br></code></pre></td></tr></table></figure>
+
+<p>这样做有一个直接的好处：</p>
+<p><strong>NAS 已经不再被路由器的千兆 LAN 口限制。</strong></p>
+<h2 id="增加额外的-2-5G-网口"><a href="#增加额外的-2-5G-网口" class="headerlink" title="增加额外的 2.5G 网口"></a>增加额外的 2.5G 网口</h2><p>细想之下，我的 PC 与 NAS 的主板网口均只有千兆水平。也就是说，这样的话 PC 与 NAS 的网口速率将会成为瓶颈，我不得不额外安装网卡。例如PCIE接口或者 USB 5Gbps 的接口。</p>
+<p>试着查了下我的PC主板与NAS主板的接口，很顺利，他们都有 USB 5Gbps 速率的接口：</p>
+<div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id999"><button type="button" role="tab" id="legacy-tabs-1-tab-0" aria-controls="legacy-tabs-1-panel-0">B450M MORTAR MAX</button><button type="button" role="tab" id="legacy-tabs-1-tab-1" aria-controls="legacy-tabs-1-panel-1">H110M-E/M.2</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-1-panel-0" aria-labelledby="legacy-tabs-1-tab-0"><p class="legacy-tab-fallback-label">B450M MORTAR MAX</p><p><img src="https://cos.blanktime.cn/assets/images/B450M%20MORTAR%20MAX.png" alt="B450M MORTAR MAX"></p>&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-1-panel-1" aria-labelledby="legacy-tabs-1-tab-1"><p class="legacy-tab-fallback-label">H110M-E/M.2</p><p><img src="https://cos.blanktime.cn/assets/images/H110M-E%20M.2.png" alt="H110M-E&#x2F;M.2"></p>&#10;</section></div>
+
+<p>那我们可以选择 USB —– RJ45 的 2.5G 拓展网口了。</p>
+<p>这样一来还不用额外打开机箱占用PCIE插槽了，还有一点就是 USB <code>方便</code>。😋</p>
+<h2 id="PC-与-NAS"><a href="#PC-与-NAS" class="headerlink" title="PC 与 NAS"></a>PC 与 NAS</h2><p>如果单纯想让 PC 和 NAS 之间跑 2.5G，最简单的想法当然是买一台 2.5G 交换机。</p>
+<p>结构会变成：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">graph TD<br>    A[Internet] --&gt; B[光猫]<br>    B -- &quot;千兆 → 路由器 WAN口&quot; --&gt; C[路由器]<br>    C -- &quot;2.5G LAN口 → 交换机 WAN口&quot; --&gt; D[2.5G 交换机]<br>    D -- &quot;2.5G LAN口&quot; --&gt; E[NAS]<br>    D -- &quot;2.5G LAN口&quot; --&gt; F[PC]<br></code></pre></td></tr></table></figure>
 
 
-</span>
-　　朋友们好啊，我是浑元形意太极门掌门人马保国。
 
-<p>　　刚才有个朋友问我马老师发生肾磨石<sup>①</sup>了，我说怎么回事？给我发了几张截图，我一看！嗷！源莱氏佐田<sup>②</sup>，有两个年轻人，三十多岁，一个体重九十多公斤，一个体重八十多公斤。塔<sup>③</sup>们说，诶…有一个说是我在健身房练功，颈椎练坏了，马老师你能不能教教我浑元功法<sup>④</sup>诶…帮助治疗一下，我的颈椎病。</p>
-<p>　　我说可以，我说你在健身房练死劲，不好用，他不服气，我说小朋友唉你两个手来折我一个手指头，他折不动。他说你这也没用（吭），我说我这个有用。这是化劲<sup>⑤</sup>儿，传统功夫是讲化劲的，四两拨千斤<sup>⑥</sup>，二百多斤的英国大力士都挝不动我这一个手指，啊…哈！</p>
-<p>　　他说要和我试试，我说可以。诶…我一说，他啪就站起来了，很快啊！然后上来就是一个左正蹬（吭），一个右鞭腿，一个左刺拳！我全部防区防出去了啊，防出去以后自然是传统功夫以点到为止，右拳放在了鼻子上，没打他。我笑一下，准备收拳。因为这时间，按传统功夫的点到为止他已经输了，如果这一拳发力，一拳就把他鼻子打骨折了，放在鼻子上没有打他。他也承认我先打到他面部，他不知道拳放在了鼻子上。他承认我先打到他面部，啊！</p>
-<p>　　我收拳的时间不打了，他突然袭击左刺拳来打我脸，啊，我大意了啊，没有闪。诶…他的左拳给我眼，右眼蹭了一下，但没关系啊。他也说啊，他截图也说了，两分多钟以后，当时流眼泪了，捂着眼，我说婷婷<sup>⑦</sup>。然后两分钟以后，两分多钟以后诶就好了。</p>
-<p>　　我说小伙子你不讲武德你不懂，他忙说马老师对不对不起，我不懂规矩，啊，我是…他说他是乱打的。他可不是乱打的啊，正蹬、鞭腿、左刺拳训练有素，后来他说他练过三四年泰拳，啊，看来是有备而来。这两个年轻人，不讲武德，来，骗！来，偷袭！我六十九岁的老同志。这好吗？这不好。我劝！这位年轻人，耗子尾汁<sup>⑧</sup>，好好反思。以后不要再犯这样的聪明，小聪明，啊，嗯…武林要以和为贵，要讲武德，不要搞窝里斗。</p>
-<p>　　谢谢朋友们！</p>
-<hr>
+<p>这也是最标准、最优雅的方案。</p>
+<h3 id="开始思索"><a href="#开始思索" class="headerlink" title="开始思索"></a>开始思索</h3><p>但是想了一圈之后发现：</p>
+<p><strong>其实我目前真正需要高速互传的设备，就 PC 和 NAS 两台。</strong></p>
+<p>那事情突然就简单了。</p>
+<p>既然如此，为什么一定要经过交换机？</p>
+<p>直接连不就完了。</p>
+<p>于是 PC 增加一张 2.5G 网卡，NAS 同样使用额外的 2.5G 网口，两台设备之间直接拉一根网线。</p>
+<p>最终结构变成：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">flowchart TB<br>    Internet[&quot;Internet&quot;]<br>    ONU[&quot;光猫&quot;]<br>    Router[&quot;Wi-Fi 7 路由器&quot;]<br><br>    PC[&quot;PC&quot;]<br>    NAS[&quot;NAS&quot;]<br>    Phone[&quot;手机&quot;]<br><br>    Internet --&gt; ONU<br>    ONU --&gt;|&quot;千兆 WAN&quot;| Router<br><br>    Router --&gt;|&quot;千兆 LAN&quot;| PC<br>    Router --&gt;|&quot;2.5G LAN&quot;| NAS<br><br>    PC &lt;--&gt;|&quot;2.5Gbps 直连&quot;| NAS<br><br>    Phone &lt;--&gt;|&quot;Wi-Fi 7&quot;| Router<br></code></pre></td></tr></table></figure>
 
+<p>这下网络被分成了两套。</p>
+<p>平时 PC 上网：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">graph TD<br>    A[PC] -- 千兆网口 --&gt; B[&quot;路由器（拨号 / NAT）&quot;]<br>    B --&gt; C[&quot;光猫（桥接）&quot;]<br>    C --&gt; D[Internet]<br></code></pre></td></tr></table></figure>
 
-<p>①[肾磨石]：什么事。</p>
-<p>②[源莱氏佐田]：原来是昨天。佐，通“昨”。</p>
-<p>③[塔]：他。</p>
-<p>④[浑元功法]：马老师自称其创立的功夫体系，全称为“混元形意太极功”。</p>
-<p>⑤[化劲]：中国传统武术中的高级技法理念，指化解、引导对手的劲力，使其不能伤害到自己。</p>
-<p>⑥[四两拨千斤]：一句著名的武术谚语，比喻用小的、巧妙的力气战胜或化解强大的力量。</p>
-<p>⑦[婷婷]：停停。婷，通“停”。</p>
-<p>⑧[耗子尾汁]：好自为之。在文中，马老师用以劝诫和警告那位“不讲武德”的年轻人，要他自己慎重考虑，好好反省自己的行为。</p>
-<h3 id="思考探究"><a href="#思考探究" class="headerlink" title="    思考探究"></a><span>  <span class="legacy-text legacy-text-green"><img src="https://cos.blanktime.cn/assets/images/RiQuestionFill.svg">  <u>思考探究</u></span></h3><ol>
-<li><p>作者开头就表明自己是“浑元形意太极门掌门人”，这样写有什么作用？请简要分析</p>
-<br>
-</li>
-<li><p>文中大量运用了语言描写，请选择一处并简要分析其作用。</p>
-<br>
-</li>
-<li><p>请按照“起因—经过—结果”的顺序，简要概括文中叙述的“比武”事件的全过程。</p>
-<br>
-</li>
-<li><p>在马老师看来，两位年轻人在哪些方面“不讲武德”？他本人所推崇的“武德”具体包含哪些内容？</p>
-<br>
-</li>
-<li><p>马老师多次强调自己“点到为止”、“传统功夫讲化劲”，但最终结果却是自己“大意了没有闪”。你认为作者是通过这种“言”与“行”的对比，想达到一种什么样的表达效果？</p>
-<br>
-</li>
-<li><p>假设你是当时在场的两位年轻人之一，请从你的视角写一段简短的解释或回应，描述当时的情况和你的想法。</p>
-</li>
+<p>PC 和 NAS 传大文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">graph TD<br>    A[PC] -- &quot;2.5G 网卡&quot; --&gt; B[NAS]<br></code></pre></td></tr></table></figure>
+
+<p>完全不用绕路由器。</p>
+<p>有点像原本大家都在走城市道路，现在 PC 和 NAS 私下修了一条高速公路。</p>
+<h2 id="直连网络最好单独划一个网段"><a href="#直连网络最好单独划一个网段" class="headerlink" title="直连网络最好单独划一个网段"></a>直连网络最好单独划一个网段</h2><p>PC 和 NAS 增加第二张网卡之后，其实就同时存在两套网络。</p>
+<p>例如正常家庭局域网可以继续使用：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">路由器：192.168.1.1<br>PC：192.168.1.x<br>NAS：192.168.1.x<br></code></pre></td></tr></table></figure>
+
+<p>而 PC 和 NAS 之间的 2.5G 直连，则可以单独划一个网段，例如：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">PC 2.5G：<br>192.168.2.1<br><br>NAS 2.5G：<br>192.168.2.2<br></code></pre></td></tr></table></figure>
+
+<p>这样访问 NAS 高速网口时，直接使用：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">\\192.168.2.2<br></code></pre></td></tr></table></figure>
+
+<p>Windows 就可以通过这条 2.5G 链路访问 NAS。</p>
+<p>而访问互联网以及其他局域网设备时，依旧正常走路由器。</p>
+<p>两边井水不犯河水。</p>
+<h2 id="手机也能超过千兆？顺手的事"><a href="#手机也能超过千兆？顺手的事" class="headerlink" title="手机也能超过千兆？顺手的事"></a>手机也能超过千兆？顺手的事</h2><p>做到这里的时候，我突然想到另一个问题。</p>
+<p>NAS 现在是通过 <strong>2.5G 网口连接路由器</strong> 的。</p>
+<p>而这台路由器又是 Wi-Fi 7。</p>
+<p>那手机通过 Wi-Fi 访问 NAS，是不是也不再受到千兆 LAN 的限制？</p>
+<p>当然如此。</p>
+<p>手机访问 NAS 的路径其实是：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">graph TD<br>    A[&quot;无线终端（手机 / 笔记本）&quot;] -- &quot;Wi-Fi 7&quot; --&gt; B[路由器]<br>    B -- &quot;2.5G LAN&quot; --&gt; C[NAS]<br></code></pre></td></tr></table></figure>
+
+<p>这整个过程都是局域网通信。</p>
+<p>根本不需要经过：<code>光猫</code></p>
+<p>更不会经过路由器的千兆 WAN。</p>
+<p>所以即使家里的宽带只有千兆，也不影响手机和 NAS 之间跑超过 1Gbps 的局域网速度。</p>
+<h2 id="关于路由器的理论-5011-Mbps"><a href="#关于路由器的理论-5011-Mbps" class="headerlink" title="关于路由器的理论 5011 Mbps"></a>关于路由器的理论 5011 Mbps</h2><p>这里顺便记录一个很容易混淆的地方。</p>
+<p>路由器标称：<code>5011 Mbps</code></p>
+<p>这个数字或许是总设备最大速率之和？</p>
+<p>不过细想之下倒也不会超过此速率，我也不会同时将 PC 与手机同时对 NAS 进行读写。</p>
+<p>我的手机支持：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">Wi-Fi 7<br>5 GHz<br>160 MHz<br>2×2 MIMO<br></code></pre></td></tr></table></figure>
+
+<p>实际连接路由器时看到的链路速度是：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">发送链接速度：2593 Mbps<br>接收链接速度：2401 Mbps<br></code></pre></td></tr></table></figure>
+
+<p>这才是对单台手机更有参考价值的数据。</p>
+<p>通常<strong>2401 Mbps 链路速率，并不等于文件能以 2401 Mbps 传输。</strong></p>
+<p>Wi-Fi 还存在：</p>
+<ul>
+<li>无线协议开销</li>
+<li>ACK</li>
+<li>信道竞争</li>
+<li>重传</li>
+<li>加密</li>
+<li>TCP &#x2F; SMB 开销</li>
+</ul>
+<p>所以真正的数据吞吐一定会低于 PHY 链路速率。</p>
+<p>以现在约 2.4~2.6Gbps 的无线协商速率来看，在信号和环境比较理想的情况下，</p>
+<p>实际局域网吞吐有机会达到：<code>1.4 ~ 1.9 Gbps</code></p>
+<p>也就是大约：<code>175 ~ 240 MB/s</code></p>
+<p>这已经明显超过千兆有线网络的：<code>约 110 MB/s</code></p>
+<h2 id="新的风暴已经出现"><a href="#新的风暴已经出现" class="headerlink" title="新的风暴已经出现"></a>新的风暴已经出现</h2><p>网络升级到 2.5G 并不意味着文件传输一定能跑满 2.5Gbps。</p>
+<p>2.5GbE 理论值是：<code>2500 Mbps</code></p>
+<p>换算下来：<code>312.5 MB/s</code></p>
+<p>扣除协议开销之后，实际极限一般会低一些。</p>
+<p>而真正传文件时，还要看：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">硬盘<br>CPU<br>文件系统<br>SMB<br>缓存<br>文件大小<br>碎片数量<br></code></pre></td></tr></table></figure>
+
+<p>其实最大的瓶颈是机械硬盘。</p>
+<p>普通机械硬盘连续读写很多时候也就在：<code>150~220 MB/s</code> 这个范围。</p>
+<p>所以网络突破千兆之后，下一位出现在性能审判席上的，很可能就变成了硬盘。</p>
+<p>以前是：</p>
+<blockquote>
+<p>机械硬盘：你跑不过我你信不信？</p>
+<p>千兆网卡：……</p>
+</blockquote>
+<p>现在变成：</p>
+<blockquote>
+<p>2.5G 网卡：你跑不过我你信不信？</p>
+<p>机械硬盘：……</p>
+</blockquote>
+<h2 id="硬盘的问题"><a href="#硬盘的问题" class="headerlink" title="硬盘的问题"></a>硬盘的问题</h2><p>这下好了，当前的压力给到了机械硬盘。</p>
+<p>对此我们无非就是增加固态：</p>
+<ol>
+<li>财大气粗，直接使用固态。</li>
+<li>囊中羞涩，还是使用固态做缓存吧。</li>
 </ol>
-<h3 id="阅读提示"><a href="#阅读提示" class="headerlink" title="    阅读提示"></a><span>  <span class="legacy-text legacy-text-green"><img src="https://cos.blanktime.cn/assets/images/WhhInfosign.svg">  <u>阅读提示</u></span></h3><p>全文背诵</p>
-<h3 id="累积拓展"><a href="#累积拓展" class="headerlink" title="    累积拓展"></a><span>  <span class="legacy-text legacy-text-green"><img src="https://cos.blanktime.cn/assets/images/MaterialSymbolsTipsAndUpdates.svg">  <u>累积拓展</u></span></h3><p>作者是在2020年5月17日演武堂上被一个50岁的年轻人王庆民偷袭后写下的文章，了解相关故事，小组讨论并分享。</p>
-<hr>
+<p>很明显，对于我们肯定是选择第二条。</p>
+<p>注意到，FnOS支持将系统剩下的空间当作机械硬盘的缓存，这无疑又双叒叕帮我省了一笔费用。</p>
+<p>图先欠着</p>
+<h2 id="关于-2-5G-交换机"><a href="#关于-2-5G-交换机" class="headerlink" title="关于 2.5G 交换机"></a>关于 2.5G 交换机</h2><p>从网络架构角度来说，2.5G 交换机当然更舒服。</p>
+<p>PC、NAS、未来其他设备都接进去，一切流量自动交换，不需要搞第二套直连网络。</p>
+<p>但考虑到我目前需要高速通信的就是：<code>PC ↔ NAS</code></p>
+<p>而 NAS 又已经可以通过路由器的 2.5G 网口服务 Wi-Fi 设备。</p>
+<p>于是现阶段：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">PC ↔ NAS：2.5G 直连<br><br>手机 ↔ NAS：<br>Wi-Fi 7 → 路由器 → 2.5G<br><br>其他设备：<br>正常连接路由器<br></code></pre></td></tr></table></figure>
+
+<p>已经基本覆盖了我的需求。</p>
+<p>没必要为了两个设备，再专门加一个交换机、一套供电和几根额外的网线。</p>
+<p>以后如果 2.5G 设备越来越多，再加交换机也不迟。<del>鄙人囊中羞涩</del></p>
+<h2 id="终了"><a href="#终了" class="headerlink" title="终了"></a>终了</h2><p>目前整个家庭网络大概就是这样：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">flowchart LR<br>    Internet[&quot;Internet&quot;]<br>    ONU[&quot;光猫&quot;]<br>    Router[&quot;BE5100&lt;br/&gt;Wi-Fi 7&quot;]<br><br>    PC[&quot;PC&lt;br/&gt;千兆 + 2.5G&quot;]<br>    NAS[&quot;NAS&lt;br/&gt;2.5G + 2.5G&quot;]<br>    Phone[&quot;手机&lt;br/&gt;Wi-Fi 7&quot;]<br><br>    Internet --&gt; ONU<br>    ONU --&gt;|&quot;1GbE&quot;| Router<br><br>    Router --&gt;|&quot;1GbE&quot;| PC<br>    Router --&gt;|&quot;2.5GbE&quot;| NAS<br>    Router &lt;--&gt;|&quot;Wi-Fi 7&lt;br/&gt;2401~2593 Mbps PHY&quot;| Phone<br><br>    PC &lt;--&gt;|&quot;2.5GbE 专线&quot;| NAS<br></code></pre></td></tr></table></figure>
+
+<p>总结下来，这次升级其实没有大动干戈。</p>
+<p>没有换光猫。</p>
+<p>没有换宽带。</p>
+<p>甚至没有买 2.5G 交换机。</p>
+<p>只是利用现有路由器的一个 2.5G 网口，再给 PC 和 NAS 补上高速网卡，就把最需要速度的几条内网路径基本打通了。</p>
+<p>对于目前的使用场景来说，已经很舒服。</p>
+<p>至于下一步……</p>
 </div>
 </article>
 </template>
@@ -646,70 +761,185 @@
 
   </main>
   <div id="announcement" class="toast" role="status" hidden></div>
-  <noscript><style>body{overflow:auto}.desktop,.dock{display:none}.noscript-article{background:white;margin:20px auto;max-width:1000px}</style><div class="noscript-article"><article class="markdown-body" data-article data-title="文章鉴赏 《偷袭》" data-date="2025-10-02" data-file="MaBaoguo.md">
+  <noscript><style>body{overflow:auto}.desktop,.dock{display:none}.noscript-article{background:white;margin:20px auto;max-width:1000px}</style><div class="noscript-article"><article class="markdown-body" data-article data-title="内网的折腾记录" data-date="2026-10-01" data-file="内网的折腾记录.md">
   <header class="article-heading">
     <p class="eyebrow">BLANKTIME / NOTES</p>
-    <h1 class="post-title">文章鉴赏 《偷袭》</h1>
-    <div class="article-meta"><time datetime="2025-10-02T14:24:30.000Z">2025年10月02日</time><span># 课文《偷袭》</span></div>
+    <h1 class="post-title">内网的折腾记录</h1>
+    <div class="article-meta"><time datetime="2026-10-01T07:40:00.000Z">2026年10月01日</time><span># NAS</span><span># 2.5G</span><span># 局域网</span><span># Wi-Fi 7</span><span># 家庭网络</span></div>
   </header>
-  <div class="post-content"><p>文章摘要：本文是混元形意太极门掌门人马保国对一次个人经历的叙述。他提到有两个三十多岁的年轻人在健身房练功导致颈椎不适，前来请教浑元功法。在交流过程中，双方因对“死劲儿”与“化劲儿”的理解不同而产生分歧，最终发展为实战切磋。</p>
-<p>马老师声称，在比试中自己迅速防住了对方的连续进攻（左正蹬、右鞭腿、左刺拳），并依循“点到为止”的传统武德，在击中对方面部后收力未发。然而，在他收拳之际，对方却突然偷袭，用左刺拳打中他的右眼，导致他一时受伤。</p>
-<p>文章结尾，马老师批评这两位年轻人“不讲武德”，指责他们用“骗”和“偷袭”的方式对待一位老同志，行为“不好”。他劝诫对方要“耗子尾汁”，好好反思，并强调武林应以和为贵，要讲武德，不要搞窝里斗。</p>
+  <div class="post-content"><p>家里的网络其实已经用了挺长时间。</p>
+<p>平时上网没有什么问题，NAS 也能正常访问。直到最近折腾 NAS 和局域网文件传输时，我突然发现了一个非常朴素的问题：</p>
+<p><strong>千兆网，好像开始不太够用了。</strong>🤔</p>
+<p>倒不是说千兆有多慢。</p>
+<p>对于互联网来说，日常上网完全够用。</p>
+<p>真正的问题出现在内网。</p>
+<p>NAS、PC、手机之间的数据传输，并不需要经过互联网。既然设备本身已经具备更高的性能，那让所有内网流量继续堵在千兆网口上，就多少有点可惜了。</p>
+<p>于是，一场 2.5G 局域网改造开始了。</p>
 <span id="more"></span>
 
-<h3 id="阅读"><a href="#阅读" class="headerlink" title="    阅读"></a><span>  <span class="legacy-text legacy-text-green"><img src="https://cos.blanktime.cn/assets/images/le4.svg">  阅读</span></h3><h2 id="1-偷袭"><a href="#1-偷袭" class="headerlink" title="1 偷袭 "></a><center>1 偷袭 </center></h2><center> 马保国 </center>
+<h2 id="原来的网络结构"><a href="#原来的网络结构" class="headerlink" title="原来的网络结构"></a>原来的网络结构</h2><p>最初的结构其实非常普通：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">graph TD<br>    A[Internet] --&gt; B[光猫]<br>    B -- 千兆 --&gt; C[路由器]<br>    C -- 千兆 --&gt; D[PC]<br>    C -- 千兆 --&gt; E[NAS]<br></code></pre></td></tr></table></figure>
 
-
-<h3 id="预习："><a href="#预习：" class="headerlink" title="预习："></a>预习：</h3><ul>
-<li><span class="legacy-text legacy-text-green">了解马老师的背景故事，说说马老师为什么要说年轻人不讲武德？</span></li>
-<li><span class="legacy-text legacy-text-green">快速阅读课文，感受马老师的语言风格</span></li>
+<p>千兆以太网理论速率是：<code>1000 Mbps</code></p>
+<p>换算成字节大约是：<code>125 MB/s</code></p>
+<p>再扣除以协议开销之后，实际文件传输一般也就是：<code>110 MB/s 左右</code></p>
+<p>放在以前，这已经很快了。</p>
+<p>但随着 NAS、大文件、本地备份越来越多，110 MB&#x2F;s 这个数字开始变得有点碍眼。</p>
+<p>尤其是 NAS 里的文件动辄几十 GB 时。</p>
+<p>这个时候，千兆网就开始散发出一种：</p>
+<blockquote>
+<p>“你在教我做事啊？我就这个速率，嫌慢自己升级啊。”</p>
+</blockquote>
+<p>的气息。</p>
+<h2 id="路由器设备信息"><a href="#路由器设备信息" class="headerlink" title="路由器设备信息"></a>路由器设备信息</h2><p>目前使用的路由器是腾达云霄 BE5100 &#x2F; BE6L Pro。</p>
+<p>主要规格大概是：</p>
+<ul>
+<li>Wi-Fi 7</li>
+<li>160 MHz 频宽</li>
+<li>无线理论速率 5011 Mbps</li>
+<li>1 个 2.5G WAN&#x2F;LAN 自适应网口</li>
+<li>3 个千兆 WAN&#x2F;LAN 自适应网口</li>
 </ul>
-<hr>
-<br>
+<p>也就是说，虽然大部分有线接口还是千兆，但它至少给了一个 2.5G 口。</p>
+<p>这就有操作空间了。但是实现起来方案也有许多种。</p>
+<p>于是我先把 NAS 接到了路由器的 2.5G 网口。</p>
+<p>PC 则暂时继续使用主板自带的千兆网口连接路由器。</p>
+<p>结构变成：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">flowchart TB<br>    Internet[&quot;Internet&quot;]<br>    ONU[&quot;光猫&quot;]<br>    Router[&quot;Wi-Fi 7 路由器&quot;]<br>    NAS[&quot;NAS&quot;]<br>    PC[&quot;PC&quot;]<br><br>    Internet --&gt; ONU<br>    ONU --&gt;|&quot;千兆 WAN&quot;| Router<br>    Router --&gt;|&quot;2.5G LAN&quot;| NAS<br>    Router --&gt;|&quot;千兆 LAN&quot;| PC<br></code></pre></td></tr></table></figure>
+
+<p>这样做有一个直接的好处：</p>
+<p><strong>NAS 已经不再被路由器的千兆 LAN 口限制。</strong></p>
+<h2 id="增加额外的-2-5G-网口"><a href="#增加额外的-2-5G-网口" class="headerlink" title="增加额外的 2.5G 网口"></a>增加额外的 2.5G 网口</h2><p>细想之下，我的 PC 与 NAS 的主板网口均只有千兆水平。也就是说，这样的话 PC 与 NAS 的网口速率将会成为瓶颈，我不得不额外安装网卡。例如PCIE接口或者 USB 5Gbps 的接口。</p>
+<p>试着查了下我的PC主板与NAS主板的接口，很顺利，他们都有 USB 5Gbps 速率的接口：</p>
+<div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id999"><button type="button" role="tab" id="legacy-tabs-1-tab-0" aria-controls="legacy-tabs-1-panel-0">B450M MORTAR MAX</button><button type="button" role="tab" id="legacy-tabs-1-tab-1" aria-controls="legacy-tabs-1-panel-1">H110M-E/M.2</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-1-panel-0" aria-labelledby="legacy-tabs-1-tab-0"><p class="legacy-tab-fallback-label">B450M MORTAR MAX</p><p><img src="https://cos.blanktime.cn/assets/images/B450M%20MORTAR%20MAX.png" alt="B450M MORTAR MAX"></p>&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-1-panel-1" aria-labelledby="legacy-tabs-1-tab-1"><p class="legacy-tab-fallback-label">H110M-E/M.2</p><p><img src="https://cos.blanktime.cn/assets/images/H110M-E%20M.2.png" alt="H110M-E&#x2F;M.2"></p>&#10;</section></div>
+
+<p>那我们可以选择 USB —– RJ45 的 2.5G 拓展网口了。</p>
+<p>这样一来还不用额外打开机箱占用PCIE插槽了，还有一点就是 USB <code>方便</code>。😋</p>
+<h2 id="PC-与-NAS"><a href="#PC-与-NAS" class="headerlink" title="PC 与 NAS"></a>PC 与 NAS</h2><p>如果单纯想让 PC 和 NAS 之间跑 2.5G，最简单的想法当然是买一台 2.5G 交换机。</p>
+<p>结构会变成：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">graph TD<br>    A[Internet] --&gt; B[光猫]<br>    B -- &quot;千兆 → 路由器 WAN口&quot; --&gt; C[路由器]<br>    C -- &quot;2.5G LAN口 → 交换机 WAN口&quot; --&gt; D[2.5G 交换机]<br>    D -- &quot;2.5G LAN口&quot; --&gt; E[NAS]<br>    D -- &quot;2.5G LAN口&quot; --&gt; F[PC]<br></code></pre></td></tr></table></figure>
 
 
-</span>
-　　朋友们好啊，我是浑元形意太极门掌门人马保国。
 
-<p>　　刚才有个朋友问我马老师发生肾磨石<sup>①</sup>了，我说怎么回事？给我发了几张截图，我一看！嗷！源莱氏佐田<sup>②</sup>，有两个年轻人，三十多岁，一个体重九十多公斤，一个体重八十多公斤。塔<sup>③</sup>们说，诶…有一个说是我在健身房练功，颈椎练坏了，马老师你能不能教教我浑元功法<sup>④</sup>诶…帮助治疗一下，我的颈椎病。</p>
-<p>　　我说可以，我说你在健身房练死劲，不好用，他不服气，我说小朋友唉你两个手来折我一个手指头，他折不动。他说你这也没用（吭），我说我这个有用。这是化劲<sup>⑤</sup>儿，传统功夫是讲化劲的，四两拨千斤<sup>⑥</sup>，二百多斤的英国大力士都挝不动我这一个手指，啊…哈！</p>
-<p>　　他说要和我试试，我说可以。诶…我一说，他啪就站起来了，很快啊！然后上来就是一个左正蹬（吭），一个右鞭腿，一个左刺拳！我全部防区防出去了啊，防出去以后自然是传统功夫以点到为止，右拳放在了鼻子上，没打他。我笑一下，准备收拳。因为这时间，按传统功夫的点到为止他已经输了，如果这一拳发力，一拳就把他鼻子打骨折了，放在鼻子上没有打他。他也承认我先打到他面部，他不知道拳放在了鼻子上。他承认我先打到他面部，啊！</p>
-<p>　　我收拳的时间不打了，他突然袭击左刺拳来打我脸，啊，我大意了啊，没有闪。诶…他的左拳给我眼，右眼蹭了一下，但没关系啊。他也说啊，他截图也说了，两分多钟以后，当时流眼泪了，捂着眼，我说婷婷<sup>⑦</sup>。然后两分钟以后，两分多钟以后诶就好了。</p>
-<p>　　我说小伙子你不讲武德你不懂，他忙说马老师对不对不起，我不懂规矩，啊，我是…他说他是乱打的。他可不是乱打的啊，正蹬、鞭腿、左刺拳训练有素，后来他说他练过三四年泰拳，啊，看来是有备而来。这两个年轻人，不讲武德，来，骗！来，偷袭！我六十九岁的老同志。这好吗？这不好。我劝！这位年轻人，耗子尾汁<sup>⑧</sup>，好好反思。以后不要再犯这样的聪明，小聪明，啊，嗯…武林要以和为贵，要讲武德，不要搞窝里斗。</p>
-<p>　　谢谢朋友们！</p>
-<hr>
+<p>这也是最标准、最优雅的方案。</p>
+<h3 id="开始思索"><a href="#开始思索" class="headerlink" title="开始思索"></a>开始思索</h3><p>但是想了一圈之后发现：</p>
+<p><strong>其实我目前真正需要高速互传的设备，就 PC 和 NAS 两台。</strong></p>
+<p>那事情突然就简单了。</p>
+<p>既然如此，为什么一定要经过交换机？</p>
+<p>直接连不就完了。</p>
+<p>于是 PC 增加一张 2.5G 网卡，NAS 同样使用额外的 2.5G 网口，两台设备之间直接拉一根网线。</p>
+<p>最终结构变成：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">flowchart TB<br>    Internet[&quot;Internet&quot;]<br>    ONU[&quot;光猫&quot;]<br>    Router[&quot;Wi-Fi 7 路由器&quot;]<br><br>    PC[&quot;PC&quot;]<br>    NAS[&quot;NAS&quot;]<br>    Phone[&quot;手机&quot;]<br><br>    Internet --&gt; ONU<br>    ONU --&gt;|&quot;千兆 WAN&quot;| Router<br><br>    Router --&gt;|&quot;千兆 LAN&quot;| PC<br>    Router --&gt;|&quot;2.5G LAN&quot;| NAS<br><br>    PC &lt;--&gt;|&quot;2.5Gbps 直连&quot;| NAS<br><br>    Phone &lt;--&gt;|&quot;Wi-Fi 7&quot;| Router<br></code></pre></td></tr></table></figure>
 
+<p>这下网络被分成了两套。</p>
+<p>平时 PC 上网：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">graph TD<br>    A[PC] -- 千兆网口 --&gt; B[&quot;路由器（拨号 / NAT）&quot;]<br>    B --&gt; C[&quot;光猫（桥接）&quot;]<br>    C --&gt; D[Internet]<br></code></pre></td></tr></table></figure>
 
-<p>①[肾磨石]：什么事。</p>
-<p>②[源莱氏佐田]：原来是昨天。佐，通“昨”。</p>
-<p>③[塔]：他。</p>
-<p>④[浑元功法]：马老师自称其创立的功夫体系，全称为“混元形意太极功”。</p>
-<p>⑤[化劲]：中国传统武术中的高级技法理念，指化解、引导对手的劲力，使其不能伤害到自己。</p>
-<p>⑥[四两拨千斤]：一句著名的武术谚语，比喻用小的、巧妙的力气战胜或化解强大的力量。</p>
-<p>⑦[婷婷]：停停。婷，通“停”。</p>
-<p>⑧[耗子尾汁]：好自为之。在文中，马老师用以劝诫和警告那位“不讲武德”的年轻人，要他自己慎重考虑，好好反省自己的行为。</p>
-<h3 id="思考探究"><a href="#思考探究" class="headerlink" title="    思考探究"></a><span>  <span class="legacy-text legacy-text-green"><img src="https://cos.blanktime.cn/assets/images/RiQuestionFill.svg">  <u>思考探究</u></span></h3><ol>
-<li><p>作者开头就表明自己是“浑元形意太极门掌门人”，这样写有什么作用？请简要分析</p>
-<br>
-</li>
-<li><p>文中大量运用了语言描写，请选择一处并简要分析其作用。</p>
-<br>
-</li>
-<li><p>请按照“起因—经过—结果”的顺序，简要概括文中叙述的“比武”事件的全过程。</p>
-<br>
-</li>
-<li><p>在马老师看来，两位年轻人在哪些方面“不讲武德”？他本人所推崇的“武德”具体包含哪些内容？</p>
-<br>
-</li>
-<li><p>马老师多次强调自己“点到为止”、“传统功夫讲化劲”，但最终结果却是自己“大意了没有闪”。你认为作者是通过这种“言”与“行”的对比，想达到一种什么样的表达效果？</p>
-<br>
-</li>
-<li><p>假设你是当时在场的两位年轻人之一，请从你的视角写一段简短的解释或回应，描述当时的情况和你的想法。</p>
-</li>
+<p>PC 和 NAS 传大文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">graph TD<br>    A[PC] -- &quot;2.5G 网卡&quot; --&gt; B[NAS]<br></code></pre></td></tr></table></figure>
+
+<p>完全不用绕路由器。</p>
+<p>有点像原本大家都在走城市道路，现在 PC 和 NAS 私下修了一条高速公路。</p>
+<h2 id="直连网络最好单独划一个网段"><a href="#直连网络最好单独划一个网段" class="headerlink" title="直连网络最好单独划一个网段"></a>直连网络最好单独划一个网段</h2><p>PC 和 NAS 增加第二张网卡之后，其实就同时存在两套网络。</p>
+<p>例如正常家庭局域网可以继续使用：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">路由器：192.168.1.1<br>PC：192.168.1.x<br>NAS：192.168.1.x<br></code></pre></td></tr></table></figure>
+
+<p>而 PC 和 NAS 之间的 2.5G 直连，则可以单独划一个网段，例如：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">PC 2.5G：<br>192.168.2.1<br><br>NAS 2.5G：<br>192.168.2.2<br></code></pre></td></tr></table></figure>
+
+<p>这样访问 NAS 高速网口时，直接使用：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">\\192.168.2.2<br></code></pre></td></tr></table></figure>
+
+<p>Windows 就可以通过这条 2.5G 链路访问 NAS。</p>
+<p>而访问互联网以及其他局域网设备时，依旧正常走路由器。</p>
+<p>两边井水不犯河水。</p>
+<h2 id="手机也能超过千兆？顺手的事"><a href="#手机也能超过千兆？顺手的事" class="headerlink" title="手机也能超过千兆？顺手的事"></a>手机也能超过千兆？顺手的事</h2><p>做到这里的时候，我突然想到另一个问题。</p>
+<p>NAS 现在是通过 <strong>2.5G 网口连接路由器</strong> 的。</p>
+<p>而这台路由器又是 Wi-Fi 7。</p>
+<p>那手机通过 Wi-Fi 访问 NAS，是不是也不再受到千兆 LAN 的限制？</p>
+<p>当然如此。</p>
+<p>手机访问 NAS 的路径其实是：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">graph TD<br>    A[&quot;无线终端（手机 / 笔记本）&quot;] -- &quot;Wi-Fi 7&quot; --&gt; B[路由器]<br>    B -- &quot;2.5G LAN&quot; --&gt; C[NAS]<br></code></pre></td></tr></table></figure>
+
+<p>这整个过程都是局域网通信。</p>
+<p>根本不需要经过：<code>光猫</code></p>
+<p>更不会经过路由器的千兆 WAN。</p>
+<p>所以即使家里的宽带只有千兆，也不影响手机和 NAS 之间跑超过 1Gbps 的局域网速度。</p>
+<h2 id="关于路由器的理论-5011-Mbps"><a href="#关于路由器的理论-5011-Mbps" class="headerlink" title="关于路由器的理论 5011 Mbps"></a>关于路由器的理论 5011 Mbps</h2><p>这里顺便记录一个很容易混淆的地方。</p>
+<p>路由器标称：<code>5011 Mbps</code></p>
+<p>这个数字或许是总设备最大速率之和？</p>
+<p>不过细想之下倒也不会超过此速率，我也不会同时将 PC 与手机同时对 NAS 进行读写。</p>
+<p>我的手机支持：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">Wi-Fi 7<br>5 GHz<br>160 MHz<br>2×2 MIMO<br></code></pre></td></tr></table></figure>
+
+<p>实际连接路由器时看到的链路速度是：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">发送链接速度：2593 Mbps<br>接收链接速度：2401 Mbps<br></code></pre></td></tr></table></figure>
+
+<p>这才是对单台手机更有参考价值的数据。</p>
+<p>通常<strong>2401 Mbps 链路速率，并不等于文件能以 2401 Mbps 传输。</strong></p>
+<p>Wi-Fi 还存在：</p>
+<ul>
+<li>无线协议开销</li>
+<li>ACK</li>
+<li>信道竞争</li>
+<li>重传</li>
+<li>加密</li>
+<li>TCP &#x2F; SMB 开销</li>
+</ul>
+<p>所以真正的数据吞吐一定会低于 PHY 链路速率。</p>
+<p>以现在约 2.4~2.6Gbps 的无线协商速率来看，在信号和环境比较理想的情况下，</p>
+<p>实际局域网吞吐有机会达到：<code>1.4 ~ 1.9 Gbps</code></p>
+<p>也就是大约：<code>175 ~ 240 MB/s</code></p>
+<p>这已经明显超过千兆有线网络的：<code>约 110 MB/s</code></p>
+<h2 id="新的风暴已经出现"><a href="#新的风暴已经出现" class="headerlink" title="新的风暴已经出现"></a>新的风暴已经出现</h2><p>网络升级到 2.5G 并不意味着文件传输一定能跑满 2.5Gbps。</p>
+<p>2.5GbE 理论值是：<code>2500 Mbps</code></p>
+<p>换算下来：<code>312.5 MB/s</code></p>
+<p>扣除协议开销之后，实际极限一般会低一些。</p>
+<p>而真正传文件时，还要看：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">硬盘<br>CPU<br>文件系统<br>SMB<br>缓存<br>文件大小<br>碎片数量<br></code></pre></td></tr></table></figure>
+
+<p>其实最大的瓶颈是机械硬盘。</p>
+<p>普通机械硬盘连续读写很多时候也就在：<code>150~220 MB/s</code> 这个范围。</p>
+<p>所以网络突破千兆之后，下一位出现在性能审判席上的，很可能就变成了硬盘。</p>
+<p>以前是：</p>
+<blockquote>
+<p>机械硬盘：你跑不过我你信不信？</p>
+<p>千兆网卡：……</p>
+</blockquote>
+<p>现在变成：</p>
+<blockquote>
+<p>2.5G 网卡：你跑不过我你信不信？</p>
+<p>机械硬盘：……</p>
+</blockquote>
+<h2 id="硬盘的问题"><a href="#硬盘的问题" class="headerlink" title="硬盘的问题"></a>硬盘的问题</h2><p>这下好了，当前的压力给到了机械硬盘。</p>
+<p>对此我们无非就是增加固态：</p>
+<ol>
+<li>财大气粗，直接使用固态。</li>
+<li>囊中羞涩，还是使用固态做缓存吧。</li>
 </ol>
-<h3 id="阅读提示"><a href="#阅读提示" class="headerlink" title="    阅读提示"></a><span>  <span class="legacy-text legacy-text-green"><img src="https://cos.blanktime.cn/assets/images/WhhInfosign.svg">  <u>阅读提示</u></span></h3><p>全文背诵</p>
-<h3 id="累积拓展"><a href="#累积拓展" class="headerlink" title="    累积拓展"></a><span>  <span class="legacy-text legacy-text-green"><img src="https://cos.blanktime.cn/assets/images/MaterialSymbolsTipsAndUpdates.svg">  <u>累积拓展</u></span></h3><p>作者是在2020年5月17日演武堂上被一个50岁的年轻人王庆民偷袭后写下的文章，了解相关故事，小组讨论并分享。</p>
-<hr>
+<p>很明显，对于我们肯定是选择第二条。</p>
+<p>注意到，FnOS支持将系统剩下的空间当作机械硬盘的缓存，这无疑又双叒叕帮我省了一笔费用。</p>
+<p>图先欠着</p>
+<h2 id="关于-2-5G-交换机"><a href="#关于-2-5G-交换机" class="headerlink" title="关于 2.5G 交换机"></a>关于 2.5G 交换机</h2><p>从网络架构角度来说，2.5G 交换机当然更舒服。</p>
+<p>PC、NAS、未来其他设备都接进去，一切流量自动交换，不需要搞第二套直连网络。</p>
+<p>但考虑到我目前需要高速通信的就是：<code>PC ↔ NAS</code></p>
+<p>而 NAS 又已经可以通过路由器的 2.5G 网口服务 Wi-Fi 设备。</p>
+<p>于是现阶段：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">PC ↔ NAS：2.5G 直连<br><br>手机 ↔ NAS：<br>Wi-Fi 7 → 路由器 → 2.5G<br><br>其他设备：<br>正常连接路由器<br></code></pre></td></tr></table></figure>
+
+<p>已经基本覆盖了我的需求。</p>
+<p>没必要为了两个设备，再专门加一个交换机、一套供电和几根额外的网线。</p>
+<p>以后如果 2.5G 设备越来越多，再加交换机也不迟。<del>鄙人囊中羞涩</del></p>
+<h2 id="终了"><a href="#终了" class="headerlink" title="终了"></a>终了</h2><p>目前整个家庭网络大概就是这样：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">flowchart LR<br>    Internet[&quot;Internet&quot;]<br>    ONU[&quot;光猫&quot;]<br>    Router[&quot;BE5100&lt;br/&gt;Wi-Fi 7&quot;]<br><br>    PC[&quot;PC&lt;br/&gt;千兆 + 2.5G&quot;]<br>    NAS[&quot;NAS&lt;br/&gt;2.5G + 2.5G&quot;]<br>    Phone[&quot;手机&lt;br/&gt;Wi-Fi 7&quot;]<br><br>    Internet --&gt; ONU<br>    ONU --&gt;|&quot;1GbE&quot;| Router<br><br>    Router --&gt;|&quot;1GbE&quot;| PC<br>    Router --&gt;|&quot;2.5GbE&quot;| NAS<br>    Router &lt;--&gt;|&quot;Wi-Fi 7&lt;br/&gt;2401~2593 Mbps PHY&quot;| Phone<br><br>    PC &lt;--&gt;|&quot;2.5GbE 专线&quot;| NAS<br></code></pre></td></tr></table></figure>
+
+<p>总结下来，这次升级其实没有大动干戈。</p>
+<p>没有换光猫。</p>
+<p>没有换宽带。</p>
+<p>甚至没有买 2.5G 交换机。</p>
+<p>只是利用现有路由器的一个 2.5G 网口，再给 PC 和 NAS 补上高速网卡，就把最需要速度的几条内网路径基本打通了。</p>
+<p>对于目前的使用场景来说，已经很舒服。</p>
+<p>至于下一步……</p>
 </div>
 </article>
 </div><p class="noscript-notice">启用 JavaScript 可使用桌面窗口交互。<a href="/">返回首页</a></p><ul class="noscript-posts"><li><a href="/2026/10/01/%E5%86%85%E7%BD%91%E7%9A%84%E6%8A%98%E8%85%BE%E8%AE%B0%E5%BD%95/">内网的折腾记录</a></li><li><a href="/2026/09/28/%E5%86%99%E4%BD%9C%E6%8C%87%E5%8D%97/">写作文档</a></li><li><a href="/2026/09/27/markdown%E6%A0%B7%E5%BC%8F%E6%B5%8B%E8%AF%95/">Markdown 全功能显示测试</a></li><li><a href="/2026/09/26/markdown%E6%A0%B7%E5%BC%8F%E6%B5%8B%E8%AF%95lite/">Markdown 样式测试</a></li><li><a href="/2026/06/02/OnePlus13-Rom/">OnePlus13刷入crDroid</a></li><li><a href="/2026/03/04/Bitwarden%20and%20Bitwarden/">Bitwarden + Vaultwarden 自托管密码管理</a></li><li><a href="/2026/01/20/RX-9070-power/">RX 9070 功耗解锁</a></li><li><a href="/2026/01/13/NAS/">关于折腾 NAS 的记录</a></li><li><a href="/2025/10/20/root-modules/">Root管理器与一些模块链接</a></li><li><a href="/2025/10/15/Redmi-k40/">Redmi k40(alioth)刷入 Pixel OS</a></li><li><a href="/2025/10/03/pgzj/">文章鉴赏《潘嘎之交》</a></li><li><a href="/2025/10/02/MaBaoguo/">文章鉴赏 《偷袭》</a></li><li><a href="/2025/09/30/ollama/">ollama</a></li><li><a href="/2025/09/27/Artalk%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/">Artalk评论系统</a></li><li><a href="/2025/09/25/Ubuntu/">Ubuntu部分</a></li><li><a href="/2025/09/24/test/">显示测试</a></li><li><a href="/2025/09/23/Hexo/">Hexo</a></li><li><a href="/2025/09/22/Scrcpy_new/">Scrcpy</a></li><li><a href="/2025/09/22/Typora1.9.5/">Typora1.9.5</a></li></ul></noscript>
