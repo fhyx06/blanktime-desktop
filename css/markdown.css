@@ -144,3 +144,40 @@
   .code-line-numbers { padding-left: 10px; padding-right: 10px; }
   .post-content blockquote { padding-inline: 15px; }
 }
+
+/* Diagram cards follow the reader theme; source retains code highlighting. */
+.post-content .mermaid-block {
+  --diagram-surface: #fafbfc;
+  --diagram-header: #f1f3f5;
+  --diagram-border: #dfe3e8;
+  --diagram-text: #606b77;
+  --diagram-hover: #303c49;
+  --diagram-error: #94621f;
+  border: 1px solid var(--diagram-border);
+  background: var(--diagram-surface);
+  box-shadow: 0 2px 5px #26354808;
+}
+.reader-window[data-theme="dark"] .mermaid-block {
+  --diagram-surface: #252a32;
+  --diagram-header: #2c323b;
+  --diagram-border: #3d4652;
+  --diagram-text: #b3bdca;
+  --diagram-hover: #f0f3f7;
+  --diagram-error: #e7bd84;
+  box-shadow: none;
+}
+.mermaid-block .code-block-header {
+  background: var(--diagram-header);
+  color: var(--diagram-text);
+  border-bottom: 1px solid var(--diagram-border);
+}
+.mermaid-block .code-language { color: inherit; }
+.mermaid-block .code-block-header button:hover { color: var(--diagram-hover); }
+/* SVGs must not inherit the desktop's small outline-icon sizing. */
+.mermaid-output { padding: 24px 20px; background: var(--diagram-surface, #fafbfc); color: var(--diagram-text, #414b54); overflow: auto; text-align: center; }
+.mermaid-output svg { display: block; width: 100%; height: auto; margin: auto; fill: initial; stroke: none; stroke-width: initial; }
+.mermaid-stage { position: fixed; left: -20000px; top: 0; width: 900px; pointer-events: none; }
+.mermaid-body { display: block; padding: 0; }
+.mermaid-source { display: flex; padding: 14px 0 16px; border-top: 1px solid var(--diagram-border); background: var(--md-code-background, #282c34); color: var(--md-code-text-color, #abb2bf); }
+.mermaid-error { padding: 12px 18px; color: var(--diagram-error, #94621f); }
+.mermaid-error button { margin-left: 12px; text-decoration: underline; }

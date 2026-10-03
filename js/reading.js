@@ -59,6 +59,7 @@
       });
       header.append(dots, label, copy, collapse); block.append(header, body);
       (original.closest('figure.highlight') || original).replaceWith(block);
+      if (language.toLowerCase() === 'mermaid') window.blanktimeMermaid.setup(block, text, onChange);
     });
   }
   window.blanktimeReading = {setupCodeBlocks};
