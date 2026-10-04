@@ -456,3 +456,19 @@
  #music .song-name {font-size:14px;}
 }
 @media(prefers-reduced-motion:reduce) {#music * {animation:none!important;transition:none!important;}}
+
+#music .utility-actions { display:flex; align-items:center; gap:10px; }
+#music .lyrics-toggle { width:28px; height:28px; border:1px solid var(--line); border-radius:7px; color:var(--text-2); font-size:14px; font-weight:600; }
+#music .lyrics-toggle:hover { color:var(--accent); background:var(--accent-soft); }
+#music .lyrics-toggle[aria-expanded="true"] { color:var(--accent); background:var(--accent-soft); border-color:var(--accent); }
+#music.lyrics-hidden .body { grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr); }
+#music .row-idx { position:relative; }
+#music .rhythm-bars { display:none; height:16px; align-items:flex-end; justify-content:flex-end; gap:2px; color:var(--accent); }
+#music .row.active .row-number { visibility:hidden; }
+#music .row.active .rhythm-bars { display:flex; position:absolute; inset:0; margin:auto 0; }
+#music .rhythm-bars i { display:block; width:3px; height:100%; border-radius:2px; background:currentColor; transform-origin:bottom; transform:scaleY(.25); animation:music-rhythm .85s ease-in-out infinite alternate; animation-play-state:paused; }
+#music .rhythm-bars i:nth-child(2) { animation-delay:-.35s; transform:scaleY(.6); }
+#music .rhythm-bars i:nth-child(3) { animation-delay:-.6s; transform:scaleY(.85); }
+#music .rhythm-bars i:nth-child(4) { animation-delay:-.15s; transform:scaleY(.4); }
+#music .row.is-playing .rhythm-bars i { animation-play-state:running; }
+@keyframes music-rhythm { 0% { transform:scaleY(.2); } 50% { transform:scaleY(.65); } 100% { transform:scaleY(1); } }

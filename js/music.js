@@ -50,6 +50,7 @@
     set(key,value) { try { localStorage.setItem('blanktime-music:' + key, value); } catch {} }
   };
   let songs = [], index = -1, lyrics = [], lyricIndex = -1, loop = 'list';
+  let buffering = true;
   let loading = false, playlistRequest = 0, trackRequest = 0, lyricController;
   let userScrollUntil = 0, seeking = false, rememberedVolume = 0.5;
   const id = playlistId(win.dataset.playlist);
@@ -69,6 +70,7 @@
     dock?.classList.toggle('is-playing', playing);
     list.querySelectorAll('.row').forEach((row,i) => {
       row.classList.toggle('active',i === index);
+      row.classList.toggle('is-playing',i === index && playing && !buffering);
       row.setAttribute('aria-current',i === index ? 'true' : 'false');
     });
   }
@@ -99,6 +101,12 @@
         const span = document.createElement('span');
         span.className = className;
         span.textContent = [String(i+1),song.name,song.artist][j];
+        if (j === 0) {
+          const number = document.createElement('span'); number.className = 'row-number'; number.textContent = span.textContent;
+          const bars = document.createElement('span'); bars.className = 'rhythm-bars'; bars.setAttribute('aria-hidden', 'true');
+          bars.innerHTML = '<i></i><i></i><i></i><i></i>';
+          span.replaceChildren(number, bars);
+        }
         button.append(span);
       });
       li.append(button); list.append(li);
@@ -147,7 +155,7 @@
     if (!songs[i]) return;
     ++trackRequest;
     lyricController?.abort();
-    audio.pause(); index = i;
+    audio.pause(); buffering = true; index = i;
     const song = songs[i];
     $('songName').textContent = song.name; $('songName').title = song.name;
     $('songArtist').textContent = song.artist; $('songArtist').title = song.artist;
@@ -205,14 +213,29 @@
       if (request === trackRequest) { empty.hidden = false; empty.textContent = '歌词暂时无法加载'; }
     } finally { clearTimeout(timer); }
   }
+  function setLyricsVisible(visible) {
+    $('lyrics').hidden = !visible;
+    win.classList.toggle('lyrics-hidden', !visible);
+    const button = $('btnLyrics');
+    button.setAttribute('aria-expanded', String(visible));
+    button.title = visible ? '收起歌词' : '展开歌词';
+    button.setAttribute('aria-label', button.title);
+    if (visible) { userScrollUntil = 0; layoutLyrics(); syncLyrics(true); }
+  }
+  $('btnLyrics').addEventListener('click', () => {
+    const visible = $('lyrics').hidden;
+    setLyricsVisible(visible); store.set('lyrics-visible', String(visible));
+  });
+  setLyricsVisible(store.get('lyrics-visible') !== 'false');
   function layoutLyrics() {
+    if ($('lyrics').hidden) return;
     lyricInner.style.paddingTop = Math.max(0,lyricScroll.clientHeight / 2 - 16) + 'px';
     lyricInner.style.paddingBottom = lyricScroll.clientHeight / 2 + 'px';
     if (lyricIndex >= 0) centerLine(lyricIndex,true);
   }
   function centerLine(i,instant = false) {
     const line = lyricInner.children[i];
-    if (!line || Date.now() < userScrollUntil) return;
+    if ($('lyrics').hidden || !line || Date.now() < userScrollUntil) return;
     lyricScroll.scrollTo({top:Math.max(0,line.offsetTop + line.offsetHeight/2 - lyricScroll.clientHeight/2),behavior:instant || reducedMotion ? 'instant' : 'smooth'});
   }
   function syncLyrics(force = false) {
@@ -334,9 +357,12 @@
     if(closed()) {audio.pause();return;}
     playingUI();setStatus('正在播放 · '+songs[index].name);
   });
-  audio.addEventListener('pause',() => {playingUI();if(index>=0)setStatus('已暂停 · '+songs[index].name);});
+  audio.addEventListener('playing',() => {buffering=false;playingUI();});
+  ['waiting','seeking','emptied'].forEach(type => audio.addEventListener(type,() => {buffering=true;playingUI();}));
+  audio.addEventListener('pause',() => {buffering=true;playingUI();if(index>=0)setStatus('已暂停 · '+songs[index].name);});
   ['timeupdate','loadedmetadata','durationchange','progress'].forEach(type => audio.addEventListener(type,() => {updateProgress();syncLyrics();}));
   audio.addEventListener('ended',() => {
+    buffering=true;playingUI();
     if(closed())return;
     if(loop==='one') {audio.currentTime=0;playAudio();}
     else selectSong(nextIndex(index,songs.length,loop,1),true);
