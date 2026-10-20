@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fff"/>
+      <stop offset="1" stop-color="#e9edf2"/>
+    </linearGradient>
+    <linearGradient id="yellow" x2=".25" y2="1">
+      <stop stop-color="#ffd168"/><stop offset="1" stop-color="#efa927" stop-opacity=".7"/>
+    </linearGradient>
+    <linearGradient id="orange" x2=".25" y2="1">
+      <stop stop-color="#ffb77c"/><stop offset="1" stop-color="#f49b52" stop-opacity=".7"/>
+    </linearGradient>
+    <linearGradient id="red" x2=".25" y2="1">
+      <stop stop-color="#ff7767"/><stop offset="1" stop-color="#f45657" stop-opacity=".75"/>
+    </linearGradient>
+    <linearGradient id="pink" x2=".25" y2="1">
+      <stop stop-color="#ed91d0"/><stop offset="1" stop-color="#cb70c4" stop-opacity=".7"/>
+    </linearGradient>
+    <linearGradient id="blue" x2=".25" y2="1">
+      <stop stop-color="#609aff"/><stop offset="1" stop-color="#467af0" stop-opacity=".8"/>
+    </linearGradient>
+    <linearGradient id="cyan" x2=".25" y2="1">
+      <stop stop-color="#6edcc6"/><stop offset="1" stop-color="#32b8c9" stop-opacity=".7"/>
+    </linearGradient>
+    <linearGradient id="green" x2=".25" y2="1">
+      <stop stop-color="#6ada7d"/><stop offset="1" stop-color="#27bd68" stop-opacity=".75"/>
+    </linearGradient>
+    <linearGradient id="lime" x2=".25" y2="1">
+      <stop stop-color="#c1e789"/><stop offset="1" stop-color="#85c960" stop-opacity=".75"/>
+    </linearGradient>
+    <path id="petal" d="M48 13C56 19 62 27 60 35C59 42 53 46 48 49C43 46 37 42 36 35C34 27 40 19 48 13Z"/>
+    <filter id="shadow" x="-.25" y="-.25" width="1.5" height="1.6">
+      <feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#687580" flood-opacity=".15"/>
+    </filter>
+  </defs>
+  <rect x="1" y="1" width="94" height="94" rx="23" fill="url(#tile)" stroke="#fff" stroke-opacity=".7"/>
+  <g filter="url(#shadow)">
+    <use href="#petal" fill="url(#yellow)"/>
+    <use href="#petal" fill="url(#orange)" transform="rotate(45 48 48)" opacity=".9"/>
+    <use href="#petal" fill="url(#red)" transform="rotate(90 48 48)" opacity=".9"/>
+    <use href="#petal" fill="url(#pink)" transform="rotate(135 48 48)" opacity=".88"/>
+    <use href="#petal" fill="url(#blue)" transform="rotate(180 48 48)" opacity=".9"/>
+    <use href="#petal" fill="url(#cyan)" transform="rotate(225 48 48)" opacity=".88"/>
+    <use href="#petal" fill="url(#green)" transform="rotate(270 48 48)" opacity=".88"/>
+    <use href="#petal" fill="url(#lime)" transform="rotate(315 48 48)" opacity=".86"/>
+  </g>
+</svg>

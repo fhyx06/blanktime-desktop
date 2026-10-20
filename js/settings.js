@@ -36,6 +36,7 @@
   document.getElementById('settings-wallpaper-toggle').addEventListener('click',() => {
     show(false);
     document.querySelector('.dock-button[data-open="album"]').click();
+    window.dispatchEvent(new CustomEvent('blanktime:open-wallpapers'));
   });
   sync();
 })();

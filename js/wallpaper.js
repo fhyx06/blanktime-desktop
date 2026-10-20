@@ -2,8 +2,13 @@
   'use strict';
   const feedback = document.getElementById('album-status');
   const wallpaper = document.querySelector('.wallpaper');
-  let revision = 0, activeObjectURL = '';
-  // Blobs stay in this browser; local images are never uploaded to a server.
+  function notify(message) {
+    feedback.textContent = message;
+    window.dispatchEvent(new CustomEvent('blanktime:wallpaper-feedback', {detail:message}));
+  }
+  let revision = 0;
+  const allowed = new Set([...document.querySelectorAll('.album-card[data-wallpaper="true"]')].map(card => new URL(card.dataset.src, location.href).href));
+  // Store only a URL selected from the configured wallpaper folder.
   const database = new Promise((resolve,reject) => {
     const request = indexedDB.open('blanktime-appearance',1);
     request.onupgradeneeded = () => request.result.createObjectStore('preferences');
@@ -38,23 +43,22 @@
   }
   async function apply(value, persist = true) {
     const request = ++revision;
-    let objectURL = '';
-    if (persist) feedback.textContent='正在加载图片…';
+    if (persist) notify('正在加载图片…');
     try {
-      const src = value.kind === 'file' && value.blob instanceof Blob
-        ? (objectURL=URL.createObjectURL(value.blob)) : imageURL(value.url);
+      const src = value.kind === 'url' ? imageURL(value.url) : '';
+      if (!allowed.has(src)) {
+        if (!persist) { await storage(null, true); return; }
+        throw new Error('只能将壁纸文件夹中的图片设为壁纸。');
+      }
       await checkImage(src);
-      if (request !== revision) {if(objectURL)URL.revokeObjectURL(objectURL);return;}
+      if (request !== revision) return;
       wallpaper.style.backgroundImage='url('+JSON.stringify(src)+')';
-      if(activeObjectURL) URL.revokeObjectURL(activeObjectURL);
-      activeObjectURL=objectURL;
       if (persist) {
-        try {await storage(value,true);if(request===revision)feedback.textContent='壁纸已更换并保存在当前浏览器。';}
-        catch {if(request===revision)feedback.textContent='壁纸已更换，但浏览器无法保存，下次刷新后会恢复默认。';}
+        try {await storage(value,true);if(request===revision)notify('壁纸已更换并保存在当前浏览器。');}
+        catch {if(request===revision)notify('壁纸已更换，但浏览器无法保存，下次刷新后会恢复默认。');}
       }
     } catch(error) {
-      if(objectURL)URL.revokeObjectURL(objectURL);
-      if(request===revision)feedback.textContent=error.message;
+      if(request===revision)notify(error.message);
     }
   }
   window.addEventListener('blanktime:set-wallpaper',event => {
@@ -63,10 +67,8 @@
   document.getElementById('wallpaper-reset').addEventListener('click',async () => {
     const request=++revision;
     wallpaper.style.removeProperty('background-image');
-    if(activeObjectURL)URL.revokeObjectURL(activeObjectURL);
-    activeObjectURL='';
-    try {await storage(null,true);if(request===revision)feedback.textContent='已恢复默认壁纸。';}
-    catch {if(request===revision)feedback.textContent='已恢复默认，但浏览器无法清除保存的偏好。';}
+    try {await storage(null,true);if(request===revision)notify('已恢复默认壁纸。');}
+    catch {if(request===revision)notify('已恢复默认，但浏览器无法清除保存的偏好。');}
   });
   const initialRevision=revision;
   storage().then(value => {if(value && revision===initialRevision)apply(value,false);}).catch(() => {});

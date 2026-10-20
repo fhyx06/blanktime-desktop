@@ -39,12 +39,11 @@ html[data-system-theme="dark"] .files-sort-label select {background:var(--sys-ra
 html[data-system-theme="dark"] :is(.files-category:hover,.post-file:hover,.files-actions>button:enabled:hover) {background:var(--sys-hover);}
 html[data-system-theme="dark"] :is(.files-category.is-selected,.post-file.is-selected) {background:#293e59;color:#80b6ff;}
 html[data-system-theme="dark"] .file-icon {background:linear-gradient(145deg,#3c4958,#2b3540);border-color:#566374;color:#c4d6e3;}
-/* Album and image preview. */
-html[data-system-theme="dark"] :is(.album-content,.album-preview-toolbar) {background:var(--sys-base);border-color:var(--sys-border);}
+/* Album. */
+html[data-system-theme="dark"] .album-content {background:var(--sys-base);border-color:var(--sys-border);}
 html[data-system-theme="dark"] :is(.album-toolbar p,.album-empty) {color:var(--sys-muted);}
-html[data-system-theme="dark"] :is(.album-card,.album-preview,.album-toolbar button,.album-preview-toolbar button) {background:var(--sys-raised);border-color:var(--sys-border);color:var(--sys-text);}
-html[data-system-theme="dark"] :is(.album-card:hover,.album-toolbar button:hover,.album-preview-toolbar button:hover) {background:var(--sys-hover);}
-html[data-system-theme="dark"] #album-wallpaper {background:var(--accent);color:#fff;}
+html[data-system-theme="dark"] :is(.album-card,.album-toolbar button) {background:var(--sys-raised);border-color:var(--sys-border);color:var(--sys-text);}
+html[data-system-theme="dark"] :is(.album-card:hover,.album-toolbar button:hover) {background:var(--sys-hover);}
 /* Music keeps its user-selected accent, while all neutral surfaces follow the system. */
 html[data-system-theme="dark"] #music {--text:var(--sys-text);--text-2:var(--sys-muted);--line:var(--sys-border);--window-bg:var(--sys-base);--panel-bg:var(--sys-raised);background:var(--sys-base);}
 html[data-system-theme="dark"] #music :is(.theme-pop,.list-state) {background:var(--sys-raised);color:var(--sys-text);}

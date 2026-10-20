@@ -40,7 +40,7 @@
     close: svg('<path d="M7 7l10 10M17 7 7 17"/>', { size: 15, sw: 1.7 })
   };
 
-  const {playlistId, safeURL, tracks, parseLrc, formatTime, nextIndex} = window.BlanktimeMusic;
+  const {playlistId, safeURL, largeCoverURL, tracks, parseLrc, formatTime, nextIndex} = window.BlanktimeMusic;
   const $ = id => document.getElementById('music-' + id);
   const audio = $('audio'), status = $('status'), list = $('playlist'), empty = $('lyricsEmpty');
   const lyricScroll = $('lyricsScroll'), lyricInner = $('lyricsInner');
@@ -97,6 +97,7 @@
       const button = document.createElement('button');
       button.type = 'button'; button.className = 'row'; button.dataset.index = i;
       button.title = song.name + ' · ' + song.artist;
+      const meta = document.createElement('span'); meta.className = 'row-meta';
       ['row-idx','row-name','row-artist'].forEach((className,j) => {
         const span = document.createElement('span');
         span.className = className;
@@ -107,31 +108,74 @@
           bars.innerHTML = '<i></i><i></i><i></i><i></i>';
           span.replaceChildren(number, bars);
         }
-        button.append(span);
+        if (j === 0) {
+          button.append(span);
+          const art = document.createElement('span'); art.className = 'row-cover'; art.setAttribute('aria-hidden','true');
+          const placeholder = document.createElement('span'); placeholder.textContent = '♪'; art.append(placeholder);
+          if (song.cover) {
+            const img = document.createElement('img'); img.alt = ''; img.loading = 'lazy'; img.decoding = 'async';
+            img.addEventListener('error', () => img.remove(), {once:true});
+            img.src = song.cover; art.append(img);
+          }
+          button.append(art, meta);
+        } else meta.append(span);
       });
       li.append(button); list.append(li);
     });
     $('count').textContent = songs.length;
+    filterSongs();
   }
+  function filterSongs() {
+    const query = $('search').value.trim().toLocaleLowerCase();
+    let matches = 0;
+    songs.forEach((song, i) => {
+      const visible = (song.name + ' ' + song.artist).toLocaleLowerCase().includes(query);
+      list.children[i].hidden = !visible;
+      if (visible) matches++;
+    });
+    $('searchEmpty').hidden = !songs.length || matches > 0;
+  }
+  $('search').addEventListener('input', filterSongs);
   async function loadPlaylist() {
     if (loading) return;
-    const url = safeURL(win.dataset.api.replace(/:server/g,'netease').replace(/:type/g,'playlist').replace(/:id/g,id).replace(/:r/g,String(Date.now())));
-    if (!id || !url) { listState('请在主题配置中设置有效歌单和接口地址。'); return; }
+    let fallbacks = [];
+    try { fallbacks = JSON.parse(win.dataset.apiFallbacks || '[]'); } catch {}
+    const urls = [...new Set([win.dataset.api, ...(Array.isArray(fallbacks) ? fallbacks : [])]
+      .filter(value => typeof value === 'string')
+      .map(value => safeURL(value.replace(/:server/g,'netease').replace(/:type/g,'playlist').replace(/:id/g,id).replace(/:r/g,String(Date.now()))))
+      .filter(Boolean))];
+    if (!id || !urls.length) { listState('请在主题配置中设置有效歌单和接口地址。'); return; }
     loading = true;
     win.dataset.loadState = 'loading';
     $('reload').disabled = true;
     controlsEnabled(false);
     audio.pause();
     const request = ++playlistRequest;
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(),15000);
     listState('正在加载歌单…'); setStatus('正在加载歌单…');
     try {
-      const response = await fetch(url,{signal:controller.signal,credentials:'omit'});
-      if (!response.ok) throw new Error('request');
-      const result = tracks(await response.json());
+      let result, lastError;
+      for (let attempt = 0; attempt < urls.length; attempt++) {
+        if (attempt) {
+          const message = `正在尝试备用接口（${attempt + 1}/${urls.length}）…`;
+          listState(songs.length ? '' : message); setStatus(message);
+        }
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 6000);
+        try {
+          const response = await fetch(urls[attempt], {signal:controller.signal, credentials:'omit', headers:{Accept:'application/json'}});
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
+          result = tracks(Array.isArray(data) ? data : data?.data);
+          if (!result.length) throw new Error('empty');
+          break;
+        } catch (error) {
+          lastError = error;
+        } finally {
+          clearTimeout(timer);
+        }
+      }
       if (request !== playlistRequest) return;
-      if (!result.length) throw new Error('empty');
+      if (!result?.length) throw lastError;
       songs = result;
       index = -1;
       renderList(); listState('');
@@ -142,14 +186,53 @@
       win.dataset.loadState = 'ready';
     } catch (error) {
       if (request !== playlistRequest) return;
-      const message = error.name === 'AbortError' ? '歌单加载超时，请重试。' : '暂时无法读取歌单，请重试。';
+      const message = error.name === 'AbortError' ? '歌单加载超时，请重试。'
+        : error.name === 'TypeError' ? '歌单接口连接失败，请检查网络或 music.api 配置后重试。'
+        : error.name === 'SyntaxError' ? '歌单接口返回的数据无效，请检查 music.api 配置。'
+        : error.message === 'empty' ? '接口未返回可播放曲目，请检查歌单或接口配置。'
+        : /^HTTP \d+$/.test(error.message) ? `歌单接口返回 ${error.message}，请稍后重试。`
+        : '暂时无法读取歌单，请重试。';
       listState(songs.length ? '' : message,true);
       setStatus(message); controlsEnabled(songs.length > 0);
       win.dataset.loadState = 'error';
     } finally {
-      clearTimeout(timer);
       if (request === playlistRequest) { loading = false; $('reload').disabled = false; }
     }
+  }
+  const largeCovers = new Map();
+  async function loadLargeCover(original) {
+    let candidate = largeCoverURL(original);
+    if (!candidate) {
+      const url = new URL(original);
+      if (url.searchParams.get('server') !== 'netease' || url.searchParams.get('type') !== 'pic') return '';
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(),8000);
+      try {
+        // The current Meting API fixes artwork at 90px; resolve its CDN redirect first.
+        const response = await fetch(original,{method:'HEAD',credentials:'omit',signal:controller.signal});
+        if (!response.ok) return '';
+        candidate = largeCoverURL(response.url);
+      } finally { clearTimeout(timer); }
+    }
+    if (!candidate || candidate === original) return '';
+    return new Promise(resolve => {
+      const image = new Image();
+      const finish = result => {
+        clearTimeout(timer); image.onload = image.onerror = null;
+        resolve(result);
+      };
+      const timer = setTimeout(() => finish(''),10000);
+      image.onload = () => finish(image.naturalWidth > 90 ? candidate : '');
+      image.onerror = () => finish('');
+      image.src = candidate;
+    });
+  }
+  async function upgradeCover() {
+    const song = songs[index], request = trackRequest;
+    if ($('lyrics').hidden || !song?.cover) return;
+    if (!largeCovers.has(song.cover)) largeCovers.set(song.cover,loadLargeCover(song.cover).catch(() => ''));
+    const url = await largeCovers.get(song.cover);
+    if (url && request === trackRequest && songs[index] === song && !$('lyrics').hidden) $('cover').src = url;
   }
   function selectSong(i, autoplay) {
     if (!songs[i]) return;
@@ -163,6 +246,7 @@
     cover.hidden = true; $('coverPh').hidden = false;
     cover.removeAttribute('src');
     if (song.cover) cover.src = song.cover;
+    upgradeCover();
     lyrics = []; lyricIndex = -1; lyricInner.replaceChildren();
     empty.hidden = false; empty.textContent = '正在加载歌词…';
     audio.src = song.url;
@@ -214,19 +298,35 @@
     } finally { clearTimeout(timer); }
   }
   function setLyricsVisible(visible) {
+    const player = win.querySelector('.player');
+    const workspace = win.querySelector('.music-workspace');
+    const body = win.querySelector('.body');
+    // Move the existing controls; the same audio element and listeners keep playing.
+    (visible ? $('listeningPlayer') : workspace).append(player);
+    body.hidden = visible;
+    $('listeningView').hidden = !visible;
+    $('backToList').tabIndex = visible ? 0 : -1;
+    $('openLyrics').disabled = visible;
+    if (visible) $('openLyrics').removeAttribute('title');
+    else $('openLyrics').title = '打开歌词界面';
+    $('openLyrics').setAttribute('aria-label',visible ? '歌曲封面' : '打开歌词界面');
     $('lyrics').hidden = !visible;
+    win.classList.toggle('is-lyrics-view', visible);
     win.classList.toggle('lyrics-hidden', !visible);
     const button = $('btnLyrics');
     button.setAttribute('aria-expanded', String(visible));
-    button.title = visible ? '收起歌词' : '展开歌词';
+    button.title = visible ? '返回歌单' : '打开歌词界面';
     button.setAttribute('aria-label', button.title);
-    if (visible) { userScrollUntil = 0; layoutLyrics(); syncLyrics(true); }
+    if (visible) { userScrollUntil = 0; layoutLyrics(); syncLyrics(true); upgradeCover(); }
   }
-  $('btnLyrics').addEventListener('click', () => {
-    const visible = $('lyrics').hidden;
+  function switchLyrics(visible) {
     setLyricsVisible(visible); store.set('lyrics-visible', String(visible));
-  });
-  setLyricsVisible(store.get('lyrics-visible') !== 'false');
+    (visible ? $('backToList') : $('btnLyrics')).focus();
+  }
+  $('btnLyrics').addEventListener('click', () => switchLyrics($('lyrics').hidden));
+  $('openLyrics').addEventListener('click', () => switchLyrics(true));
+  $('backToList').addEventListener('click', () => switchLyrics(false));
+  setLyricsVisible(store.get('lyrics-visible') === 'true');
   function layoutLyrics() {
     if ($('lyrics').hidden) return;
     lyricInner.style.paddingTop = Math.max(0,lyricScroll.clientHeight / 2 - 16) + 'px';
@@ -374,7 +474,7 @@
       // Let metadata finish loading even if the window closes mid-request.
       audio.pause();controlsEnabled(songs.length>0 && !loading);themePopup(false);
     } else if(!win.hidden) {
-      if (!songs.length && !loading) loadPlaylist();
+      if (!songs.length && !loading && !win.dataset.loadState) loadPlaylist();
       else if (songs.length && index < 0 && !loading) selectSong(0,false);
     }
   }).observe(win,{attributes:true,attributeFilter:['data-state','hidden']});
@@ -386,7 +486,7 @@
   if(!win.hidden && !closed()) loadPlaylist();
   function schedulePreload() {
     const preload = () => {
-      // Opening first reuses the same request; failed preloads retry on open.
+      // Opening first reuses the request; failed loads wait for an explicit retry.
       if (!songs.length && !loading && !win.dataset.loadState) loadPlaylist();
     };
     if ('requestIdleCallback' in window) window.requestIdleCallback(preload,{timeout:3000});

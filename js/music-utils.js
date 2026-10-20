@@ -19,6 +19,16 @@
       return /^https?:$/.test(url.protocol) ? url.href : '';
     } catch { return ''; }
   }
+  function largeCoverURL(value) {
+    try {
+      const url = new URL(value);
+      // Only change the documented image resize parameter on NetEase artwork hosts.
+      if (!/^https?:$/.test(url.protocol) || !/^p\d+\.music\.126\.net$/.test(url.hostname)) return '';
+      url.protocol = 'https:';
+      url.searchParams.set('param', '800y800');
+      return url.href;
+    } catch { return ''; }
+  }
   function tracks(data) {
     if (!Array.isArray(data)) return [];
     return data.map(item => {
@@ -53,5 +63,5 @@
     if (mode === 'shuffle' && length > 1) return (index+1+Math.floor(random()*(length-1)))%length;
     return (index+direction+length)%length;
   }
-  return {playlistId, safeURL, tracks, parseLrc, formatTime, nextIndex};
+  return {playlistId, safeURL, largeCoverURL, tracks, parseLrc, formatTime, nextIndex};
 });

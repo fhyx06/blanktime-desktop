@@ -1,0 +1,325 @@
+(() => {
+  'use strict';
+  const win = document.getElementById('image-viewer');
+  const $ = name => document.getElementById('image-viewer-' + name);
+  const stage = $('stage'), message = $('message'), status = $('status'), apply = $('wallpaper');
+  let imageTimer;
+  let items = [], index = 0, trigger, source = '', photo, version = 0, awaitingWallpaper = false;
+  const controls = ['zoom-out','zoom-in','actual','fit','rotate-left','rotate-right'].map($);
+  const MAX_ZOOM = 8, PADDING = 32;
+  let naturalWidth = 0, naturalHeight = 0, scale = 1, angle = 0, mode = 'fit', panX = 0, panY = 0, drag;
+  const ready = () => naturalWidth > 0 && naturalHeight > 0;
+  function rotatedSize() {
+    return angle % 180 === 0 ? [naturalWidth, naturalHeight] : [naturalHeight, naturalWidth];
+  }
+  function fitScale() {
+    const [width, height] = rotatedSize();
+    return Math.min(1, Math.max(1,stage.clientWidth - PADDING) / width, Math.max(1,stage.clientHeight - PADDING) / height);
+  }
+  function bounds() {
+    const [width, height] = rotatedSize();
+    return [Math.max(0,(width * scale - Math.max(1,stage.clientWidth - PADDING)) / 2),
+      Math.max(0,(height * scale - Math.max(1,stage.clientHeight - PADDING)) / 2)];
+  }
+  function endDrag() {
+    const pointerId = drag?.id; drag = null;
+    stage.classList.remove('is-panning');
+    if (pointerId !== undefined && stage.hasPointerCapture?.(pointerId)) stage.releasePointerCapture(pointerId);
+  }
+  function draw() {
+    controls.forEach(button => { button.disabled = !ready(); });
+    $('fit').setAttribute('aria-pressed',String(mode === 'fit'));
+    $('actual').setAttribute('aria-pressed',String(mode === 'manual' && scale === 1));
+    if (!ready()) { $('zoom').textContent = '—'; stage.classList.remove('can-pan'); return; }
+    // Hidden/minimized windows have no usable viewport; retain their current view.
+    if (!stage.clientWidth || !stage.clientHeight) return;
+    if (mode === 'fit') { scale = fitScale(); panX = 0; panY = 0; }
+    const [limitX, limitY] = bounds();
+    panX = Math.max(-limitX,Math.min(limitX,panX));
+    panY = Math.max(-limitY,Math.min(limitY,panY));
+    photo.style.width = `${naturalWidth * scale}px`;
+    photo.style.height = `${naturalHeight * scale}px`;
+    photo.style.transform = `translate(-50%, -50%) translate(${panX}px, ${panY}px) rotate(${angle}deg)`;
+    stage.classList.toggle('can-pan',limitX > .5 || limitY > .5);
+    $('zoom').textContent = `${Number((scale * 100).toFixed(1))}%`;
+    $('zoom-out').disabled = scale <= Math.min(.05,fitScale()) + 1e-8;
+    $('zoom-in').disabled = scale >= MAX_ZOOM;
+  }
+  function resetView() {
+    endDrag(); naturalWidth = 0; naturalHeight = 0; scale = 1; angle = 0; mode = 'fit'; panX = 0; panY = 0; draw();
+  }
+  function zoomTo(value, anchorX = 0, anchorY = 0) {
+    if (!ready()) return;
+    endDrag();
+    const next = Math.max(Math.min(.05,fitScale()),Math.min(MAX_ZOOM,value));
+    // Keep the image point beneath the anchor fixed, within the image bounds.
+    const ratio = next / scale;
+    panX = anchorX + (panX - anchorX) * ratio;
+    panY = anchorY + (panY - anchorY) * ratio;
+    scale = next; mode = 'manual'; draw();
+  }
+  stage.addEventListener('wheel', event => {
+    // Keep browser zoom shortcuts and horizontal trackpad scrolling intact.
+    if (!ready() || event.ctrlKey || event.metaKey || !event.deltaY || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
+    event.preventDefault();
+    const rect = stage.getBoundingClientRect();
+    const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? stage.clientHeight : 1;
+    const delta = Math.max(-120,Math.min(120,event.deltaY * unit));
+    zoomTo(scale * Math.exp(-delta * .002),event.clientX - rect.left - rect.width / 2,event.clientY - rect.top - rect.height / 2);
+  }, {passive:false});
+  $('zoom-out').addEventListener('click', () => zoomTo(scale / 1.25));
+  $('zoom-in').addEventListener('click', () => zoomTo(scale * 1.25));
+  $('actual').addEventListener('click', () => { if (ready()) { panX = 0; panY = 0; zoomTo(1); } });
+  $('fit').addEventListener('click', () => { if (ready()) { endDrag(); mode = 'fit'; draw(); } });
+  function rotate(degrees) {
+    if (!ready()) return;
+    endDrag(); angle = (angle + degrees + 360) % 360; panX = 0; panY = 0; draw();
+  }
+  $('rotate-left').addEventListener('click', () => rotate(-90));
+  $('rotate-right').addEventListener('click', () => rotate(90));
+  stage.addEventListener('pointerdown', event => {
+    if (event.target !== photo || !ready() || event.button !== 0 || event.isPrimary === false || !stage.classList.contains('can-pan')) return;
+    event.preventDefault();
+    stage.setPointerCapture(event.pointerId);
+    drag = {id:event.pointerId, x:event.clientX, y:event.clientY, panX, panY};
+    stage.classList.add('is-panning');
+  });
+  stage.addEventListener('pointermove', event => {
+    if (!drag || event.pointerId !== drag.id) return;
+    panX = drag.panX + event.clientX - drag.x; panY = drag.panY + event.clientY - drag.y; draw();
+  });
+  ['pointerup','pointercancel','lostpointercapture'].forEach(type => stage.addEventListener(type, event => {
+    if (drag?.id === event.pointerId) endDrag();
+  }));
+  new ResizeObserver(() => { endDrag(); draw(); }).observe(stage);
+  let albumMode = false, metadataRequest, metadataTimer, fullscreenPending = false;
+  function stopMetadata() {
+    metadataRequest?.abort(); metadataRequest = null;
+    clearTimeout(metadataTimer);
+  }
+  function sizeLabel(bytes) {
+    if (bytes < 1024) return `${bytes} B`;
+    const unit = bytes < 1024 ** 2 ? 'KB' : bytes < 1024 ** 3 ? 'MB' : 'GB';
+    const divisor = unit === 'KB' ? 1024 : unit === 'MB' ? 1024 ** 2 : 1024 ** 3;
+    return `${Number((bytes / divisor).toFixed(2))} ${unit}`;
+  }
+  function setMetadata(name, value = '') {
+    const field = $(name);
+    field.textContent = value;
+    field.parentElement.hidden = !value;
+    $('info').hidden = !albumMode || ![...$('info').children].some(row => !row.hidden);
+  }
+  async function showMetadata(item, current) {
+    stopMetadata();
+    ['filename','resolution','size','format'].forEach(name => setMetadata(name));
+    if (!albumMode) return;
+    setMetadata('filename',fileName(item.url,''));
+    const ext = new URL(item.url).pathname.match(/\.(jpe?g|png|webp|gif|avif|bmp|svg)$/i)?.[1];
+    setMetadata('format',ext ? `${ext.toUpperCase()}（扩展名）` : '');
+    setMetadata('size',item.size !== null ? sizeLabel(item.size) : '');
+    if (item.size !== null) return;
+    if (!/^https?:/.test(item.url)) return;
+    const controller = new AbortController(); metadataRequest = controller;
+    const timer = setTimeout(() => controller.abort(),5000); metadataTimer = timer;
+    try {
+      // HEAD reads headers only; never download the image a second time for its size.
+      const response = await fetch(item.url,{method:'HEAD',credentials:'omit',signal:controller.signal});
+      if (current !== version || controller.signal.aborted) return;
+      if (!response.ok) throw new Error('metadata unavailable');
+      const type = (response.headers.get('Content-Type') || '').split(';')[0].trim().toLowerCase();
+      const formats = {'image/jpeg':'JPEG','image/png':'PNG','image/webp':'WebP','image/gif':'GIF','image/avif':'AVIF','image/bmp':'BMP','image/svg+xml':'SVG'};
+      if (formats[type]) setMetadata('format',formats[type]);
+      const length = response.headers.get('Content-Length');
+      const bytes = length === null || length.trim() === '' ? NaN : Number(length);
+      setMetadata('size',type.startsWith('image/') && Number.isSafeInteger(bytes) && bytes >= 0 ? sizeLabel(bytes) : '');
+    } catch {
+      if (current === version) setMetadata('size');
+    } finally {
+      clearTimeout(timer);
+      if (metadataRequest === controller) metadataRequest = null;
+    }
+  }
+  const fullscreenButton = $('fullscreen');
+  fullscreenButton.disabled = !win.requestFullscreen || document.fullscreenEnabled === false;
+  async function exitFullscreen() {
+    if (document.fullscreenElement === win) {
+      try { await document.exitFullscreen(); } catch { status.textContent = '请按 Esc 退出全屏'; }
+    }
+  }
+  async function toggleFullscreen() {
+    if (fullscreenButton.disabled || fullscreenPending) return;
+    endDrag(); fullscreenPending = true;
+    try {
+      if (document.fullscreenElement === win) await document.exitFullscreen();
+      else { await win.requestFullscreen(); if (win.hidden) await exitFullscreen(); }
+    } catch { if (!win.hidden) status.textContent = '当前环境无法进入全屏，可使用窗口最大化'; }
+    finally { fullscreenPending = false; }
+  }
+  fullscreenButton.addEventListener('click',toggleFullscreen);
+  stage.addEventListener('dblclick',event => { if (event.target === photo && ready()) { event.preventDefault(); toggleFullscreen(); } });
+  document.addEventListener('fullscreenchange',() => {
+    const active = document.fullscreenElement === win;
+    fullscreenButton.textContent = active ? '退出全屏' : '全屏';
+    fullscreenButton.setAttribute('aria-pressed',String(active));
+    endDrag(); draw();
+    if (!win.hidden) win.focus({preventScroll:true});
+  });
+  function safeURL(value) {
+    if (!value) return '';
+    try {
+      const url = new URL(value, location.href);
+      return /^(https?:|blob:)$/.test(url.protocol) || /^data:image\//i.test(url.href) ? url.href : '';
+    } catch { return ''; }
+  }
+  function fileName(url, fallback = '图片') {
+    try { return decodeURIComponent(new URL(url).pathname.split('/').pop()) || fallback; }
+    catch { return fallback; }
+  }
+  function show(next) {
+    if (next < 0 || next >= items.length) return;
+    clearTimeout(imageTimer);
+    index = next; const item = items[index], current = ++version;
+    awaitingWallpaper = false; resetView();
+    showMetadata(item,current);
+    if (photo) { photo.removeAttribute('src'); photo.remove(); }
+    $('name').textContent = item.name;
+    $('name').title = item.name;
+    $('count').textContent = `${index + 1} / ${items.length}`;
+    $('prev').disabled = index === 0;
+    $('next').disabled = index === items.length - 1;
+    apply.hidden = !item.wallpaper; apply.disabled = true;
+    status.textContent = source;
+    $('feedback').hidden = false; $('retry').hidden = true;
+    message.hidden = false; message.textContent = '正在加载图片…';
+    stage.setAttribute('aria-busy','true');
+    // A separate element for each request prevents stale load/error events from
+    // replacing the state of a more recently selected picture.
+    const img = document.createElement('img'); photo = img;
+    let settled = false;
+    img.alt = item.name; img.draggable = false; img.hidden = true;
+    img.addEventListener('load', () => {
+      if (current !== version || settled) return;
+      settled = true; clearTimeout(imageTimer); $('feedback').hidden = true;
+      stage.setAttribute('aria-busy','false'); message.hidden = true; img.hidden = false;
+      apply.disabled = !item.wallpaper;
+      naturalWidth = img.naturalWidth; naturalHeight = img.naturalHeight; draw();
+      if (albumMode) setMetadata('resolution',ready() ? `${naturalWidth} × ${naturalHeight} px` : '');
+    });
+    const fail = (timedOut = false) => {
+      if (current !== version || settled) return;
+      settled = true; clearTimeout(imageTimer);
+      if (timedOut) img.removeAttribute('src');
+      resetView(); stage.setAttribute('aria-busy','false');
+      if (albumMode) setMetadata('resolution');
+      message.textContent = timedOut ? '图片加载超时，请重试或切换其他图片。' : '图片加载失败，请重试或切换其他图片。';
+      $('feedback').hidden = false; $('retry').hidden = false;
+      message.hidden = false; img.hidden = true; apply.disabled = true;
+    };
+    img.addEventListener('error',() => fail());
+    stage.append(img);
+    imageTimer = setTimeout(() => fail(true),20000);
+    img.src = item.url;
+  }
+  function open(sequence, selected = 0, context = {}) {
+    const normalized = sequence.map(item => {
+      const url = safeURL(item.url);
+      return url ? {url, name:item.name || fileName(url), wallpaper:item.wallpaper === true, size:item.size !== undefined && item.size !== null && item.size !== '' && Number.isSafeInteger(Number(item.size)) && Number(item.size) >= 0 ? Number(item.size) : null} : null;
+    });
+    if (!normalized[selected]) return;
+    const nextIndex = normalized.slice(0, selected).filter(Boolean).length;
+    items = normalized.filter(Boolean); trigger = context.trigger; source = context.source || '';
+    albumMode = context.kind === 'album';
+    show(nextIndex);
+    window.blanktimeDesktop.openWindow(win);
+    draw();
+  }
+  $('retry').addEventListener('click',() => { if (items.length) show(index); });
+  $('prev').addEventListener('click', () => show(index - 1));
+  $('next').addEventListener('click', () => show(index + 1));
+  win.addEventListener('keydown', event => {
+    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+    if (event.target.closest('input,textarea,select,[contenteditable=true]')) return;
+    if (event.key === 'Escape') {
+      if (document.fullscreenElement === win) exitFullscreen();
+      else window.blanktimeDesktop.closeWindow(win);
+    }
+    else if (event.key === 'ArrowLeft') show(index - 1);
+    else if (event.key === 'ArrowRight') show(index + 1);
+    else return;
+    event.preventDefault(); event.stopPropagation();
+  });
+  win.addEventListener('blanktime:window-hidden', event => {
+    endDrag(); exitFullscreen();
+    if (event.detail.state !== 'closed') return;
+    resetView();
+    ++version; clearTimeout(imageTimer); stopMetadata(); $('info').hidden = true; items = []; awaitingWallpaper = false;
+    if (photo) { photo.removeAttribute('src'); photo.remove(); photo = null; }
+    stage.setAttribute('aria-busy','false');
+    if (trigger?.isConnected && !trigger.closest('[hidden]')) {
+      const owner = trigger.closest('.app-window');
+      if (owner) window.blanktimeDesktop.openWindow(owner, false);
+      trigger.focus({preventScroll:true});
+    }
+    trigger = null;
+  });
+  apply.addEventListener('click', () => {
+    const item = items[index];
+    if (!item?.wallpaper || apply.disabled) return;
+    awaitingWallpaper = true;
+    window.dispatchEvent(new CustomEvent('blanktime:set-wallpaper', {detail:{kind:'url', url:item.url, name:item.name}}));
+  });
+  window.addEventListener('blanktime:wallpaper-feedback', event => {
+    if (awaitingWallpaper && !win.hidden) status.textContent = event.detail;
+  });
+
+  function articleItem(img) {
+    if (img.parentElement?.closest('button,[role=button],.code-block') || img.classList.contains('emoji')) return null;
+    const src = safeURL(img.currentSrc || img.getAttribute('src'));
+    if (!src) return null;
+    const link = img.closest('a[href]');
+    let url = src;
+    if (link) {
+      const href = safeURL(link.href);
+      // Preserve links to pages, downloads and deliberate new destinations.
+      if (!href || link.hasAttribute('download') || (href !== src && !/\.(?:jpe?g|png|webp|gif|avif|bmp|svg)$/i.test(new URL(href).pathname))) return null;
+      url = href;
+    }
+    return {url, name:img.alt || img.title || fileName(url), wallpaper:false};
+  }
+  function prepareArticle(article) {
+    const images = [...article.querySelectorAll('.post-content img')];
+    const sequence = images.filter(img => articleItem(img));
+    sequence.forEach(img => {
+      img.classList.add('image-viewer-trigger');
+      if (!img.closest('a[href]')) {
+        img.tabIndex = 0;
+        img.setAttribute('role','button');
+        img.setAttribute('aria-label','查看图片：' + articleItem(img).name);
+      }
+    });
+    const launch = (img, event) => {
+      if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+      const selected = sequence.indexOf(img);
+      if (selected < 0) return;
+      // Re-read currentSrc after responsive images have selected their source.
+      const entries = sequence.map(image => articleItem(image));
+      if (!entries[selected]) return;
+      const target = entries.slice(0,selected).filter(Boolean).length;
+      event.preventDefault(); event.stopPropagation();
+      open(entries.filter(Boolean), target, {trigger:img.closest('a[href]') || img, source:article.dataset.title || '文章图片'});
+    };
+    article.addEventListener('click', event => {
+      if (event.button !== 0) return;
+      const img = event.target.closest('img');
+      if (img) launch(img,event);
+      else {
+        const link = event.target.closest('a[href]');
+        if (link && event.detail === 0) { const child = link.querySelector('img'); if (child) launch(child,event); }
+      }
+    });
+    article.addEventListener('keydown', event => {
+      if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('img.image-viewer-trigger')) launch(event.target,event);
+    });
+  }
+  window.blanktimeImages = {open, prepareArticle};
+})();

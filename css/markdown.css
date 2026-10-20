@@ -181,3 +181,10 @@
 .mermaid-source { display: flex; padding: 14px 0 16px; border-top: 1px solid var(--diagram-border); background: var(--md-code-background, #282c34); color: var(--md-code-text-color, #abb2bf); }
 .mermaid-error { padding: 12px 18px; color: var(--diagram-error, #94621f); }
 .mermaid-error button { margin-left: 12px; text-decoration: underline; }
+
+/* Footnotes share the article palette in both reading themes. */
+.post-content .footnotes { margin-top:2.5em; padding-top:1em; border-top:1px solid var(--line); font-size:.9em; }
+.post-content .footnotes .footnotes-title { margin:.2em 0 .8em; font-size:1.2em; }
+.post-content .footnotes li { padding-left:.3em; scroll-margin-top:24px; }
+.post-content [data-footnote-ref] { padding:0 .15em; scroll-margin-top:24px; text-decoration:none; }
+.post-content [data-footnote-backref] { margin-left:.35em; text-decoration:none; }

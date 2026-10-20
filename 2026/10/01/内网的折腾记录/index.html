@@ -51,6 +51,8 @@
 </style>
 
   <script src="/js/desktop.js" defer></script>
+  <link rel="stylesheet" href="/css/image-viewer.css">
+  <script src="/js/image-viewer.js" defer></script>
   <link rel="stylesheet" href="/css/settings.css">
   <script src="/js/settings.js?v=system-theme-1" defer></script>
   <link rel="stylesheet" href="/css/browser.css">
@@ -64,12 +66,14 @@
   <script src="/js/poetry.js" defer></script>
   <script src="/js/welcome-info.js" defer></script>
   <link rel="stylesheet" href="/css/system-theme.css?v=3">
+  
+  <link rel="stylesheet" href="/css/cursors.css">
+  
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-home="/" style="--wallpaper: url('/images/cover.jpg')">
   <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <symbol id="i-browser" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18Z"/></symbol>
     <symbol id="i-album" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="2"/><path d="m3 17 6-6 4 4 3-3 5 5"/></symbol>
-    <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 8l12-2"/><ellipse cx="6" cy="18" rx="3" ry="3"/><ellipse cx="18" cy="16" rx="3" ry="3"/></symbol>
     <symbol id="i-home" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
     <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 3h12a3 3 0 0 1 3 3v15H6a3 3 0 0 1-3-3V4a1 1 0 0 1 1-1ZM3 17h16M7 7h7M7 11h5"/></symbol>
     <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="3" y="15" width="6" height="6" rx="1"/><rect x="15" y="15" width="6" height="6" rx="1"/></symbol>
@@ -81,9 +85,10 @@
     <button class="dock-button" data-open="welcome" aria-label="欢迎窗口" title="欢迎窗口"><svg><use href="#i-home"/></svg><span class="running-dot"></span></button>
     <span class="dock-divider"></span>
     <button class="dock-button" data-open="files" aria-label="文件管理" title="文件管理"><span class="dock-app-icon" aria-hidden="true"><span class="folder-art"><span></span></span></span><span class="running-dot"></span></button>
-    <button class="dock-button" data-open="music" aria-label="音乐播放器" title="音乐播放器"><span class="dock-app-icon" aria-hidden="true"><span class="music-icon-art"><svg><use href="#i-music"/></svg></span></span><span class="running-dot"></span></button>
-    <button class="dock-button" data-open="album" aria-label="相册" title="相册"><span class="album-icon-art" aria-hidden="true"><svg><use href="#i-album"/></svg></span><span class="running-dot"></span></button>
+    <button class="dock-button" data-open="music" aria-label="音乐播放器" title="音乐播放器"><span class="dock-app-icon" aria-hidden="true"><img class="music-icon-art" src="/images/icons/fnos-music.jpg" alt="" width="46" height="46"></span><span class="running-dot"></span></button>
+    <button class="dock-button" data-open="album" aria-label="相册" title="相册"><img class="album-icon-art" src="/images/icons/album-flower.svg" alt="" width="46" height="46"><span class="running-dot"></span></button>
     <button class="dock-button" data-open="browser" aria-label="博客浏览器" title="博客浏览器"><span class="browser-icon-art" aria-hidden="true"><svg><use href="#i-browser"/></svg></span><span class="running-dot"></span></button>
+    <button class="dock-button" data-open="image-viewer" data-running-only aria-label="图片查看器" title="图片查看器" hidden><svg><use href="#i-album"/></svg><span class="running-dot"></span></button>
     <div class="dock-space"></div>
     <button class="dock-button desktop-toggle" aria-label="显示桌面" title="显示桌面"><svg><use href="#i-grid"/></svg></button>
     <button class="dock-button" id="settings-toggle" type="button" title="设置" aria-label="设置" aria-expanded="false" aria-controls="settings-panel" aria-haspopup="dialog"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m9 3-.6 2.3-2 .9-2.1-.6-2 3.4 1.6 1.8v2.4L2.3 15l2 3.4 2.1-.6 2 .9L9 21h6l.6-2.3 2-.9 2.1.6 2-3.4-1.6-1.8v-2.4L21.7 9l-2-3.4-2.1.6-2-.9L15 3Z"/><circle cx="12" cy="12" r="3"/></svg></button>
@@ -113,26 +118,64 @@
       <span class="folder-art" aria-hidden="true"><span></span></span><span>文件管理</span>
     </button>
     
-    <button class="desktop-file-icon desktop-music-icon" data-open="music" type="button" aria-label="打开音乐播放器" title="单击打开音乐播放器"><span class="music-icon-art"><svg aria-hidden="true"><use href="#i-music"/></svg></span><span>音乐</span></button>
+    <button class="desktop-file-icon desktop-music-icon" data-open="music" type="button" aria-label="打开音乐播放器" title="单击打开音乐播放器"><img class="music-icon-art" src="/images/icons/fnos-music.jpg" alt="" width="46" height="46"><span>音乐</span></button>
     
 <section class="app-window music-window" id="music" aria-label="音乐播放器窗口" tabindex="-1" hidden
- data-playlist="14326234190" data-api="https://meting.mysqil.com/api?server=:server&amp;type=:type&amp;id=:id" data-volume="0.5"
+ data-playlist="14326234190" data-api="https://api.injahow.cn/meting/?server=:server&amp;type=:type&amp;id=:id" data-volume="0.5"
+ data-api-fallbacks="[&#34;https://meting.mysqil.com/api?server=:server&amp;type=:type&amp;id=:id&#34;,&#34;https://api.i-meto.com/meting/api?server=:server&amp;type=:type&amp;id=:id&#34;]"
  data-accent="#3B82F6">
- <header class="titlebar"><div class="window-caption"><svg aria-hidden="true"><use href="#i-music"/></svg><span>音乐播放器</span></div><div class="window-controls"><button data-action="minimize" aria-label="最小化" title="最小化"><svg viewBox="0 0 16 16"><path d="M3 8h10"/></svg></button><button data-action="maximize" aria-label="最大化" title="最大化"><svg viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8"/></svg></button><button data-action="close" aria-label="关闭" title="关闭"><svg viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></button></div>
+ <header class="titlebar"><div class="window-caption"><img class="music-icon-art" src="/images/icons/fnos-music.jpg" alt="" width="20" height="20"><span>音乐播放器</span></div><div class="window-controls"><button data-action="minimize" aria-label="最小化" title="最小化"><svg viewBox="0 0 16 16"><path d="M3 8h10"/></svg></button><button data-action="maximize" aria-label="最大化" title="最大化"><svg viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8"/></svg></button><button data-action="close" aria-label="关闭" title="关闭"><svg viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></button></div>
 </header>
+ <div class="music-workspace">
  <div class="body">
-      
-      <section class="player">
+   <section class="library" aria-label="我的歌单">
+     <header class="library-heading">
+       <div><h2>我的歌单</h2><p><b id="music-count">0</b> 首歌曲</p></div>
+       <div class="library-actions">
+         <label class="music-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><input type="search" id="music-search" placeholder="搜索歌曲或歌手" aria-label="搜索歌曲或歌手" autocomplete="off"></label>
+         <button type="button" id="music-reload" title="刷新歌单" aria-label="刷新歌单"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 6M4 12l2 6a7 7 0 0 0 12-1"/></svg></button>
+       </div>
+     </header>
+     <div class="list-columns" aria-hidden="true"><span>#</span><span>歌曲 / 歌手</span></div>
+     <div class="list-wrap">
+       <ul class="playlist" id="music-playlist" aria-label="播放列表"></ul>
+       <p class="search-empty" id="music-searchEmpty" role="status" hidden>没有找到匹配的歌曲</p>
+       <div class="list-state" id="music-listState" role="status" aria-live="polite"></div>
+     </div>
+   </section>
+ </div>
+ <section class="listening-view" id="music-listeningView" aria-label="正在播放" hidden>
+   <header class="listening-heading"><button type="button" id="music-backToList" aria-label="返回歌单" title="返回歌单"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><span>返回歌单</span></button><span>正在播放</span></header>
+   <div class="listening-content"><div class="listening-player" id="music-listeningPlayer"></div>
+      <aside class="lyrics" id="music-lyrics" aria-label="歌词">
+        <div class="lyrics-scroll" id="music-lyricsScroll">
+          <div class="lyrics-inner" id="music-lyricsInner"></div>
+        </div>
+        <div class="lyrics-empty" id="music-lyricsEmpty">选择一首歌开始播放</div>
+      </aside>
+   </div>
+ </section>
+ <section class="player" aria-label="播放控制">
         <div class="now">
-          <div class="cover">
+          <button type="button" class="cover" id="music-openLyrics" aria-label="打开歌词界面" title="打开歌词界面">
             <img id="music-cover" alt="封面" hidden>
             <span class="ph" id="music-coverPh" aria-hidden="true">♪</span>
-          </div>
+          </button>
           <div class="now-meta">
             <div class="song-name" id="music-songName" title="">未选择歌曲</div>
             <div class="song-artist" id="music-songArtist" title="">—</div>
           </div>
         </div>
+
+   <div class="transport">
+        <div class="controls">
+          <button class="ctrl" id="music-btnLoop" type="button" title="列表循环（点击切换）" aria-label="循环模式"></button>
+          <button class="ctrl" id="music-btnPrev" type="button" title="上一首" aria-label="上一首"></button>
+          <button class="ctrl play" id="music-btnPlay" type="button" title="播放" aria-label="播放"></button>
+          <button class="ctrl" id="music-btnNext" type="button" title="下一首" aria-label="下一首"></button>
+          <button class="ctrl" id="music-btnLink" type="button" title="在音乐平台打开" aria-label="在音乐平台打开"></button>
+        </div>
+
 
         <div class="progress">
           <span class="time" id="music-timeCur">00:00</span>
@@ -147,15 +190,7 @@
           <span class="time total" id="music-timeTotal">00:00</span>
         </div>
 
-        <div class="controls">
-          <button class="ctrl" id="music-btnLoop" type="button" title="列表循环（点击切换）" aria-label="循环模式"></button>
-          <button class="ctrl" id="music-btnPrev" type="button" title="上一首" aria-label="上一首"></button>
-          <button class="ctrl play" id="music-btnPlay" type="button" title="播放" aria-label="播放"></button>
-          <button class="ctrl" id="music-btnNext" type="button" title="下一首" aria-label="下一首"></button>
-          <button class="ctrl" id="music-btnLink" type="button" title="在音乐平台打开" aria-label="在音乐平台打开"></button>
-        </div>
-
-        
+   </div>
         <div class="utility">
           <div class="volume">
             <button class="vol-btn" id="music-btnVol" type="button" title="静音 / 取消静音" aria-label="静音"></button>
@@ -168,7 +203,7 @@
           </div>
 
           <div class="utility-actions">
-            <button class="lyrics-toggle" id="music-btnLyrics" type="button" title="收起歌词" aria-label="收起歌词" aria-controls="music-lyrics" aria-expanded="true">词</button>
+            <button class="lyrics-toggle" id="music-btnLyrics" type="button" title="打开歌词界面" aria-label="打开歌词界面" aria-controls="music-listeningView" aria-expanded="false">词</button>
             <div class="theme-wrap">
               <button class="theme-btn" id="music-btnTheme" type="button" title="主色调" aria-label="主色调" aria-haspopup="true" aria-expanded="false">
                 <span class="theme-dot" id="music-themeDot"></span>
@@ -187,53 +222,174 @@
           </div>
         </div>
 
-        <div class="list-wrap">
-          <div class="list-heading"><span>我的歌单 · <b id="music-count">0</b> 首</span><button type="button" id="music-reload">刷新歌单</button></div><ul class="playlist" id="music-playlist" aria-label="播放列表"></ul>
-          <div class="list-state" id="music-listState" role="status" aria-live="polite"></div>
-        </div>
-      </section>
-
-      
-      <aside class="lyrics" id="music-lyrics" aria-label="歌词">
-        <div class="lyrics-scroll" id="music-lyricsScroll">
-          <div class="lyrics-inner" id="music-lyricsInner"></div>
-        </div>
-        <div class="lyrics-empty" id="music-lyricsEmpty">选择一首歌开始播放</div>
-      </aside>
-    </div>
+ </section>
+ </div>
  <footer class="window-status"><span id="music-status" role="status" aria-live="polite">未播放</span><span>最小化继续播放 · 关闭暂停</span></footer>
  <audio id="music-audio" preload="none" aria-label="音乐播放器音频"></audio>
 </section>
 
     
-    <button class="desktop-file-icon desktop-album-icon" data-open="album" type="button" aria-label="打开相册" title="单击打开相册"><span class="album-icon-art" aria-hidden="true"><svg><use href="#i-album"/></svg></span><span>相册</span></button>
+    <button class="desktop-file-icon desktop-album-icon" data-open="album" type="button" aria-label="打开相册" title="单击打开相册"><img class="album-icon-art" src="/images/icons/album-flower.svg" alt="" width="46" height="46"><span>相册</span></button>
     <section class="app-window album-window" id="album" aria-label="相册窗口" tabindex="-1" hidden>
-<header class="titlebar"><div class="window-caption"><svg aria-hidden="true"><use href="#i-album"/></svg><span>相册</span></div><div class="window-controls"><button data-action="minimize" aria-label="最小化" title="最小化"><svg viewBox="0 0 16 16"><path d="M3 8h10"/></svg></button><button data-action="maximize" aria-label="最大化" title="最大化"><svg viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8"/></svg></button><button data-action="close" aria-label="关闭" title="关闭"><svg viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></button></div>
+<header class="titlebar"><div class="window-caption"><img class="album-icon-art" src="/images/icons/album-flower.svg" alt="" width="20" height="20"><span>相册</span></div><div class="window-controls"><button data-action="minimize" aria-label="最小化" title="最小化"><svg viewBox="0 0 16 16"><path d="M3 8h10"/></svg></button><button data-action="maximize" aria-label="最大化" title="最大化"><svg viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8"/></svg></button><button data-action="close" aria-label="关闭" title="关闭"><svg viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></button></div>
 </header>
 <div class="album-content">
  <div class="album-toolbar"><div><h2>我的相册</h2><p>壁纸与图片</p></div><button type="button" id="wallpaper-reset">恢复默认壁纸</button></div>
 
-<div class="album-grid" id="album-grid">
+
+<div class="album-grid" id="album-folders" aria-label="相册文件夹">
  
-  <button class="album-card" type="button" data-src="/images/wallpapers/cover.jpg" data-name="cover.jpg"><img src="/images/wallpapers/cover.jpg" alt="" loading="lazy"><span>cover.jpg</span></button>
+ <button class="album-folder" type="button" data-folder="wallpapers">
+  <span class="album-folder-cover" aria-hidden="true">
+   <svg><use href="#i-album"/></svg>
+   <img src="/images/wallpapers/cover.jpg" alt="" loading="lazy" decoding="async">
+  </span>
+  <strong>壁纸</strong><small>5 张图片</small>
+ </button>
  
-  <button class="album-card" type="button" data-src="https://cos.blanktime.cn/assets/images/moon%20hour%20w.png" data-name="月亮时光_P0"><img src="https://cos.blanktime.cn/assets/images/moon%20hour%20w.png" alt="" loading="lazy"><span>月亮时光_P0</span></button>
+ <button class="album-folder" type="button" data-folder="web">
+  <span class="album-folder-cover" aria-hidden="true">
+   <svg><use href="#i-album"/></svg>
+   <img src="https://cos.blanktime.cn/assets/images/fish.gif" alt="" loading="lazy" decoding="async">
+  </span>
+  <strong>Other</strong><small>1 张图片</small>
+ </button>
  
-  <button class="album-card" type="button" data-src="https://cos.blanktime.cn/assets/images/moon%20hour%20h.png" data-name="月亮时光_P1"><img src="https://cos.blanktime.cn/assets/images/moon%20hour%20h.png" alt="" loading="lazy"><span>月亮时光_P1</span></button>
- 
-  <button class="album-card" type="button" data-src="http://cos.blanktime.cn/assets/images/bg.png" data-name="废弃首都的黎明"><img src="http://cos.blanktime.cn/assets/images/bg.png" alt="" loading="lazy"><span>废弃首都的黎明</span></button>
- 
-  <button class="album-card" type="button" data-src="https://cos.blanktime.cn/assets/images/124089112_p0.jpg" data-name="雨后"><img src="https://cos.blanktime.cn/assets/images/124089112_p0.jpg" alt="" loading="lazy"><span>雨后</span></button>
- 
-  <button class="album-card" type="button" data-src="https://cos.blanktime.cn/assets/images/fish.gif" data-name="fish"><img src="https://cos.blanktime.cn/assets/images/fish.gif" alt="" loading="lazy"><span>fish</span></button>
+ <button class="album-folder" type="button" data-folder="NevernessToEverness">
+  <span class="album-folder-cover" aria-hidden="true">
+   <svg><use href="#i-album"/></svg>
+   <img src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_04_23_20_32_37.webp" alt="" loading="lazy" decoding="async">
+  </span>
+  <strong>NevernessToEverness</strong><small>35 张图片</small>
+ </button>
  
 </div>
-<section class="album-preview" id="album-preview" aria-label="图片预览" hidden>
- <div class="album-preview-toolbar"><button type="button" id="album-back">返回相册</button><strong id="album-name"></strong><button type="button" id="album-wallpaper">设为壁纸</button></div>
- <div class="album-preview-image"><img id="album-image" alt=""></div>
-</section>
+<div id="album-folder-view" hidden>
+ <div class="album-folder-heading"><button type="button" id="album-folders-back">返回文件夹</button><h3 id="album-folder-name"></h3><button type="button" id="album-retry" hidden>重试失败图片</button></div>
+ <div class="album-grid" id="album-grid">
+ 
+  <button class="album-card" type="button" data-folder="wallpapers" data-wallpaper="true" data-src="/images/wallpapers/cover.jpg" data-preview-src="/images/wallpapers/cover.jpg" data-thumbnail-mode="false" data-name="cover.jpg" data-size="1336761" hidden><img alt="" loading="lazy" decoding="async"><span>cover.jpg</span></button>
+ 
+  <button class="album-card" type="button" data-folder="wallpapers" data-wallpaper="true" data-src="https://cos.blanktime.cn/assets/images/moon%20hour%20w.png" data-preview-src="https://cos.blanktime.cn/assets/images/moon%20hour%20w.png" data-thumbnail-mode="false" data-name="月亮时光_P0" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>月亮时光_P0</span></button>
+ 
+  <button class="album-card" type="button" data-folder="wallpapers" data-wallpaper="true" data-src="https://cos.blanktime.cn/assets/images/moon%20hour%20h.png" data-preview-src="https://cos.blanktime.cn/assets/images/moon%20hour%20h.png" data-thumbnail-mode="false" data-name="月亮时光_P1" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>月亮时光_P1</span></button>
+ 
+  <button class="album-card" type="button" data-folder="wallpapers" data-wallpaper="true" data-src="http://cos.blanktime.cn/assets/images/bg.png" data-preview-src="http://cos.blanktime.cn/assets/images/bg.png" data-thumbnail-mode="false" data-name="废弃首都的黎明" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>废弃首都的黎明</span></button>
+ 
+  <button class="album-card" type="button" data-folder="wallpapers" data-wallpaper="true" data-src="https://cos.blanktime.cn/assets/images/124089112_p0.jpg" data-preview-src="https://cos.blanktime.cn/assets/images/124089112_p0.jpg" data-thumbnail-mode="false" data-name="雨后" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>雨后</span></button>
+ 
+  <button class="album-card" type="button" data-folder="web" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/fish.gif" data-preview-src="https://cos.blanktime.cn/assets/images/fish.gif" data-thumbnail-mode="false" data-name="fish" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>fish</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_04_23_20_32_37.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_04_23_20_32_37.webp" data-thumbnail-mode="true" data-name="26_04_23_20_32_37.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_04_23_20_32_37.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_04_23_20_32_47.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_04_23_20_32_47.webp" data-thumbnail-mode="true" data-name="26_04_23_20_32_47.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_04_23_20_32_47.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_04_23_20_33_01.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_04_23_20_33_01.webp" data-thumbnail-mode="true" data-name="26_04_23_20_33_01.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_04_23_20_33_01.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_04_23_20_34_32.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_04_23_20_34_32.webp" data-thumbnail-mode="true" data-name="26_04_23_20_34_32.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_04_23_20_34_32.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_04_26_10_55_02.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_04_26_10_55_02.webp" data-thumbnail-mode="true" data-name="26_04_26_10_55_02.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_04_26_10_55_02.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_04_26_11_00_16.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_04_26_11_00_16.webp" data-thumbnail-mode="true" data-name="26_04_26_11_00_16.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_04_26_11_00_16.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_04_26_16_21_15.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_04_26_16_21_15.webp" data-thumbnail-mode="true" data-name="26_04_26_16_21_15.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_04_26_16_21_15.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_04_26_17_22_36.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_04_26_17_22_36.webp" data-thumbnail-mode="true" data-name="26_04_26_17_22_36.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_04_26_17_22_36.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_04_27_16_05_19.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_04_27_16_05_19.webp" data-thumbnail-mode="true" data-name="26_04_27_16_05_19.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_04_27_16_05_19.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_04_27_17_48_43.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_04_27_17_48_43.webp" data-thumbnail-mode="true" data-name="26_04_27_17_48_43.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_04_27_17_48_43.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_04_27_18_13_23.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_04_27_18_13_23.webp" data-thumbnail-mode="true" data-name="26_04_27_18_13_23.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_04_27_18_13_23.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_01_19_54_49.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_01_19_54_49.webp" data-thumbnail-mode="true" data-name="26_05_01_19_54_49.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_01_19_54_49.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_02_11_51_06.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_02_11_51_06.webp" data-thumbnail-mode="true" data-name="26_05_02_11_51_06.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_02_11_51_06.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_02_16_48_38.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_02_16_48_38.webp" data-thumbnail-mode="true" data-name="26_05_02_16_48_38.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_02_16_48_38.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_02_17_47_24.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_02_17_47_24.webp" data-thumbnail-mode="true" data-name="26_05_02_17_47_24.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_02_17_47_24.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_03_13_12_00.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_03_13_12_00.webp" data-thumbnail-mode="true" data-name="26_05_03_13_12_00.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_03_13_12_00.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_03_13_20_20.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_03_13_20_20.webp" data-thumbnail-mode="true" data-name="26_05_03_13_20_20.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_03_13_20_20.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_03_17_38_37.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_03_17_38_37.webp" data-thumbnail-mode="true" data-name="26_05_03_17_38_37.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_03_17_38_37.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_03_18_47_05.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_03_18_47_05.webp" data-thumbnail-mode="true" data-name="26_05_03_18_47_05.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_03_18_47_05.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_05_20_24_33.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_05_20_24_33.webp" data-thumbnail-mode="true" data-name="26_05_05_20_24_33.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_05_20_24_33.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_05_20_58_39.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_05_20_58_39.webp" data-thumbnail-mode="true" data-name="26_05_05_20_58_39.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_05_20_58_39.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_06_19_26_42.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_06_19_26_42.webp" data-thumbnail-mode="true" data-name="26_05_06_19_26_42.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_06_19_26_42.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_06_19_28_15.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_06_19_28_15.webp" data-thumbnail-mode="true" data-name="26_05_06_19_28_15.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_06_19_28_15.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_06_19_28_29.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_06_19_28_29.webp" data-thumbnail-mode="true" data-name="26_05_06_19_28_29.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_06_19_28_29.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_06_19_29_32.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_06_19_29_32.webp" data-thumbnail-mode="true" data-name="26_05_06_19_29_32.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_06_19_29_32.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_07_20_21_46.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_07_20_21_46.webp" data-thumbnail-mode="true" data-name="26_05_07_20_21_46.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_07_20_21_46.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_08_20_25_13.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_08_20_25_13.webp" data-thumbnail-mode="true" data-name="26_05_08_20_25_13.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_08_20_25_13.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_09_19_17_00.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_09_19_17_00.webp" data-thumbnail-mode="true" data-name="26_05_09_19_17_00.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_09_19_17_00.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_12_19_30_32.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_12_19_30_32.webp" data-thumbnail-mode="true" data-name="26_05_12_19_30_32.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_12_19_30_32.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_18_19_24_11.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_18_19_24_11.webp" data-thumbnail-mode="true" data-name="26_05_18_19_24_11.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_18_19_24_11.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_18_21_23_47.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_18_21_23_47.webp" data-thumbnail-mode="true" data-name="26_05_18_21_23_47.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_18_21_23_47.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_18_21_24_02.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_18_21_24_02.webp" data-thumbnail-mode="true" data-name="26_05_18_21_24_02.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_18_21_24_02.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_18_21_33_04.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_18_21_33_04.webp" data-thumbnail-mode="true" data-name="26_05_18_21_33_04.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_18_21_33_04.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_18_21_47_00.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_18_21_47_00.webp" data-thumbnail-mode="true" data-name="26_05_18_21_47_00.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_18_21_47_00.webp</span></button>
+ 
+  <button class="album-card" type="button" data-folder="NevernessToEverness" data-wallpaper="false" data-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/26_05_19_17_51_52.webp" data-preview-src="https://cos.blanktime.cn/assets/images/NevernessToEverness/thumbnails/26_05_19_17_51_52.webp" data-thumbnail-mode="true" data-name="26_05_19_17_51_52.webp" data-size="" hidden><img alt="" loading="lazy" decoding="async"><span>26_05_19_17_51_52.webp</span></button>
+ 
+ <p class="album-empty" id="album-empty" hidden>此文件夹暂无图片</p>
+ </div>
+</div>
+
 </div>
 <footer class="window-status"><span id="album-status" role="status" aria-live="polite">选择图片查看大图</span><span>壁纸偏好保存在当前浏览器</span></footer>
+</section>
+
+    <section class="app-window image-viewer-window" id="image-viewer" aria-label="图片查看器窗口" tabindex="-1" hidden>
+  <header class="titlebar"><div class="window-caption"><svg aria-hidden="true"><use href="#i-album"/></svg><span>图片查看器</span></div><div class="window-controls"><button data-action="minimize" aria-label="最小化" title="最小化"><svg viewBox="0 0 16 16"><path d="M3 8h10"/></svg></button><button data-action="maximize" aria-label="最大化" title="最大化"><svg viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8"/></svg></button><button data-action="close" aria-label="关闭" title="关闭"><svg viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></button></div>
+</header>
+  <div class="image-viewer-toolbar">
+    <span id="image-viewer-count">0 / 0</span>
+    <strong id="image-viewer-name"></strong><button type="button" id="image-viewer-wallpaper" hidden>设为壁纸</button>
+  </div>
+  <div class="image-viewer-canvas">
+    <div class="image-viewer-stage" id="image-viewer-stage" aria-label="图片预览">
+      <div class="image-viewer-feedback" id="image-viewer-feedback"><p id="image-viewer-message" role="status"></p><button type="button" id="image-viewer-retry" hidden>重新加载</button></div>
+    </div>
+    <button class="image-viewer-side" type="button" id="image-viewer-prev" aria-label="上一张" title="上一张（←）"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button>
+    <button class="image-viewer-side" type="button" id="image-viewer-next" aria-label="下一张" title="下一张（→）"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
+  </div>
+  <div class="image-viewer-tools" role="group" aria-label="图片操作">
+    <button type="button" id="image-viewer-zoom-out" aria-label="缩小" title="缩小" disabled>−</button>
+    <output id="image-viewer-zoom" aria-label="缩放比例" aria-live="polite">—</output>
+    <button type="button" id="image-viewer-zoom-in" aria-label="放大" title="放大" disabled>+</button>
+    <button type="button" id="image-viewer-actual" title="按图片原始尺寸显示" aria-pressed="false" disabled>100%</button>
+    <button type="button" id="image-viewer-fit" aria-pressed="true" disabled>适应窗口</button>
+    <span class="image-viewer-tools-divider" aria-hidden="true"></span>
+    <button type="button" id="image-viewer-rotate-left" aria-label="向左旋转 90°" title="向左旋转 90°" disabled>↶</button>
+    <button type="button" id="image-viewer-rotate-right" aria-label="向右旋转 90°" title="向右旋转 90°" disabled>↷</button>
+    <button type="button" id="image-viewer-fullscreen" aria-pressed="false">全屏</button>
+  </div>
+  <dl class="image-viewer-info" id="image-viewer-info" aria-label="图片基本信息" hidden>
+    <div hidden><dt>文件名</dt><dd id="image-viewer-filename">—</dd></div>
+    <div hidden><dt>分辨率</dt><dd id="image-viewer-resolution">—</dd></div>
+    <div hidden><dt>文件大小</dt><dd id="image-viewer-size">—</dd></div>
+    <div hidden><dt>格式</dt><dd id="image-viewer-format">—</dd></div>
+  </dl>
+  <footer class="window-status"><span id="image-viewer-status" role="status" aria-live="polite"></span></footer>
 </section>
 
     
@@ -245,27 +401,27 @@
       <button class="files-category is-selected" data-category="all" aria-current="page"><svg><use href="#i-folder"/></svg><span>所有帖子</span><small>19</small></button>
       <p class="files-sidebar-label">分类</p>
       
-        <button class="files-category" data-category="cuidf9Xc25-WGvlGiEohMGYxm"><svg><use href="#i-folder"/></svg><span>Test</span><small>1</small></button>
+        <button class="files-category" data-category="cuidh5GWKrMoHuKAPyv0BzN-S"><svg><use href="#i-folder"/></svg><span>Test</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidy8u7zdKB-hS0l3zKk_dbf"><svg><use href="#i-folder"/></svg><span>主题开发</span><small>1</small></button>
+        <button class="files-category" data-category="cuidn3Z1905KmADoahb1F_iXV"><svg><use href="#i-folder"/></svg><span>主题开发</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidvZm9ENSdIKcgcho1YFlyV"><svg><use href="#i-folder"/></svg><span>写作文档</span><small>1</small></button>
+        <button class="files-category" data-category="cuidySh0ooKdMJIKqkAK9rWkW"><svg><use href="#i-folder"/></svg><span>写作文档</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidJXGd4Kh5dL_FU9T6PEU2V"><svg><use href="#i-folder"/></svg><span>工具</span><small>2</small></button>
+        <button class="files-category" data-category="cuidqDGqSysFFjdX8FElzkBh5"><svg><use href="#i-folder"/></svg><span>工具</span><small>2</small></button>
       
-        <button class="files-category" data-category="cuidvXQM_jDNFB5EcVxHwgFTj"><svg><use href="#i-folder"/></svg><span>折腾</span><small>1</small></button>
+        <button class="files-category" data-category="cuidnaJDUaQ2pD9yAmaeKATyW"><svg><use href="#i-folder"/></svg><span>折腾</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidNvQfR-JALtbjij8kOlybx"><svg><use href="#i-folder"/></svg><span>文章鉴赏</span><small>2</small></button>
+        <button class="files-category" data-category="cuidfPXaCN4UyrT0d1aY6ntnf"><svg><use href="#i-folder"/></svg><span>文章鉴赏</span><small>2</small></button>
       
-        <button class="files-category" data-category="cuidiWyv6J1zkMZL267LIdYbz"><svg><use href="#i-folder"/></svg><span>测试</span><small>1</small></button>
+        <button class="files-category" data-category="cuidSMh1AF9iOresW8tjnrXbW"><svg><use href="#i-folder"/></svg><span>测试</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidcYrWdrJbXUDbZs1I7ozpK"><svg><use href="#i-folder"/></svg><span>硬件</span><small>1</small></button>
+        <button class="files-category" data-category="cuid8UTa9pOzOxFgoIimtVV5-"><svg><use href="#i-folder"/></svg><span>硬件</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidXcFDGYgSrjRtw65WRpMDR"><svg><use href="#i-folder"/></svg><span>经验记录</span><small>1</small></button>
+        <button class="files-category" data-category="cuidUD9cXPkd9ZonfK2mrIdOG"><svg><use href="#i-folder"/></svg><span>经验记录</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidIXFb3H5egVi8-ycxjNO6j"><svg><use href="#i-folder"/></svg><span>记录</span><small>8</small></button>
+        <button class="files-category" data-category="cuidxeqpGanbT0y7P6QfajU6r"><svg><use href="#i-folder"/></svg><span>记录</span><small>8</small></button>
       
-        <button class="files-category" data-category="cuidgGcVBIX49yxBFwDrmdxU4"><svg><use href="#i-folder"/></svg><span>链接</span><small>1</small></button>
+        <button class="files-category" data-category="cuid7BLpYsbPx5qVNxVAVtREb"><svg><use href="#i-folder"/></svg><span>链接</span><small>1</small></button>
       
       
     </nav>
@@ -277,133 +433,133 @@
           <thead><tr><th scope="col">文件名称</th><th scope="col">分类</th><th scope="col">发布时间</th><th scope="col">类型</th></tr></thead>
           <tbody id="files-list">
             
-            <tr class="post-file" data-title="内网的折腾记录" data-date="1790840400000" data-categories="[&#34;cuidvXQM_jDNFB5EcVxHwgFTj&#34;]" data-search="内网的折腾记录 内网的折腾记录 折腾 NAS 2.5G 局域网 Wi-Fi 7 家庭网络">
+            <tr class="post-file" data-title="内网的折腾记录" data-date="1790840400000" data-categories="[&#34;cuidnaJDUaQ2pD9yAmaeKATyW&#34;]" data-search="内网的折腾记录 内网的折腾记录 折腾 NAS 2.5G 局域网 Wi-Fi 7 家庭网络">
               <td><a class="file-link" href="/2026/10/01/%E5%86%85%E7%BD%91%E7%9A%84%E6%8A%98%E8%85%BE%E8%AE%B0%E5%BD%95/" title="内网的折腾记录.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">内网的折腾记录<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">折腾</td>
               <td><time datetime="2026-10-01T07:40:00.000Z">2026-10-01</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="写作文档" data-date="1790602800000" data-categories="[&#34;cuidvZm9ENSdIKcgcho1YFlyV&#34;]" data-search="写作文档 写作指南 写作文档 记录 写作文档">
+            <tr class="post-file" data-title="写作文档" data-date="1790602800000" data-categories="[&#34;cuidySh0ooKdMJIKqkAK9rWkW&#34;]" data-search="写作文档 写作指南 写作文档 记录 写作文档">
               <td><a class="file-link" href="/2026/09/28/%E5%86%99%E4%BD%9C%E6%8C%87%E5%8D%97/" title="写作文档.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">写作文档<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">写作文档</td>
               <td><time datetime="2026-09-28T13:40:00.000Z">2026-09-28</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Markdown 全功能显示测试" data-date="1790490000000" data-categories="[&#34;cuidiWyv6J1zkMZL267LIdYbz&#34;]" data-search="Markdown 全功能显示测试 markdown样式测试 测试 Markdown Test">
+            <tr class="post-file" data-title="Markdown 全功能显示测试" data-date="1790490000000" data-categories="[&#34;cuidSMh1AF9iOresW8tjnrXbW&#34;]" data-search="Markdown 全功能显示测试 markdown样式测试 测试 Markdown Test">
               <td><a class="file-link" href="/2026/09/27/markdown%E6%A0%B7%E5%BC%8F%E6%B5%8B%E8%AF%95/" title="Markdown 全功能显示测试.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Markdown 全功能显示测试<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">测试</td>
               <td><time datetime="2026-09-27T06:20:00.000Z">2026-09-27</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Markdown 样式测试" data-date="1790425800000" data-categories="[&#34;cuidy8u7zdKB-hS0l3zKk_dbf&#34;]" data-search="Markdown 样式测试 markdown样式测试lite 主题开发 Markdown 主题测试">
+            <tr class="post-file" data-title="Markdown 样式测试" data-date="1790425800000" data-categories="[&#34;cuidn3Z1905KmADoahb1F_iXV&#34;]" data-search="Markdown 样式测试 markdown样式测试lite 主题开发 Markdown 主题测试">
               <td><a class="file-link" href="/2026/09/26/markdown%E6%A0%B7%E5%BC%8F%E6%B5%8B%E8%AF%95lite/" title="Markdown 样式测试.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Markdown 样式测试<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">主题开发</td>
               <td><time datetime="2026-09-26T12:30:00.000Z">2026-09-26</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="OnePlus13刷入crDroid" data-date="1780392006000" data-categories="[&#34;cuidIXFb3H5egVi8-ycxjNO6j&#34;]" data-search="OnePlus13刷入crDroid OnePlus13-Rom 记录 刷机">
+            <tr class="post-file" data-title="OnePlus13刷入crDroid" data-date="1780392006000" data-categories="[&#34;cuidxeqpGanbT0y7P6QfajU6r&#34;]" data-search="OnePlus13刷入crDroid OnePlus13-Rom 记录 刷机">
               <td><a class="file-link" href="/2026/06/02/OnePlus13-Rom/" title="OnePlus13刷入crDroid.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">OnePlus13刷入crDroid<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2026-06-02T09:20:06.000Z">2026-06-02</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Bitwarden + Vaultwarden 自托管密码管理" data-date="1772592850000" data-categories="[&#34;cuidIXFb3H5egVi8-ycxjNO6j&#34;]" data-search="Bitwarden + Vaultwarden 自托管密码管理 Bitwarden and Bitwarden 记录 密码管理器 Bitwarden Vaultwarden">
+            <tr class="post-file" data-title="Bitwarden + Vaultwarden 自托管密码管理" data-date="1772592850000" data-categories="[&#34;cuidxeqpGanbT0y7P6QfajU6r&#34;]" data-search="Bitwarden + Vaultwarden 自托管密码管理 Bitwarden and Bitwarden 记录 密码管理器 Bitwarden Vaultwarden">
               <td><a class="file-link" href="/2026/03/04/Bitwarden%20and%20Bitwarden/" title="Bitwarden + Vaultwarden 自托管密码管理.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Bitwarden + Vaultwarden 自托管密码管理<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2026-03-04T02:54:10.000Z">2026-03-04</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="RX 9070 功耗解锁" data-date="1768883168000" data-categories="[&#34;cuidIXFb3H5egVi8-ycxjNO6j&#34;]" data-search="RX 9070 功耗解锁 RX-9070-power 记录 RX9070 AMD显卡 Linux">
+            <tr class="post-file" data-title="RX 9070 功耗解锁" data-date="1768883168000" data-categories="[&#34;cuidxeqpGanbT0y7P6QfajU6r&#34;]" data-search="RX 9070 功耗解锁 RX-9070-power 记录 RX9070 AMD显卡 Linux">
               <td><a class="file-link" href="/2026/01/20/RX-9070-power/" title="RX 9070 功耗解锁.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">RX 9070 功耗解锁<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2026-01-20T04:26:08.000Z">2026-01-20</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="关于折腾 NAS 的记录" data-date="1768269069000" data-categories="[&#34;cuidXcFDGYgSrjRtw65WRpMDR&#34;,&#34;cuidcYrWdrJbXUDbZs1I7ozpK&#34;]" data-search="关于折腾 NAS 的记录 NAS 经验记录 硬件 NAS 飞牛OS 硬件折腾">
+            <tr class="post-file" data-title="关于折腾 NAS 的记录" data-date="1768269069000" data-categories="[&#34;cuidUD9cXPkd9ZonfK2mrIdOG&#34;,&#34;cuid8UTa9pOzOxFgoIimtVV5-&#34;]" data-search="关于折腾 NAS 的记录 NAS 经验记录 硬件 NAS 飞牛OS 硬件折腾">
               <td><a class="file-link" href="/2026/01/13/NAS/" title="关于折腾 NAS 的记录.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">关于折腾 NAS 的记录<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">经验记录 / 硬件</td>
               <td><time datetime="2026-01-13T01:51:09.000Z">2026-01-13</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Root管理器与一些模块链接" data-date="1760904426000" data-categories="[&#34;cuidgGcVBIX49yxBFwDrmdxU4&#34;]" data-search="Root管理器与一些模块链接 root-modules 链接 刷机 root 模块">
+            <tr class="post-file" data-title="Root管理器与一些模块链接" data-date="1760904426000" data-categories="[&#34;cuid7BLpYsbPx5qVNxVAVtREb&#34;]" data-search="Root管理器与一些模块链接 root-modules 链接 刷机 root 模块">
               <td><a class="file-link" href="/2025/10/20/root-modules/" title="Root管理器与一些模块链接.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Root管理器与一些模块链接<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">链接</td>
               <td><time datetime="2025-10-19T20:07:06.000Z">2025-10-20</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Redmi k40(alioth)刷入 Pixel OS" data-date="1760530347000" data-categories="[&#34;cuidIXFb3H5egVi8-ycxjNO6j&#34;]" data-search="Redmi k40(alioth)刷入 Pixel OS Redmi-k40 记录 刷机">
+            <tr class="post-file" data-title="Redmi k40(alioth)刷入 Pixel OS" data-date="1760530347000" data-categories="[&#34;cuidxeqpGanbT0y7P6QfajU6r&#34;]" data-search="Redmi k40(alioth)刷入 Pixel OS Redmi-k40 记录 刷机">
               <td><a class="file-link" href="/2025/10/15/Redmi-k40/" title="Redmi k40(alioth)刷入 Pixel OS.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Redmi k40(alioth)刷入 Pixel OS<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-10-15T12:12:27.000Z">2025-10-15</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="文章鉴赏《潘嘎之交》" data-date="1759501289000" data-categories="[&#34;cuidNvQfR-JALtbjij8kOlybx&#34;]" data-search="文章鉴赏《潘嘎之交》 pgzj 文章鉴赏 课文《潘嘎之交》">
+            <tr class="post-file" data-title="文章鉴赏《潘嘎之交》" data-date="1759501289000" data-categories="[&#34;cuidfPXaCN4UyrT0d1aY6ntnf&#34;]" data-search="文章鉴赏《潘嘎之交》 pgzj 文章鉴赏 课文《潘嘎之交》">
               <td><a class="file-link" href="/2025/10/03/pgzj/" title="文章鉴赏《潘嘎之交》.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">文章鉴赏《潘嘎之交》<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">文章鉴赏</td>
               <td><time datetime="2025-10-03T14:21:29.000Z">2025-10-03</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="文章鉴赏 《偷袭》" data-date="1759415070000" data-categories="[&#34;cuidNvQfR-JALtbjij8kOlybx&#34;]" data-search="文章鉴赏 《偷袭》 MaBaoguo 文章鉴赏 课文《偷袭》">
+            <tr class="post-file" data-title="文章鉴赏 《偷袭》" data-date="1759415070000" data-categories="[&#34;cuidfPXaCN4UyrT0d1aY6ntnf&#34;]" data-search="文章鉴赏 《偷袭》 MaBaoguo 文章鉴赏 课文《偷袭》">
               <td><a class="file-link" href="/2025/10/02/MaBaoguo/" title="文章鉴赏 《偷袭》.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">文章鉴赏 《偷袭》<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">文章鉴赏</td>
               <td><time datetime="2025-10-02T14:24:30.000Z">2025-10-02</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="ollama" data-date="1759240654000" data-categories="[&#34;cuidIXFb3H5egVi8-ycxjNO6j&#34;]" data-search="ollama ollama 记录 ollama amd ai">
+            <tr class="post-file" data-title="ollama" data-date="1759240654000" data-categories="[&#34;cuidxeqpGanbT0y7P6QfajU6r&#34;]" data-search="ollama ollama 记录 ollama amd ai">
               <td><a class="file-link" href="/2025/09/30/ollama/" title="ollama.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">ollama<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-09-30T13:57:34.000Z">2025-09-30</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Artalk评论系统" data-date="1758966839000" data-categories="[&#34;cuidIXFb3H5egVi8-ycxjNO6j&#34;]" data-search="Artalk评论系统 Artalk评论系统 记录 评论">
+            <tr class="post-file" data-title="Artalk评论系统" data-date="1758966839000" data-categories="[&#34;cuidxeqpGanbT0y7P6QfajU6r&#34;]" data-search="Artalk评论系统 Artalk评论系统 记录 评论">
               <td><a class="file-link" href="/2025/09/27/Artalk%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/" title="Artalk评论系统.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Artalk评论系统<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-09-27T09:53:59.000Z">2025-09-27</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Ubuntu部分" data-date="1758810675000" data-categories="[&#34;cuidIXFb3H5egVi8-ycxjNO6j&#34;]" data-search="Ubuntu部分 Ubuntu 记录 部署">
+            <tr class="post-file" data-title="Ubuntu部分" data-date="1758810675000" data-categories="[&#34;cuidxeqpGanbT0y7P6QfajU6r&#34;]" data-search="Ubuntu部分 Ubuntu 记录 部署">
               <td><a class="file-link" href="/2025/09/25/Ubuntu/" title="Ubuntu部分.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Ubuntu部分<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-09-25T14:31:15.000Z">2025-09-25</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="显示测试" data-date="1758714000000" data-categories="[&#34;cuidf9Xc25-WGvlGiEohMGYxm&#34;]" data-search="显示测试 test Test 测试">
+            <tr class="post-file" data-title="显示测试" data-date="1758714000000" data-categories="[&#34;cuidh5GWKrMoHuKAPyv0BzN-S&#34;]" data-search="显示测试 test Test 测试">
               <td><a class="file-link" href="/2025/09/24/test/" title="显示测试.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">显示测试<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">Test</td>
               <td><time datetime="2025-09-24T11:40:00.000Z">2025-09-24</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Hexo" data-date="1758593644000" data-categories="[&#34;cuidIXFb3H5egVi8-ycxjNO6j&#34;]" data-search="Hexo Hexo 记录 部署Hexo">
+            <tr class="post-file" data-title="Hexo" data-date="1758593644000" data-categories="[&#34;cuidxeqpGanbT0y7P6QfajU6r&#34;]" data-search="Hexo Hexo 记录 部署Hexo">
               <td><a class="file-link" href="/2025/09/23/Hexo/" title="Hexo.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Hexo<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-09-23T02:14:04.000Z">2025-09-23</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Typora1.9.5" data-date="1758529624000" data-categories="[&#34;cuidJXGd4Kh5dL_FU9T6PEU2V&#34;]" data-search="Typora1.9.5 Typora1.9.5 工具 markdown">
+            <tr class="post-file" data-title="Typora1.9.5" data-date="1758529624000" data-categories="[&#34;cuidqDGqSysFFjdX8FElzkBh5&#34;]" data-search="Typora1.9.5 Typora1.9.5 工具 markdown">
               <td><a class="file-link" href="/2025/09/22/Typora1.9.5/" title="Typora1.9.5.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Typora1.9.5<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">工具</td>
               <td><time datetime="2025-09-22T08:27:04.000Z">2025-09-22</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Scrcpy" data-date="1758529624000" data-categories="[&#34;cuidJXGd4Kh5dL_FU9T6PEU2V&#34;]" data-search="Scrcpy Scrcpy_new 工具 Scrcpy">
+            <tr class="post-file" data-title="Scrcpy" data-date="1758529624000" data-categories="[&#34;cuidqDGqSysFFjdX8FElzkBh5&#34;]" data-search="Scrcpy Scrcpy_new 工具 Scrcpy">
               <td><a class="file-link" href="/2025/09/22/Scrcpy_new/" title="Scrcpy.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Scrcpy<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">工具</td>
               <td><time datetime="2025-09-22T08:27:04.000Z">2025-09-22</time></td>
@@ -442,8 +598,8 @@
     <h2 id="site-info-title"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="m8 14-1 7 5-3 5 3-1-7"/></svg>站点信息</h2>
     <dl>
       <div><dt>文章数目</dt><dd>19 篇</dd></div>
-      <div><dt>已运行时间</dt><dd id="site-runtime" data-start="2025-09-19T16:00:00.000Z">380 天</dd></div>
-      <div><dt>本站总字数</dt><dd title="中文按字、英文和数字按词统计">21,968 字</dd></div>
+      <div><dt>已运行时间</dt><dd id="site-runtime" data-start="2025-09-19T16:00:00.000Z">395 天</dd></div>
+      <div><dt>本站总字数</dt><dd title="中文按字、英文和数字按词统计">21,950 字</dd></div>
       <div><dt>最近活动时间</dt><dd><time id="site-last-update" datetime="2026-10-01T07:40:00.000Z" title="最新帖子的发布时间">2026-10-01</time></dd></div>
     </dl>
   </section>
@@ -479,7 +635,7 @@
 <p>于是，一场 2.5G 局域网改造开始了。</p>
 <span id="more"></span>
 
-<h2 id="原来的网络结构"><a href="#原来的网络结构" class="headerlink" title="原来的网络结构"></a>原来的网络结构</h2><p>最初的结构其实非常普通：</p>
+<h2 id="1-原来的网络结构"><a href="#1-原来的网络结构" class="headerlink" title="1. 原来的网络结构"></a>1. 原来的网络结构</h2><p>最初的结构其实非常普通：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">graph TD<br>    A[Internet] --&gt; B[光猫]<br>    B -- 千兆 --&gt; C[路由器]<br>    C -- 千兆 --&gt; D[PC]<br>    C -- 千兆 --&gt; E[NAS]<br></code></pre></td></tr></table></figure>
 
 <p>千兆以太网理论速率是：<code>1000 Mbps</code></p>
@@ -493,7 +649,7 @@
 <p>“你在教我做事啊？我就这个速率，嫌慢自己升级啊。”</p>
 </blockquote>
 <p>的气息。</p>
-<h2 id="路由器设备信息"><a href="#路由器设备信息" class="headerlink" title="路由器设备信息"></a>路由器设备信息</h2><p>目前使用的路由器是腾达云霄 BE5100 &#x2F; BE6L Pro。</p>
+<h2 id="2-路由器设备信息"><a href="#2-路由器设备信息" class="headerlink" title="2. 路由器设备信息"></a>2. 路由器设备信息</h2><p>目前使用的路由器是腾达云霄 BE5100 &#x2F; BE6L Pro。</p>
 <p>主要规格大概是：</p>
 <ul>
 <li>Wi-Fi 7</li>
@@ -511,13 +667,13 @@
 
 <p>这样做有一个直接的好处：</p>
 <p><strong>NAS 已经不再被路由器的千兆 LAN 口限制。</strong></p>
-<h2 id="增加额外的-2-5G-网口"><a href="#增加额外的-2-5G-网口" class="headerlink" title="增加额外的 2.5G 网口"></a>增加额外的 2.5G 网口</h2><p>细想之下，我的 PC 与 NAS 的主板网口均只有千兆水平。也就是说，这样的话 PC 与 NAS 的网口速率将会成为瓶颈，我不得不额外安装网卡。例如PCIE接口或者 USB 5Gbps 的接口。</p>
+<h2 id="3-增加额外的-2-5G-网口"><a href="#3-增加额外的-2-5G-网口" class="headerlink" title="3. 增加额外的 2.5G 网口"></a>3. 增加额外的 2.5G 网口</h2><p>细想之下，我的 PC 与 NAS 的主板网口均只有千兆水平。也就是说，这样的话 PC 与 NAS 的网口速率将会成为瓶颈，我不得不额外安装网卡。例如PCIE接口或者 USB 5Gbps 的接口。</p>
 <p>试着查了下我的PC主板与NAS主板的接口，很顺利，他们都有 USB 5Gbps 速率的接口：</p>
 <div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id999"><button type="button" role="tab" id="legacy-tabs-1-tab-0" aria-controls="legacy-tabs-1-panel-0">B450M MORTAR MAX</button><button type="button" role="tab" id="legacy-tabs-1-tab-1" aria-controls="legacy-tabs-1-panel-1">H110M-E/M.2</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-1-panel-0" aria-labelledby="legacy-tabs-1-tab-0"><p class="legacy-tab-fallback-label">B450M MORTAR MAX</p><p><img src="https://cos.blanktime.cn/assets/images/B450M%20MORTAR%20MAX.png" alt="B450M MORTAR MAX"></p>&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-1-panel-1" aria-labelledby="legacy-tabs-1-tab-1"><p class="legacy-tab-fallback-label">H110M-E/M.2</p><p><img src="https://cos.blanktime.cn/assets/images/H110M-E%20M.2.png" alt="H110M-E&#x2F;M.2"></p>&#10;</section></div>
 
 <p>那我们可以选择 USB —– RJ45 的 2.5G 拓展网口了。</p>
 <p>这样一来还不用额外打开机箱占用PCIE插槽了，还有一点就是 USB <code>方便</code>。😋</p>
-<h2 id="PC-与-NAS"><a href="#PC-与-NAS" class="headerlink" title="PC 与 NAS"></a>PC 与 NAS</h2><p>如果单纯想让 PC 和 NAS 之间跑 2.5G，最简单的想法当然是买一台 2.5G 交换机。</p>
+<h2 id="4-PC-与-NAS"><a href="#4-PC-与-NAS" class="headerlink" title="4. PC 与 NAS"></a>4. PC 与 NAS</h2><p>如果单纯想让 PC 和 NAS 之间跑 2.5G，最简单的想法当然是买一台 2.5G 交换机。</p>
 <p>结构会变成：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">graph TD<br>    A[Internet] --&gt; B[光猫]<br>    B -- &quot;千兆 → 路由器 WAN口&quot; --&gt; C[路由器]<br>    C -- &quot;2.5G LAN口 → 交换机 WAN口&quot; --&gt; D[2.5G 交换机]<br>    D -- &quot;2.5G LAN口&quot; --&gt; E[NAS]<br>    D -- &quot;2.5G LAN口&quot; --&gt; F[PC]<br></code></pre></td></tr></table></figure>
 
@@ -542,23 +698,23 @@
 
 <p>完全不用绕路由器。</p>
 <p>有点像原本大家都在走城市道路，现在 PC 和 NAS 私下修了一条高速公路。</p>
-<h2 id="直连网络最好单独划一个网段"><a href="#直连网络最好单独划一个网段" class="headerlink" title="直连网络最好单独划一个网段"></a>直连网络最好单独划一个网段</h2><p>PC 和 NAS 增加第二张网卡之后，其实就同时存在两套网络。</p>
+<h2 id="5-直连网络单独划一个网段"><a href="#5-直连网络单独划一个网段" class="headerlink" title="5. 直连网络单独划一个网段"></a>5. 直连网络单独划一个网段</h2><p>PC 和 NAS 增加第二张网卡之后，其实就同时存在两套网络。</p>
 <p>例如正常家庭局域网可以继续使用：</p>
 <figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">路由器：192.168.1.1<br>PC：192.168.1.x<br>NAS：192.168.1.x<br></code></pre></td></tr></table></figure>
 
 <p>而 PC 和 NAS 之间的 2.5G 直连，则可以单独划一个网段，例如：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">PC 2.5G：<br>192.168.2.1<br><br>NAS 2.5G：<br>192.168.2.2<br></code></pre></td></tr></table></figure>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">PC 2.5G：<br>10.10.10.1<br><br>NAS 2.5G：<br>10.10.10.2<br></code></pre></td></tr></table></figure>
 
 <p>这样访问 NAS 高速网口时，直接使用：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">\\192.168.2.2<br></code></pre></td></tr></table></figure>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">\\10.10.10.2<br></code></pre></td></tr></table></figure>
 
 <p>Windows 就可以通过这条 2.5G 链路访问 NAS。</p>
 <p>而访问互联网以及其他局域网设备时，依旧正常走路由器。</p>
 <p>两边井水不犯河水。</p>
-<h2 id="手机也能超过千兆？顺手的事"><a href="#手机也能超过千兆？顺手的事" class="headerlink" title="手机也能超过千兆？顺手的事"></a>手机也能超过千兆？顺手的事</h2><p>做到这里的时候，我突然想到另一个问题。</p>
-<p>NAS 现在是通过 <strong>2.5G 网口连接路由器</strong> 的。</p>
+<h2 id="5-手机也能超过千兆？"><a href="#5-手机也能超过千兆？" class="headerlink" title="5. 手机也能超过千兆？"></a>5. 手机也能超过千兆？</h2><p>做到这里的时候，我突然想到另一个问题。</p>
+<p>NAS 现在是通过路由器 <strong>2.5G 网口连接路由器</strong> 的。</p>
 <p>而这台路由器又是 Wi-Fi 7。</p>
-<p>那手机通过 Wi-Fi 访问 NAS，是不是也不再受到千兆 LAN 的限制？</p>
+<p>再给NAS加一个2.5G网口那手机通过 Wi-Fi 访问 NAS，是不是也不再受到千兆 LAN 的限制？</p>
 <p>当然如此。</p>
 <p>手机访问 NAS 的路径其实是：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">graph TD<br>    A[&quot;无线终端（手机 / 笔记本）&quot;] -- &quot;Wi-Fi 7&quot; --&gt; B[路由器]<br>    B -- &quot;2.5G LAN&quot; --&gt; C[NAS]<br></code></pre></td></tr></table></figure>
@@ -567,7 +723,8 @@
 <p>根本不需要经过：<code>光猫</code></p>
 <p>更不会经过路由器的千兆 WAN。</p>
 <p>所以即使家里的宽带只有千兆，也不影响手机和 NAS 之间跑超过 1Gbps 的局域网速度。</p>
-<h2 id="关于路由器的理论-5011-Mbps"><a href="#关于路由器的理论-5011-Mbps" class="headerlink" title="关于路由器的理论 5011 Mbps"></a>关于路由器的理论 5011 Mbps</h2><p>这里顺便记录一个很容易混淆的地方。</p>
+<p>不过倒也不是必须，还是先前的话，主要还是PC与NAS间的高速传输。</p>
+<h2 id="6-关于路由器的理论-5011-Mbps"><a href="#6-关于路由器的理论-5011-Mbps" class="headerlink" title="6. 关于路由器的理论 5011 Mbps"></a>6. 关于路由器的理论 5011 Mbps</h2><p>这里顺便记录一个很容易混淆的地方。</p>
 <p>路由器标称：<code>5011 Mbps</code></p>
 <p>这个数字或许是总设备最大速率之和？</p>
 <p>不过细想之下倒也不会超过此速率，我也不会同时将 PC 与手机同时对 NAS 进行读写。</p>
@@ -593,7 +750,7 @@
 <p>实际局域网吞吐有机会达到：<code>1.4 ~ 1.9 Gbps</code></p>
 <p>也就是大约：<code>175 ~ 240 MB/s</code></p>
 <p>这已经明显超过千兆有线网络的：<code>约 110 MB/s</code></p>
-<h2 id="新的风暴已经出现"><a href="#新的风暴已经出现" class="headerlink" title="新的风暴已经出现"></a>新的风暴已经出现</h2><p>网络升级到 2.5G 并不意味着文件传输一定能跑满 2.5Gbps。</p>
+<h2 id="7-新的风暴已经出现"><a href="#7-新的风暴已经出现" class="headerlink" title="7. 新的风暴已经出现"></a>7. 新的风暴已经出现</h2><p>网络升级到 2.5G 并不意味着文件传输一定能跑满 2.5Gbps。</p>
 <p>2.5GbE 理论值是：<code>2500 Mbps</code></p>
 <p>换算下来：<code>312.5 MB/s</code></p>
 <p>扣除协议开销之后，实际极限一般会低一些。</p>
@@ -603,17 +760,17 @@
 <p>其实最大的瓶颈是机械硬盘。</p>
 <p>普通机械硬盘连续读写很多时候也就在：<code>150~220 MB/s</code> 这个范围。</p>
 <p>所以网络突破千兆之后，下一位出现在性能审判席上的，很可能就变成了硬盘。</p>
-<p>以前是：</p>
+<p>以前：</p>
 <blockquote>
 <p>机械硬盘：你跑不过我你信不信？</p>
 <p>千兆网卡：……</p>
 </blockquote>
-<p>现在变成：</p>
+<p>现在：</p>
 <blockquote>
 <p>2.5G 网卡：你跑不过我你信不信？</p>
 <p>机械硬盘：……</p>
 </blockquote>
-<h2 id="硬盘的问题"><a href="#硬盘的问题" class="headerlink" title="硬盘的问题"></a>硬盘的问题</h2><p>这下好了，当前的压力给到了机械硬盘。</p>
+<h2 id="8-硬盘的问题"><a href="#8-硬盘的问题" class="headerlink" title="8. 硬盘的问题"></a>8. 硬盘的问题</h2><p>这下好了，当前的压力给到了机械硬盘。</p>
 <p>对此我们无非就是增加固态：</p>
 <ol>
 <li>财大气粗，直接使用固态。</li>
@@ -622,7 +779,7 @@
 <p>很明显，对于我们肯定是选择第二条。</p>
 <p>注意到，FnOS支持将系统剩下的空间当作机械硬盘的缓存，这无疑又双叒叕帮我省了一笔费用。</p>
 <p>图先欠着</p>
-<h2 id="关于-2-5G-交换机"><a href="#关于-2-5G-交换机" class="headerlink" title="关于 2.5G 交换机"></a>关于 2.5G 交换机</h2><p>从网络架构角度来说，2.5G 交换机当然更舒服。</p>
+<h2 id="9-关于-2-5G-交换机"><a href="#9-关于-2-5G-交换机" class="headerlink" title="9. 关于 2.5G 交换机"></a>9. 关于 2.5G 交换机</h2><p>从网络架构角度来说，2.5G 交换机当然更舒服。</p>
 <p>PC、NAS、未来其他设备都接进去，一切流量自动交换，不需要搞第二套直连网络。</p>
 <p>但考虑到我目前需要高速通信的就是：<code>PC ↔ NAS</code></p>
 <p>而 NAS 又已经可以通过路由器的 2.5G 网口服务 Wi-Fi 设备。</p>
@@ -632,7 +789,7 @@
 <p>已经基本覆盖了我的需求。</p>
 <p>没必要为了两个设备，再专门加一个交换机、一套供电和几根额外的网线。</p>
 <p>以后如果 2.5G 设备越来越多，再加交换机也不迟。<del>鄙人囊中羞涩</del></p>
-<h2 id="终了"><a href="#终了" class="headerlink" title="终了"></a>终了</h2><p>目前整个家庭网络大概就是这样：</p>
+<h2 id="10-终了"><a href="#10-终了" class="headerlink" title="10. 终了"></a>10. 终了</h2><p>目前整个家庭网络大概就是这样：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">flowchart LR<br>    Internet[&quot;Internet&quot;]<br>    ONU[&quot;光猫&quot;]<br>    Router[&quot;BE5100&lt;br/&gt;Wi-Fi 7&quot;]<br><br>    PC[&quot;PC&lt;br/&gt;千兆 + 2.5G&quot;]<br>    NAS[&quot;NAS&lt;br/&gt;2.5G + 2.5G&quot;]<br>    Phone[&quot;手机&lt;br/&gt;Wi-Fi 7&quot;]<br><br>    Internet --&gt; ONU<br>    ONU --&gt;|&quot;1GbE&quot;| Router<br><br>    Router --&gt;|&quot;1GbE&quot;| PC<br>    Router --&gt;|&quot;2.5GbE&quot;| NAS<br>    Router &lt;--&gt;|&quot;Wi-Fi 7&lt;br/&gt;2401~2593 Mbps PHY&quot;| Phone<br><br>    PC &lt;--&gt;|&quot;2.5GbE 专线&quot;| NAS<br></code></pre></td></tr></table></figure>
 
 <p>总结下来，这次升级其实没有大动干戈。</p>
@@ -662,7 +819,7 @@
       <div class="browser-posts">
       
         <a class="browser-card" href="/2026/10/01/%E5%86%85%E7%BD%91%E7%9A%84%E6%8A%98%E8%85%BE%E8%AE%B0%E5%BD%95/" data-title="内网的折腾记录">
-          
+          <div class="browser-cover"><span aria-hidden="true"><svg><use href="#i-book"/></svg></span><img src="https://cos.blanktime.cn/assets/images/Code_Generated_Image.jfif" loading="lazy" alt=""></div>
           <div class="browser-card-text"><h2>内网的折腾记录</h2><p>家里的网络其实已经用了挺长时间。 平时上网没有什么问题，NAS 也能正常访问。直到最近折腾 NAS 和局域网文件传输时，我突然发现了一个非常朴素的问题： 千兆网，好像开始不太够用了。🤔 倒不是说千兆有多慢。 对于互联网来说，日常上网完全够用。 真正的问题出现在内网。 NAS、PC、手机之间的数据传输，并不需要经过互联网。既然设备本身已经具备更高的性能，那让</p><footer><span>2026-10-01 · 折腾</span><span>阅读全文 →</span></footer></div>
         </a>
       
@@ -781,7 +938,7 @@
 <p>于是，一场 2.5G 局域网改造开始了。</p>
 <span id="more"></span>
 
-<h2 id="原来的网络结构"><a href="#原来的网络结构" class="headerlink" title="原来的网络结构"></a>原来的网络结构</h2><p>最初的结构其实非常普通：</p>
+<h2 id="1-原来的网络结构"><a href="#1-原来的网络结构" class="headerlink" title="1. 原来的网络结构"></a>1. 原来的网络结构</h2><p>最初的结构其实非常普通：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">graph TD<br>    A[Internet] --&gt; B[光猫]<br>    B -- 千兆 --&gt; C[路由器]<br>    C -- 千兆 --&gt; D[PC]<br>    C -- 千兆 --&gt; E[NAS]<br></code></pre></td></tr></table></figure>
 
 <p>千兆以太网理论速率是：<code>1000 Mbps</code></p>
@@ -795,7 +952,7 @@
 <p>“你在教我做事啊？我就这个速率，嫌慢自己升级啊。”</p>
 </blockquote>
 <p>的气息。</p>
-<h2 id="路由器设备信息"><a href="#路由器设备信息" class="headerlink" title="路由器设备信息"></a>路由器设备信息</h2><p>目前使用的路由器是腾达云霄 BE5100 &#x2F; BE6L Pro。</p>
+<h2 id="2-路由器设备信息"><a href="#2-路由器设备信息" class="headerlink" title="2. 路由器设备信息"></a>2. 路由器设备信息</h2><p>目前使用的路由器是腾达云霄 BE5100 &#x2F; BE6L Pro。</p>
 <p>主要规格大概是：</p>
 <ul>
 <li>Wi-Fi 7</li>
@@ -813,13 +970,13 @@
 
 <p>这样做有一个直接的好处：</p>
 <p><strong>NAS 已经不再被路由器的千兆 LAN 口限制。</strong></p>
-<h2 id="增加额外的-2-5G-网口"><a href="#增加额外的-2-5G-网口" class="headerlink" title="增加额外的 2.5G 网口"></a>增加额外的 2.5G 网口</h2><p>细想之下，我的 PC 与 NAS 的主板网口均只有千兆水平。也就是说，这样的话 PC 与 NAS 的网口速率将会成为瓶颈，我不得不额外安装网卡。例如PCIE接口或者 USB 5Gbps 的接口。</p>
+<h2 id="3-增加额外的-2-5G-网口"><a href="#3-增加额外的-2-5G-网口" class="headerlink" title="3. 增加额外的 2.5G 网口"></a>3. 增加额外的 2.5G 网口</h2><p>细想之下，我的 PC 与 NAS 的主板网口均只有千兆水平。也就是说，这样的话 PC 与 NAS 的网口速率将会成为瓶颈，我不得不额外安装网卡。例如PCIE接口或者 USB 5Gbps 的接口。</p>
 <p>试着查了下我的PC主板与NAS主板的接口，很顺利，他们都有 USB 5Gbps 速率的接口：</p>
 <div class="legacy-tabs"><div class="legacy-tab-list" role="tablist" aria-label="id999"><button type="button" role="tab" id="legacy-tabs-1-tab-0" aria-controls="legacy-tabs-1-panel-0">B450M MORTAR MAX</button><button type="button" role="tab" id="legacy-tabs-1-tab-1" aria-controls="legacy-tabs-1-panel-1">H110M-E/M.2</button></div><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-1-panel-0" aria-labelledby="legacy-tabs-1-tab-0"><p class="legacy-tab-fallback-label">B450M MORTAR MAX</p><p><img src="https://cos.blanktime.cn/assets/images/B450M%20MORTAR%20MAX.png" alt="B450M MORTAR MAX"></p>&#10;</section><section class="legacy-tab-panel" role="tabpanel" id="legacy-tabs-1-panel-1" aria-labelledby="legacy-tabs-1-tab-1"><p class="legacy-tab-fallback-label">H110M-E/M.2</p><p><img src="https://cos.blanktime.cn/assets/images/H110M-E%20M.2.png" alt="H110M-E&#x2F;M.2"></p>&#10;</section></div>
 
 <p>那我们可以选择 USB —– RJ45 的 2.5G 拓展网口了。</p>
 <p>这样一来还不用额外打开机箱占用PCIE插槽了，还有一点就是 USB <code>方便</code>。😋</p>
-<h2 id="PC-与-NAS"><a href="#PC-与-NAS" class="headerlink" title="PC 与 NAS"></a>PC 与 NAS</h2><p>如果单纯想让 PC 和 NAS 之间跑 2.5G，最简单的想法当然是买一台 2.5G 交换机。</p>
+<h2 id="4-PC-与-NAS"><a href="#4-PC-与-NAS" class="headerlink" title="4. PC 与 NAS"></a>4. PC 与 NAS</h2><p>如果单纯想让 PC 和 NAS 之间跑 2.5G，最简单的想法当然是买一台 2.5G 交换机。</p>
 <p>结构会变成：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">graph TD<br>    A[Internet] --&gt; B[光猫]<br>    B -- &quot;千兆 → 路由器 WAN口&quot; --&gt; C[路由器]<br>    C -- &quot;2.5G LAN口 → 交换机 WAN口&quot; --&gt; D[2.5G 交换机]<br>    D -- &quot;2.5G LAN口&quot; --&gt; E[NAS]<br>    D -- &quot;2.5G LAN口&quot; --&gt; F[PC]<br></code></pre></td></tr></table></figure>
 
@@ -844,23 +1001,23 @@
 
 <p>完全不用绕路由器。</p>
 <p>有点像原本大家都在走城市道路，现在 PC 和 NAS 私下修了一条高速公路。</p>
-<h2 id="直连网络最好单独划一个网段"><a href="#直连网络最好单独划一个网段" class="headerlink" title="直连网络最好单独划一个网段"></a>直连网络最好单独划一个网段</h2><p>PC 和 NAS 增加第二张网卡之后，其实就同时存在两套网络。</p>
+<h2 id="5-直连网络单独划一个网段"><a href="#5-直连网络单独划一个网段" class="headerlink" title="5. 直连网络单独划一个网段"></a>5. 直连网络单独划一个网段</h2><p>PC 和 NAS 增加第二张网卡之后，其实就同时存在两套网络。</p>
 <p>例如正常家庭局域网可以继续使用：</p>
 <figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">路由器：192.168.1.1<br>PC：192.168.1.x<br>NAS：192.168.1.x<br></code></pre></td></tr></table></figure>
 
 <p>而 PC 和 NAS 之间的 2.5G 直连，则可以单独划一个网段，例如：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">PC 2.5G：<br>192.168.2.1<br><br>NAS 2.5G：<br>192.168.2.2<br></code></pre></td></tr></table></figure>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">PC 2.5G：<br>10.10.10.1<br><br>NAS 2.5G：<br>10.10.10.2<br></code></pre></td></tr></table></figure>
 
 <p>这样访问 NAS 高速网口时，直接使用：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">\\192.168.2.2<br></code></pre></td></tr></table></figure>
+<figure class="highlight text"><table><tr><td class="code"><pre><code class="hljs text">\\10.10.10.2<br></code></pre></td></tr></table></figure>
 
 <p>Windows 就可以通过这条 2.5G 链路访问 NAS。</p>
 <p>而访问互联网以及其他局域网设备时，依旧正常走路由器。</p>
 <p>两边井水不犯河水。</p>
-<h2 id="手机也能超过千兆？顺手的事"><a href="#手机也能超过千兆？顺手的事" class="headerlink" title="手机也能超过千兆？顺手的事"></a>手机也能超过千兆？顺手的事</h2><p>做到这里的时候，我突然想到另一个问题。</p>
-<p>NAS 现在是通过 <strong>2.5G 网口连接路由器</strong> 的。</p>
+<h2 id="5-手机也能超过千兆？"><a href="#5-手机也能超过千兆？" class="headerlink" title="5. 手机也能超过千兆？"></a>5. 手机也能超过千兆？</h2><p>做到这里的时候，我突然想到另一个问题。</p>
+<p>NAS 现在是通过路由器 <strong>2.5G 网口连接路由器</strong> 的。</p>
 <p>而这台路由器又是 Wi-Fi 7。</p>
-<p>那手机通过 Wi-Fi 访问 NAS，是不是也不再受到千兆 LAN 的限制？</p>
+<p>再给NAS加一个2.5G网口那手机通过 Wi-Fi 访问 NAS，是不是也不再受到千兆 LAN 的限制？</p>
 <p>当然如此。</p>
 <p>手机访问 NAS 的路径其实是：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">graph TD<br>    A[&quot;无线终端（手机 / 笔记本）&quot;] -- &quot;Wi-Fi 7&quot; --&gt; B[路由器]<br>    B -- &quot;2.5G LAN&quot; --&gt; C[NAS]<br></code></pre></td></tr></table></figure>
@@ -869,7 +1026,8 @@
 <p>根本不需要经过：<code>光猫</code></p>
 <p>更不会经过路由器的千兆 WAN。</p>
 <p>所以即使家里的宽带只有千兆，也不影响手机和 NAS 之间跑超过 1Gbps 的局域网速度。</p>
-<h2 id="关于路由器的理论-5011-Mbps"><a href="#关于路由器的理论-5011-Mbps" class="headerlink" title="关于路由器的理论 5011 Mbps"></a>关于路由器的理论 5011 Mbps</h2><p>这里顺便记录一个很容易混淆的地方。</p>
+<p>不过倒也不是必须，还是先前的话，主要还是PC与NAS间的高速传输。</p>
+<h2 id="6-关于路由器的理论-5011-Mbps"><a href="#6-关于路由器的理论-5011-Mbps" class="headerlink" title="6. 关于路由器的理论 5011 Mbps"></a>6. 关于路由器的理论 5011 Mbps</h2><p>这里顺便记录一个很容易混淆的地方。</p>
 <p>路由器标称：<code>5011 Mbps</code></p>
 <p>这个数字或许是总设备最大速率之和？</p>
 <p>不过细想之下倒也不会超过此速率，我也不会同时将 PC 与手机同时对 NAS 进行读写。</p>
@@ -895,7 +1053,7 @@
 <p>实际局域网吞吐有机会达到：<code>1.4 ~ 1.9 Gbps</code></p>
 <p>也就是大约：<code>175 ~ 240 MB/s</code></p>
 <p>这已经明显超过千兆有线网络的：<code>约 110 MB/s</code></p>
-<h2 id="新的风暴已经出现"><a href="#新的风暴已经出现" class="headerlink" title="新的风暴已经出现"></a>新的风暴已经出现</h2><p>网络升级到 2.5G 并不意味着文件传输一定能跑满 2.5Gbps。</p>
+<h2 id="7-新的风暴已经出现"><a href="#7-新的风暴已经出现" class="headerlink" title="7. 新的风暴已经出现"></a>7. 新的风暴已经出现</h2><p>网络升级到 2.5G 并不意味着文件传输一定能跑满 2.5Gbps。</p>
 <p>2.5GbE 理论值是：<code>2500 Mbps</code></p>
 <p>换算下来：<code>312.5 MB/s</code></p>
 <p>扣除协议开销之后，实际极限一般会低一些。</p>
@@ -905,17 +1063,17 @@
 <p>其实最大的瓶颈是机械硬盘。</p>
 <p>普通机械硬盘连续读写很多时候也就在：<code>150~220 MB/s</code> 这个范围。</p>
 <p>所以网络突破千兆之后，下一位出现在性能审判席上的，很可能就变成了硬盘。</p>
-<p>以前是：</p>
+<p>以前：</p>
 <blockquote>
 <p>机械硬盘：你跑不过我你信不信？</p>
 <p>千兆网卡：……</p>
 </blockquote>
-<p>现在变成：</p>
+<p>现在：</p>
 <blockquote>
 <p>2.5G 网卡：你跑不过我你信不信？</p>
 <p>机械硬盘：……</p>
 </blockquote>
-<h2 id="硬盘的问题"><a href="#硬盘的问题" class="headerlink" title="硬盘的问题"></a>硬盘的问题</h2><p>这下好了，当前的压力给到了机械硬盘。</p>
+<h2 id="8-硬盘的问题"><a href="#8-硬盘的问题" class="headerlink" title="8. 硬盘的问题"></a>8. 硬盘的问题</h2><p>这下好了，当前的压力给到了机械硬盘。</p>
 <p>对此我们无非就是增加固态：</p>
 <ol>
 <li>财大气粗，直接使用固态。</li>
@@ -924,7 +1082,7 @@
 <p>很明显，对于我们肯定是选择第二条。</p>
 <p>注意到，FnOS支持将系统剩下的空间当作机械硬盘的缓存，这无疑又双叒叕帮我省了一笔费用。</p>
 <p>图先欠着</p>
-<h2 id="关于-2-5G-交换机"><a href="#关于-2-5G-交换机" class="headerlink" title="关于 2.5G 交换机"></a>关于 2.5G 交换机</h2><p>从网络架构角度来说，2.5G 交换机当然更舒服。</p>
+<h2 id="9-关于-2-5G-交换机"><a href="#9-关于-2-5G-交换机" class="headerlink" title="9. 关于 2.5G 交换机"></a>9. 关于 2.5G 交换机</h2><p>从网络架构角度来说，2.5G 交换机当然更舒服。</p>
 <p>PC、NAS、未来其他设备都接进去，一切流量自动交换，不需要搞第二套直连网络。</p>
 <p>但考虑到我目前需要高速通信的就是：<code>PC ↔ NAS</code></p>
 <p>而 NAS 又已经可以通过路由器的 2.5G 网口服务 Wi-Fi 设备。</p>
@@ -934,7 +1092,7 @@
 <p>已经基本覆盖了我的需求。</p>
 <p>没必要为了两个设备，再专门加一个交换机、一套供电和几根额外的网线。</p>
 <p>以后如果 2.5G 设备越来越多，再加交换机也不迟。<del>鄙人囊中羞涩</del></p>
-<h2 id="终了"><a href="#终了" class="headerlink" title="终了"></a>终了</h2><p>目前整个家庭网络大概就是这样：</p>
+<h2 id="10-终了"><a href="#10-终了" class="headerlink" title="10. 终了"></a>10. 终了</h2><p>目前整个家庭网络大概就是这样：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><code class="hljs mermaid">flowchart LR<br>    Internet[&quot;Internet&quot;]<br>    ONU[&quot;光猫&quot;]<br>    Router[&quot;BE5100&lt;br/&gt;Wi-Fi 7&quot;]<br><br>    PC[&quot;PC&lt;br/&gt;千兆 + 2.5G&quot;]<br>    NAS[&quot;NAS&lt;br/&gt;2.5G + 2.5G&quot;]<br>    Phone[&quot;手机&lt;br/&gt;Wi-Fi 7&quot;]<br><br>    Internet --&gt; ONU<br>    ONU --&gt;|&quot;1GbE&quot;| Router<br><br>    Router --&gt;|&quot;1GbE&quot;| PC<br>    Router --&gt;|&quot;2.5GbE&quot;| NAS<br>    Router &lt;--&gt;|&quot;Wi-Fi 7&lt;br/&gt;2401~2593 Mbps PHY&quot;| Phone<br><br>    PC &lt;--&gt;|&quot;2.5GbE 专线&quot;| NAS<br></code></pre></td></tr></table></figure>
 
 <p>总结下来，这次升级其实没有大动干戈。</p>

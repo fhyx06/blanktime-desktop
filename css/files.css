@@ -34,7 +34,7 @@
 .files-actions { display: flex; align-items: center; justify-content: space-between; gap: 9px; padding: 0 18px 12px; }
 .files-actions>button { display: flex; align-items: center; gap: 6px; border: 1px solid #e2e5e8; border-radius: 4px; padding: 5px 10px; font-size: 11px; }
 .files-actions>button svg { width: 13px; height: 13px; }
-.files-actions>button:disabled { opacity: .38; cursor: default; }
+.files-actions>button:disabled { opacity: .38; cursor:var(--cursor-default, default); }
 .files-actions>button:enabled:hover { background: #f3f7fc; }
 .files-sort-label { display: flex; align-items: center; gap: 7px; color: #90989f; font-size: 10px; }
 .files-sort-label select { font: inherit; color: #68737d; background: #f8f9fa; padding: 5px; border: 1px solid #e9ebed; border-radius: 4px; max-width: 155px; }

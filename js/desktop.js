@@ -15,6 +15,7 @@
   function syncDock() {
     document.querySelectorAll('[data-open]').forEach(button => {
       const win = document.getElementById(button.dataset.open);
+      if (button.hasAttribute('data-running-only')) button.hidden = win.dataset.state === 'closed';
       button.classList.toggle('is-running', win.dataset.state !== 'closed');
       button.classList.toggle('is-focused', activeWindow === win && !win.hidden);
     });
@@ -39,9 +40,10 @@
     if (visible.length) { focusWindow(visible[0]); visible[0].focus({preventScroll: true}); }
     else { activeWindow = null; $(`[data-open="${win.id}"]`).focus(); }
     syncDock();
+    win.dispatchEvent(new CustomEvent('blanktime:window-hidden', {detail:{state}}));
   }
   function maximize(win) {
-    if (mobile()) return;
+    if (mobile() || document.fullscreenElement === win) return;
     win.classList.toggle('is-maximized');
     const button = $('[data-action="maximize"]', win);
     button.setAttribute('aria-label', win.classList.contains('is-maximized') ? '还原窗口' : '最大化');
@@ -68,7 +70,7 @@
     win.addEventListener('pointerdown', event => {
       const resize = event.target.closest('[data-resize]');
       const title = event.target.closest('.titlebar');
-      if (mobile() || win.classList.contains('is-maximized') || event.button !== 0 || (!resize && !title) || event.target.closest('button')) return;
+      if (mobile() || document.fullscreenElement === win || win.classList.contains('is-maximized') || event.button !== 0 || (!resize && !title) || event.target.closest('button')) return;
       event.preventDefault();
       const start = win.getBoundingClientRect();
       const windowStyle = getComputedStyle(win);
@@ -175,7 +177,7 @@
   addEventListener('resize', () => {
     if (mobile()) return;
     windows.forEach(win => {
-      if (!win.style.width || win.classList.contains('is-maximized')) return;
+      if (document.fullscreenElement === win || !win.style.width || win.classList.contains('is-maximized')) return;
       const rect = win.getBoundingClientRect();
       const width = Math.min(rect.width, innerWidth - 88), height = Math.min(rect.height, innerHeight - 20);
       Object.assign(win.style, {width: `${width}px`,height:`${height}px`,left:`${Math.max(76, Math.min(rect.left, innerWidth-width-8))}px`,top:`${Math.max(8, Math.min(rect.top,innerHeight-height-8))}px`});
@@ -183,7 +185,7 @@
   });
   function clock() { $('#clock').textContent = new Intl.DateTimeFormat('zh-CN',{hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date()); }
   clock(); setInterval(clock, 30000);
-  window.blanktimeDesktop = {openWindow};
+  window.blanktimeDesktop = {openWindow, closeWindow: win => hideWindow(win, 'closed')};
   const initialArticle = document.getElementById('article-source')?.content.querySelector('[data-article]');
   if (initialArticle || welcomeDismissed) { welcome.hidden = true; welcome.dataset.state = 'closed'; syncDock(); }
   else openWindow(welcome, false);

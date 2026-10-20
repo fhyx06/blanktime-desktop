@@ -129,8 +129,19 @@
   }
   function jump(tab, hash) {
     try {
-      const id = decodeURIComponent(hash.slice(1));
-      [...tab.article.querySelectorAll('[id]')].find(el => el.id === tab.prefix + id || el.id === id)?.scrollIntoView({block:'start'});
+      // Footnote IDs may themselves contain percent-encoded labels.
+      const raw = hash.slice(1);
+      const ids = [raw];
+      try { ids.push(decodeURIComponent(raw)); } catch {}
+      const target = [...tab.article.querySelectorAll('[id]')].find(el => ids.some(id => el.id === tab.prefix + id || el.id === id));
+      if (target) {
+        target.scrollIntoView({block:'start'});
+        // Keep keyboard navigation at the destination when following a footnote.
+        if (target.matches('[data-footnote-ref], .footnotes li')) {
+          if (!target.matches('a[href]') && !target.hasAttribute('tabindex')) target.tabIndex = -1;
+          target.focus({preventScroll:true});
+        }
+      }
     } catch {}
   }
   async function load(tab, initialSource = null) {
@@ -149,7 +160,7 @@
       const article = document.importNode(source, true); tab.article = article;
       // Prefix IDs to avoid collisions between article tabs.
       article.querySelectorAll('[id]').forEach(node => { node.id = tab.prefix + node.id; });
-      for (const attribute of ['aria-controls','aria-labelledby','for']) {
+      for (const attribute of ['aria-controls','aria-labelledby','aria-describedby','for']) {
         article.querySelectorAll(`[${attribute}]`).forEach(node => node.setAttribute(attribute, node.getAttribute(attribute).split(/\s+/).map(id => tab.prefix + id).join(' ')));
       }
       article.querySelectorAll('[src],a[href]').forEach(node => {
@@ -183,6 +194,7 @@
         headings.forEach((heading, i) => { if (heading.getBoundingClientRect().top <= boundary) index = i; });
         links.forEach((link, i) => { link.classList.toggle('active', i === index); if (i === index) link.setAttribute('aria-current','location'); else link.removeAttribute('aria-current'); });
       }
+      window.blanktimeImages.prepareArticle(article);
       window.blanktimeReading.setupCodeBlocks(article, tab.prefix, progress);
       headings.forEach((heading, i) => {
         if (!heading.id) heading.id = `${tab.prefix}section-${i}`;

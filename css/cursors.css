@@ -1,0 +1,24 @@
+/* Hotspots are image-pixel coordinates: arrow tip, fingertip, or center. */
+@media (any-pointer: fine) {
+  :root {
+    --cursor-default: url('../images/cursors/pointer.png') 0 0, default;
+    --cursor-pointer: url('../images/cursors/link.png') 10 0, pointer;
+    --cursor-text: url('../images/cursors/text.png') 16 16, text;
+    --cursor-move: url('../images/cursors/move.png') 16 16, move;
+    --cursor-ns-resize: url('../images/cursors/vert.png') 16 16, ns-resize;
+    --cursor-ew-resize: url('../images/cursors/horz.png') 16 16, ew-resize;
+    --cursor-nwse-resize: url('../images/cursors/dgn1.png') 16 16, nwse-resize;
+    --cursor-nesw-resize: url('../images/cursors/dgn2.png') 16 16, nesw-resize;
+  }
+
+  body { cursor: var(--cursor-default); }
+  .markdown-body, input:not([type]), input[type=text], input[type=search],
+  input[type=email], input[type=url], input[type=password], input[type=number],
+  textarea, [contenteditable=true] { cursor: var(--cursor-text); }
+  a[href], select, input[type=range], input[type=checkbox], input[type=radio],
+  [role=button] { cursor: var(--cursor-pointer); }
+  .app-window:not(.is-maximized) .titlebar { cursor: var(--cursor-move); }
+  /* No replacement is supplied for unavailable actions. */
+  button:disabled, input:disabled, select:disabled, textarea:disabled,
+  [aria-disabled=true] { cursor: not-allowed; }
+}
