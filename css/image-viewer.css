@@ -7,7 +7,7 @@
 #image-viewer-count {min-width:55px;text-align:center;font-size:12px;font-variant-numeric:tabular-nums;}
 #image-viewer-wallpaper {background:var(--accent);color:#fff;flex-shrink:0;}
 .image-viewer-canvas {position:relative;flex:1;min-height:0;background:var(--sys-base,#f5f6f8);}
-.image-viewer-stage {position:absolute;inset:0 54px;overflow:hidden;overscroll-behavior:contain;}
+.image-viewer-stage {position:absolute;inset:0 54px;overflow:hidden;overscroll-behavior:contain;touch-action:none;}
 .image-viewer-side {position:absolute;top:50%;transform:translateY(-50%);z-index:2;display:grid;place-items:center;width:40px;height:52px;padding:0;border:1px solid #ffffff40;border-radius:10px;background:#20252cbf;color:#fff;box-shadow:0 2px 8px #0002;transition:background .15s,opacity .15s;}
 .image-viewer-side svg {width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;}
 .image-viewer-side:enabled:hover {background:#20252cf0;}

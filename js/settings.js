@@ -25,6 +25,7 @@
     sync();
   });
   document.addEventListener('blanktime:system-theme', sync);
+  document.getElementById('settings-system-info').addEventListener('click',() => show(false));
   document.getElementById('settings-desktop').addEventListener('click',() => {
     show(false,true);
     document.querySelector('.desktop-toggle').click();

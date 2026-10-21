@@ -1,0 +1,114 @@
+/* Phone windows share one workspace above the bottom app bar. */
+@media (max-width:760px) {
+  :root {
+    --mobile-top:max(6px,env(safe-area-inset-top));
+    --mobile-left:max(4px,env(safe-area-inset-left));
+    --mobile-right:max(4px,env(safe-area-inset-right));
+    --mobile-bottom:calc(62px + env(safe-area-inset-bottom));
+  }
+  .dock {
+    inset:auto 0 0;
+    width:100%;
+    height:calc(56px + env(safe-area-inset-bottom));
+    box-sizing:border-box;
+    flex-direction:row;
+    align-items:center;
+    gap:0;
+    padding:4px max(4px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(4px,env(safe-area-inset-left));
+    border-radius:16px 16px 0 0;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scrollbar-width:none;
+    overscroll-behavior-x:contain;
+  }
+  .dock::-webkit-scrollbar {display:none;}
+  .dock-divider,.dock-space {display:none;}
+  .dock-button {flex:1 0 44px;width:44px;min-width:44px;height:44px;}
+  .dock-button .running-dot {left:calc(50% - 6px);top:auto;bottom:0;width:12px;height:3px;}
+  body .app-window:not(:fullscreen) {
+    left:var(--mobile-left)!important;
+    top:var(--mobile-top)!important;
+    right:auto!important;
+    bottom:auto!important;
+    width:calc(100% - var(--mobile-left) - var(--mobile-right))!important;
+    height:calc(100dvh - var(--mobile-top) - var(--mobile-bottom))!important;
+    min-width:0;
+    min-height:0;
+    border-radius:12px;
+  }
+  .titlebar {height:44px;flex-basis:44px;padding-left:12px;}
+  .window-caption {font-size:13px;overflow:hidden;}
+  .window-caption > span {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .window-controls {flex-shrink:0;}
+  .window-controls button {width:44px;}
+  .desktop-status {top:max(18px,env(safe-area-inset-top));right:max(16px,env(safe-area-inset-right));}
+  .desktop-file-icon {left:20px;top:64px;width:80px;}
+  .desktop-music-icon {left:120px;top:64px;}
+  .desktop-album-icon {left:20px;top:172px;}
+  .desktop-browser-icon {left:120px;top:172px;}
+  .settings-panel {
+    left:var(--mobile-left);
+    bottom:var(--mobile-bottom);
+    width:calc(100% - var(--mobile-left) - var(--mobile-right));
+    max-width:none;
+    max-height:calc(100dvh - var(--mobile-top) - var(--mobile-bottom));
+  }
+  .toast {left:16px;right:16px;bottom:calc(var(--mobile-bottom) + 8px);max-width:none;transform:none;}
+  .markdown-body {padding:22px 16px 36px;font-size:15px;overflow-wrap:anywhere;}
+  .reader-tool {min-width:40px;height:40px;}
+  .files-actions {flex-wrap:wrap;gap:8px;}
+  .files-search {min-width:0;}
+  .files-table td {font-size:12px;}
+  .files-category {min-height:40px;}
+  .album-toolbar {flex-wrap:wrap;gap:12px;}
+  .album-toolbar button,.album-folder-heading button {min-height:40px;}
+  #album-folders {grid-template-columns:repeat(auto-fill,minmax(120px,150px));justify-content:space-between;}
+  .browser-toolbar button {min-width:40px;height:40px;}
+  .browser-tab {min-height:40px;}
+  .browser-location {min-width:0;}
+  input[type="search"],.files-search input {font-size:16px;}
+  .files-search {height:40px;}
+  #music .library-heading {align-items:stretch;flex-direction:column;gap:12px;}
+  #music .library-actions {flex:0 0 auto;width:100%;}
+  #music .music-search {min-width:0;min-height:40px;box-sizing:border-box;}
+  #music .music-search input {font-size:16px;}
+  #music-reload {width:40px;height:40px;flex-shrink:0;}
+  #music .player {padding:10px 12px;gap:8px;}
+  #music .ctrl,#music .vol-btn,#music .lyrics-toggle,#music .theme-btn {min-width:40px;min-height:40px;}
+  #music .lyrics-toggle {border:0;}
+  #music .controls {gap:12px;}
+  #music .utility {gap:4px;}
+  #music .vol-num {display:none;}
+  #music .track,#music .vol-track {min-height:28px;}
+  #music .listening-content {padding:8px 16px 12px;}
+  #music-backToList {min-height:40px;}
+}
+
+@media (max-width:360px) {
+  #album-folders {grid-template-columns:repeat(2,minmax(0,1fr));}
+  #music:not(.is-lyrics-view) .player {grid-template-columns:minmax(0,1fr);}
+  #music:not(.is-lyrics-view) .now {grid-column:1;grid-row:1;}
+  #music:not(.is-lyrics-view) .transport {grid-column:1;grid-row:2;}
+  #music:not(.is-lyrics-view) .utility {grid-column:1;grid-row:3;justify-content:space-between;}
+}
+
+/* Keep the list usable on short landscape screens. */
+@media (min-width:520px) and (max-width:760px) and (max-height:500px) {
+  #music .library-heading {flex-direction:row;align-items:center;margin-bottom:8px;}
+  #music .library-heading h2 {font-size:18px;}
+  #music .library-heading p {display:none;}
+  #music .library-actions {width:auto;flex:1;}
+  #music .library {padding-top:10px;}
+  #music:not(.is-lyrics-view) .player {grid-template-columns:minmax(90px,1fr) minmax(220px,1.6fr) auto;}
+  #music:not(.is-lyrics-view) .now {grid-column:1;grid-row:1;}
+  #music:not(.is-lyrics-view) .transport {grid-column:2;grid-row:1;gap:0;}
+  #music:not(.is-lyrics-view) .utility {grid-column:3;grid-row:1;flex-direction:column;}
+  #music:not(.is-lyrics-view) .controls {gap:4px;}
+  #music .listening-content {grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);overflow:auto;}
+  #music.is-lyrics-view .now {flex-direction:row;gap:12px;}
+  #music.is-lyrics-view .cover {width:64px;height:64px;}
+  #music.is-lyrics-view .player {gap:4px;max-width:none;}
+  #music.is-lyrics-view .song-name {font-size:16px;}
+  #music.is-lyrics-view .transport {gap:4px;}
+  #music .listening-player {align-items:flex-start;}
+}

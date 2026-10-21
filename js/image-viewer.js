@@ -7,7 +7,8 @@
   let items = [], index = 0, trigger, source = '', photo, version = 0, awaitingWallpaper = false;
   const controls = ['zoom-out','zoom-in','actual','fit','rotate-left','rotate-right'].map($);
   const MAX_ZOOM = 8, PADDING = 32;
-  let naturalWidth = 0, naturalHeight = 0, scale = 1, angle = 0, mode = 'fit', panX = 0, panY = 0, drag;
+  let naturalWidth = 0, naturalHeight = 0, scale = 1, angle = 0, mode = 'fit', panX = 0, panY = 0, drag, pinch;
+  const pointers = new Map();
   const ready = () => naturalWidth > 0 && naturalHeight > 0;
   function rotatedSize() {
     return angle % 180 === 0 ? [naturalWidth, naturalHeight] : [naturalHeight, naturalWidth];
@@ -21,10 +22,11 @@
     return [Math.max(0,(width * scale - Math.max(1,stage.clientWidth - PADDING)) / 2),
       Math.max(0,(height * scale - Math.max(1,stage.clientHeight - PADDING)) / 2)];
   }
-  function endDrag() {
-    const pointerId = drag?.id; drag = null;
+  function endGesture() {
+    const ids = [...pointers.keys()];
+    pointers.clear(); drag = null; pinch = null;
     stage.classList.remove('is-panning');
-    if (pointerId !== undefined && stage.hasPointerCapture?.(pointerId)) stage.releasePointerCapture(pointerId);
+    ids.forEach(id => { if (stage.hasPointerCapture?.(id)) stage.releasePointerCapture(id); });
   }
   function draw() {
     controls.forEach(button => { button.disabled = !ready(); });
@@ -46,12 +48,13 @@
     $('zoom-in').disabled = scale >= MAX_ZOOM;
   }
   function resetView() {
-    endDrag(); naturalWidth = 0; naturalHeight = 0; scale = 1; angle = 0; mode = 'fit'; panX = 0; panY = 0; draw();
+    endGesture(); naturalWidth = 0; naturalHeight = 0; scale = 1; angle = 0; mode = 'fit'; panX = 0; panY = 0; draw();
   }
+  const clampScale = value => Math.max(Math.min(.05,fitScale()),Math.min(MAX_ZOOM,value));
   function zoomTo(value, anchorX = 0, anchorY = 0) {
     if (!ready()) return;
-    endDrag();
-    const next = Math.max(Math.min(.05,fitScale()),Math.min(MAX_ZOOM,value));
+    endGesture();
+    const next = clampScale(value);
     // Keep the image point beneath the anchor fixed, within the image bounds.
     const ratio = next / scale;
     panX = anchorX + (panX - anchorX) * ratio;
@@ -70,28 +73,69 @@
   $('zoom-out').addEventListener('click', () => zoomTo(scale / 1.25));
   $('zoom-in').addEventListener('click', () => zoomTo(scale * 1.25));
   $('actual').addEventListener('click', () => { if (ready()) { panX = 0; panY = 0; zoomTo(1); } });
-  $('fit').addEventListener('click', () => { if (ready()) { endDrag(); mode = 'fit'; draw(); } });
+  $('fit').addEventListener('click', () => { if (ready()) { endGesture(); mode = 'fit'; draw(); } });
   function rotate(degrees) {
     if (!ready()) return;
-    endDrag(); angle = (angle + degrees + 360) % 360; panX = 0; panY = 0; draw();
+    endGesture(); angle = (angle + degrees + 360) % 360; panX = 0; panY = 0; draw();
   }
   $('rotate-left').addEventListener('click', () => rotate(-90));
   $('rotate-right').addEventListener('click', () => rotate(90));
+  function pinchPosition() {
+    const [a,b] = [...pointers.values()], rect = stage.getBoundingClientRect();
+    return {distance:Math.hypot(b.x - a.x,b.y - a.y),
+      x:(a.x + b.x) / 2 - rect.left - rect.width / 2,
+      y:(a.y + b.y) / 2 - rect.top - rect.height / 2};
+  }
+  function startGesture() {
+    drag = null; pinch = null;
+    if (pointers.size === 2) {
+      pinch = {...pinchPosition(),scale,panX,panY};
+    } else if (pointers.size === 1) {
+      const [id,point] = [...pointers.entries()][0];
+      drag = {id,...point,panX,panY};
+    }
+    stage.classList.toggle('is-panning',pointers.size > 0 && stage.classList.contains('can-pan'));
+  }
   stage.addEventListener('pointerdown', event => {
-    if (event.target !== photo || !ready() || event.button !== 0 || event.isPrimary === false || !stage.classList.contains('can-pan')) return;
+    if (!ready() || win.hidden || (event.target !== photo && event.target !== stage) || event.button !== 0 || pointers.size >= 2) return;
+    const touch = event.pointerType === 'touch';
+    // Track the first finger even while the whole image fits, so the second
+    // finger can start a pinch. Mouse dragging still requires an enlarged image.
+    if (!touch && (event.target !== photo || event.isPrimary === false || pointers.size || !stage.classList.contains('can-pan'))) return;
+    if (touch && [...pointers.values()].some(point => point.type !== 'touch')) return;
     event.preventDefault();
+    pointers.set(event.pointerId,{x:event.clientX,y:event.clientY,type:event.pointerType});
     stage.setPointerCapture(event.pointerId);
-    drag = {id:event.pointerId, x:event.clientX, y:event.clientY, panX, panY};
-    stage.classList.add('is-panning');
+    startGesture();
   });
   stage.addEventListener('pointermove', event => {
-    if (!drag || event.pointerId !== drag.id) return;
-    panX = drag.panX + event.clientX - drag.x; panY = drag.panY + event.clientY - drag.y; draw();
+    const point = pointers.get(event.pointerId);
+    if (!point) return;
+    event.preventDefault();
+    point.x = event.clientX; point.y = event.clientY;
+    if (pinch) {
+      const current = pinchPosition();
+      // Coincident fingers have no useful scale; rebase once they separate.
+      if (pinch.distance < 1) { startGesture(); return; }
+      const next = clampScale(pinch.scale * current.distance / pinch.distance);
+      const ratio = next / pinch.scale;
+      panX = current.x + (pinch.panX - pinch.x) * ratio;
+      panY = current.y + (pinch.panY - pinch.y) * ratio;
+      scale = next; mode = 'manual'; draw();
+    } else if (drag && stage.classList.contains('can-pan')) {
+      panX = drag.panX + point.x - drag.x; panY = drag.panY + point.y - drag.y; draw();
+    }
   });
-  ['pointerup','pointercancel','lostpointercapture'].forEach(type => stage.addEventListener(type, event => {
-    if (drag?.id === event.pointerId) endDrag();
+  stage.addEventListener('pointerup', event => {
+    if (!pointers.delete(event.pointerId)) return;
+    if (stage.hasPointerCapture?.(event.pointerId)) stage.releasePointerCapture(event.pointerId);
+    // Lifting either finger continues as a one-finger pan without a jump.
+    startGesture();
+  });
+  ['pointercancel','lostpointercapture'].forEach(type => stage.addEventListener(type, event => {
+    if (pointers.has(event.pointerId)) endGesture();
   }));
-  new ResizeObserver(() => { endDrag(); draw(); }).observe(stage);
+  new ResizeObserver(() => { endGesture(); draw(); }).observe(stage);
   let albumMode = false, metadataRequest, metadataTimer, fullscreenPending = false;
   function stopMetadata() {
     metadataRequest?.abort(); metadataRequest = null;
@@ -148,7 +192,7 @@
   }
   async function toggleFullscreen() {
     if (fullscreenButton.disabled || fullscreenPending) return;
-    endDrag(); fullscreenPending = true;
+    endGesture(); fullscreenPending = true;
     try {
       if (document.fullscreenElement === win) await document.exitFullscreen();
       else { await win.requestFullscreen(); if (win.hidden) await exitFullscreen(); }
@@ -161,7 +205,7 @@
     const active = document.fullscreenElement === win;
     fullscreenButton.textContent = active ? '退出全屏' : '全屏';
     fullscreenButton.setAttribute('aria-pressed',String(active));
-    endDrag(); draw();
+    endGesture(); draw();
     if (!win.hidden) win.focus({preventScroll:true});
   });
   function safeURL(value) {
@@ -249,7 +293,7 @@
     event.preventDefault(); event.stopPropagation();
   });
   win.addEventListener('blanktime:window-hidden', event => {
-    endDrag(); exitFullscreen();
+    endGesture(); exitFullscreen();
     if (event.detail.state !== 'closed') return;
     resetView();
     ++version; clearTimeout(imageTimer); stopMetadata(); $('info').hidden = true; items = []; awaitingWallpaper = false;
@@ -273,7 +317,7 @@
   });
 
   function articleItem(img) {
-    if (img.parentElement?.closest('button,[role=button],.code-block') || img.classList.contains('emoji')) return null;
+    if (img.parentElement?.closest('button,[role=button],.code-block,.legacy-link') || img.classList.contains('emoji')) return null;
     const src = safeURL(img.currentSrc || img.getAttribute('src'));
     if (!src) return null;
     const link = img.closest('a[href]');

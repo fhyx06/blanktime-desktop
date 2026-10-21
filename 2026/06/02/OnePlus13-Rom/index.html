@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <script src="/js/appearance.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="文字、折腾记录，以及一些突发奇想。">
   <meta name="theme-color" content="#1270FE">
   <link rel="icon" href="/images/icon/favicon.ico" type="image/x-icon">
@@ -55,6 +55,8 @@
   <script src="/js/image-viewer.js" defer></script>
   <link rel="stylesheet" href="/css/settings.css">
   <script src="/js/settings.js?v=system-theme-1" defer></script>
+  <link rel="stylesheet" href="/css/system-info.css">
+  <script src="/js/system-info.js" defer></script>
   <link rel="stylesheet" href="/css/browser.css">
   <script src="/js/mermaid.js" defer></script>
   <script src="/js/reading.js" defer></script>
@@ -69,9 +71,11 @@
   
   <link rel="stylesheet" href="/css/cursors.css">
   
+  <link rel="stylesheet" href="/css/mobile.css">
 <meta name="generator" content="Hexo 8.1.2"></head>
 <body data-home="/" style="--wallpaper: url('/images/cover.jpg')">
   <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-system-info" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="14" rx="3"/><path d="M8 21h8M12 17v4M12 9v4M12 6.5h.01"/></symbol>
     <symbol id="i-browser" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18Z"/></symbol>
     <symbol id="i-album" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="2"/><path d="m3 17 6-6 4 4 3-3 5 5"/></symbol>
     <symbol id="i-home" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
@@ -89,6 +93,7 @@
     <button class="dock-button" data-open="album" aria-label="相册" title="相册"><img class="album-icon-art" src="/images/icons/album-flower.svg" alt="" width="46" height="46"><span class="running-dot"></span></button>
     <button class="dock-button" data-open="browser" aria-label="博客浏览器" title="博客浏览器"><span class="browser-icon-art" aria-hidden="true"><svg><use href="#i-browser"/></svg></span><span class="running-dot"></span></button>
     <button class="dock-button" data-open="image-viewer" data-running-only aria-label="图片查看器" title="图片查看器" hidden><svg><use href="#i-album"/></svg><span class="running-dot"></span></button>
+    <button class="dock-button" data-open="system-info" data-running-only aria-label="基础信息" title="基础信息" hidden><svg aria-hidden="true"><use href="#i-system-info"/></svg><span class="running-dot"></span></button>
     <div class="dock-space"></div>
     <button class="dock-button desktop-toggle" aria-label="显示桌面" title="显示桌面"><svg><use href="#i-grid"/></svg></button>
     <button class="dock-button" id="settings-toggle" type="button" title="设置" aria-label="设置" aria-expanded="false" aria-controls="settings-panel" aria-haspopup="dialog"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m9 3-.6 2.3-2 .9-2.1-.6-2 3.4 1.6 1.8v2.4L2.3 15l2 3.4 2.1-.6 2 .9L9 21h6l.6-2.3 2-.9 2.1.6 2-3.4-1.6-1.8v-2.4L21.7 9l-2-3.4-2.1.6-2-.9L15 3Z"/><circle cx="12" cy="12" r="3"/></svg></button>
@@ -107,6 +112,7 @@
     <button type="button" id="settings-wallpaper-toggle" aria-controls="album"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="2"/><path d="m3 17 6-6 4 4 3-3 5 5"/></svg><span>更换壁纸</span></button>
 
     <button type="button" id="settings-desktop"><svg aria-hidden="true"><use href="#i-home"/></svg><span>显示桌面</span></button>
+    <button type="button" id="settings-system-info" data-open="system-info" aria-controls="system-info"><svg aria-hidden="true"><use href="#i-system-info"/></svg><span>基础信息</span></button>
     <button type="button" id="settings-about"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v1"/></svg><span>关于本站</span></button>
   </div>
   <p class="settings-note">外观偏好保存在当前浏览器</p>
@@ -392,6 +398,83 @@
   <footer class="window-status"><span id="image-viewer-status" role="status" aria-live="polite"></span></footer>
 </section>
 
+    <section class="app-window system-info-window" id="system-info" aria-label="基础信息" tabindex="-1" hidden>
+  <header class="titlebar"><div class="window-caption"><svg aria-hidden="true"><use href="#i-system-info"/></svg><span>基础信息</span></div><div class="window-controls"><button data-action="minimize" aria-label="最小化" title="最小化"><svg viewBox="0 0 16 16"><path d="M3 8h10"/></svg></button><button data-action="maximize" aria-label="最大化" title="最大化"><svg viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8"/></svg></button><button data-action="close" aria-label="关闭" title="关闭"><svg viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></button></div>
+</header>
+  <div class="system-info-content">
+    <div class="info-overview">
+      <section class="info-card info-summary" aria-labelledby="info-platform-label">
+        <svg class="info-summary-art" aria-hidden="true"><use href="#i-home"/></svg>
+        <h2 id="info-platform-label">当前平台</h2>
+        <p class="info-summary-value" data-info="platform">—</p>
+        <dl class="info-rows">
+          <div hidden><dt>平台标识</dt><dd data-info="platform-id"></dd></div>
+          <div hidden><dt>本机时间</dt><dd><time data-info="time"></time></dd></div>
+          <div hidden><dt>时区</dt><dd data-info="timezone"></dd></div>
+        </dl>
+      </section>
+      <section class="info-card info-summary" aria-labelledby="info-browser-label">
+        <svg class="info-summary-art" aria-hidden="true"><use href="#i-browser"/></svg>
+        <h2 id="info-browser-label">浏览器</h2>
+        <p class="info-summary-value" data-info="browser">—</p>
+        <dl class="info-rows">
+          <div hidden><dt>厂商标识</dt><dd data-info="vendor"></dd></div>
+          <div hidden><dt>Cookie</dt><dd data-info="cookies"></dd></div>
+          <div hidden><dt>Do Not Track</dt><dd data-info="dnt"></dd></div>
+        </dl>
+      </section>
+    </div>
+    <div class="info-details">
+      <section class="info-card" data-info-group aria-labelledby="info-display-label" hidden>
+        <h2 id="info-display-label"><svg aria-hidden="true"><use href="#i-home"/></svg>屏幕与显示</h2>
+        <dl class="info-rows">
+          <div hidden><dt>屏幕尺寸</dt><dd data-info="screen"></dd></div>
+          <div hidden><dt>可用屏幕</dt><dd data-info="available-screen"></dd></div>
+          <div hidden><dt>页面视口</dt><dd data-info="viewport"></dd></div>
+          <div hidden><dt>Device Pixel Ratio</dt><dd data-info="dpr"></dd></div>
+          <div hidden><dt>色深</dt><dd data-info="color-depth"></dd></div>
+          <div hidden><dt>像素深度</dt><dd data-info="pixel-depth"></dd></div>
+        </dl>
+        <p class="info-hint">尺寸以 CSS 像素显示，可能受系统缩放影响。</p>
+      </section>
+      <section class="info-card" data-info-group aria-labelledby="info-language-label" hidden>
+        <h2 id="info-language-label"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 5h12M9 3v2M12 5c0 6-4 10-9 12M5 9c1 3 4 6 8 8M14 21l4-11 4 11M15.5 17h5"/></svg>语言与输入</h2>
+        <dl class="info-rows">
+          <div hidden><dt>首选语言</dt><dd data-info="language"></dd></div>
+          <div hidden><dt>语言列表</dt><dd data-info="languages"></dd></div>
+          <div hidden><dt>触控能力</dt><dd data-info="touch"></dd></div>
+          <div hidden><dt>指针能力</dt><dd data-info="pointer"></dd></div>
+          <div hidden><dt>悬停能力</dt><dd data-info="hover"></dd></div>
+        </dl>
+      </section>
+      <section class="info-card" data-info-group aria-labelledby="info-hardware-label" hidden>
+        <h2 id="info-hardware-label"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="3"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M9 2v3m6-3v3M9 19v3m6-3v3M2 9h3m-3 6h3M19 9h3m-3 6h3"/></svg>硬件提示</h2>
+        <dl class="info-rows">
+          <div hidden><dt>CPU 逻辑处理器</dt><dd data-info="cpu"></dd></div>
+          <div hidden><dt>GPU 厂商</dt><dd data-info="gpu-vendor"></dd></div>
+          <div class="info-row-wide" hidden><dt>GPU 渲染器</dt><dd data-info="gpu"></dd></div>
+          <div hidden><dt>电量</dt><dd class="info-battery"><meter id="info-battery-level" min="0" max="1" aria-label="电池电量"></meter><span data-info="battery"></span></dd></div>
+          <div hidden><dt>充电状态</dt><dd data-info="charging"></dd></div>
+        </dl>
+        <p class="info-hint">浏览器报告的信息，仅供参考。</p>
+      </section>
+      <section class="info-card" data-info-group aria-labelledby="info-network-label" hidden>
+        <h2 id="info-network-label"><svg aria-hidden="true"><use href="#i-browser"/></svg>网络连接</h2>
+        <dl class="info-rows">
+          <div hidden><dt>连接状态</dt><dd><span class="info-connection" data-info="online"></span></dd></div>
+          <div hidden><dt>连接方式</dt><dd data-info="connection-type"></dd></div>
+          <div hidden><dt>连接质量（估计）</dt><dd data-info="effective-type"></dd></div>
+          <div hidden><dt>估算下行</dt><dd data-info="downlink"></dd></div>
+          <div hidden><dt>估算往返延迟</dt><dd data-info="rtt"></dd></div>
+          <div hidden><dt>节省流量</dt><dd data-info="save-data"></dd></div>
+        </dl>
+        <p class="info-hint">在线状态不保证互联网可用，估算速率不代表实际测速。</p>
+      </section>
+    </div>
+  </div>
+  <footer class="window-status"><span>信息仅在当前页面展示，不上传或保存</span></footer>
+</section>
+
     
 <section class="app-window files-window" id="files" aria-label="文件管理窗口" tabindex="-1" hidden>
   <header class="titlebar"><div class="window-caption"><span class="folder-art folder-art-small" aria-hidden="true"><span></span></span><span>文件管理</span></div><div class="window-controls"><button data-action="minimize" aria-label="最小化" title="最小化"><svg viewBox="0 0 16 16"><path d="M3 8h10"/></svg></button><button data-action="maximize" aria-label="最大化" title="最大化"><svg viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8"/></svg></button><button data-action="close" aria-label="关闭" title="关闭"><svg viewBox="0 0 16 16"><path d="m4 4 8 8m0-8-8 8"/></svg></button></div>
@@ -401,27 +484,27 @@
       <button class="files-category is-selected" data-category="all" aria-current="page"><svg><use href="#i-folder"/></svg><span>所有帖子</span><small>19</small></button>
       <p class="files-sidebar-label">分类</p>
       
-        <button class="files-category" data-category="cuidh5GWKrMoHuKAPyv0BzN-S"><svg><use href="#i-folder"/></svg><span>Test</span><small>1</small></button>
+        <button class="files-category" data-category="cuid3Rma4UNHcKLI5zMgUUxLH"><svg><use href="#i-folder"/></svg><span>Test</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidn3Z1905KmADoahb1F_iXV"><svg><use href="#i-folder"/></svg><span>主题开发</span><small>1</small></button>
+        <button class="files-category" data-category="cuidpfqb7OewjmVt-lGZqYA6y"><svg><use href="#i-folder"/></svg><span>主题开发</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidySh0ooKdMJIKqkAK9rWkW"><svg><use href="#i-folder"/></svg><span>写作文档</span><small>1</small></button>
+        <button class="files-category" data-category="cuidJo9xBCHgjde0FXEid37jc"><svg><use href="#i-folder"/></svg><span>写作文档</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidqDGqSysFFjdX8FElzkBh5"><svg><use href="#i-folder"/></svg><span>工具</span><small>2</small></button>
+        <button class="files-category" data-category="cuidg9YuxhAKK4xWM-PUt_0Wv"><svg><use href="#i-folder"/></svg><span>工具</span><small>2</small></button>
       
-        <button class="files-category" data-category="cuidnaJDUaQ2pD9yAmaeKATyW"><svg><use href="#i-folder"/></svg><span>折腾</span><small>1</small></button>
+        <button class="files-category" data-category="cuidSVizG2jOy-zT94yBoyc0J"><svg><use href="#i-folder"/></svg><span>折腾</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidfPXaCN4UyrT0d1aY6ntnf"><svg><use href="#i-folder"/></svg><span>文章鉴赏</span><small>2</small></button>
+        <button class="files-category" data-category="cuid-vM-R4nX77qK1rlIMWVIX"><svg><use href="#i-folder"/></svg><span>文章鉴赏</span><small>2</small></button>
       
-        <button class="files-category" data-category="cuidSMh1AF9iOresW8tjnrXbW"><svg><use href="#i-folder"/></svg><span>测试</span><small>1</small></button>
+        <button class="files-category" data-category="cuidUbHK6OKz-loobTteF0-BA"><svg><use href="#i-folder"/></svg><span>测试</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuid8UTa9pOzOxFgoIimtVV5-"><svg><use href="#i-folder"/></svg><span>硬件</span><small>1</small></button>
+        <button class="files-category" data-category="cuidyY1LaxiMQyc5tnYidp4f3"><svg><use href="#i-folder"/></svg><span>硬件</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidUD9cXPkd9ZonfK2mrIdOG"><svg><use href="#i-folder"/></svg><span>经验记录</span><small>1</small></button>
+        <button class="files-category" data-category="cuid5MdywrVSuqv25UswB9iUb"><svg><use href="#i-folder"/></svg><span>经验记录</span><small>1</small></button>
       
-        <button class="files-category" data-category="cuidxeqpGanbT0y7P6QfajU6r"><svg><use href="#i-folder"/></svg><span>记录</span><small>8</small></button>
+        <button class="files-category" data-category="cuidHwsWETYb7sARiPbXpuZRs"><svg><use href="#i-folder"/></svg><span>记录</span><small>8</small></button>
       
-        <button class="files-category" data-category="cuid7BLpYsbPx5qVNxVAVtREb"><svg><use href="#i-folder"/></svg><span>链接</span><small>1</small></button>
+        <button class="files-category" data-category="cuidv-PyXZgbaA2p5GuJbfaAG"><svg><use href="#i-folder"/></svg><span>链接</span><small>1</small></button>
       
       
     </nav>
@@ -433,134 +516,134 @@
           <thead><tr><th scope="col">文件名称</th><th scope="col">分类</th><th scope="col">发布时间</th><th scope="col">类型</th></tr></thead>
           <tbody id="files-list">
             
-            <tr class="post-file" data-title="内网的折腾记录" data-date="1790840400000" data-categories="[&#34;cuidnaJDUaQ2pD9yAmaeKATyW&#34;]" data-search="内网的折腾记录 内网的折腾记录 折腾 NAS 2.5G 局域网 Wi-Fi 7 家庭网络">
+            <tr class="post-file" data-title="内网的折腾记录" data-date="1790840400000" data-categories="[&#34;cuidSVizG2jOy-zT94yBoyc0J&#34;]" data-search="内网的折腾记录 内网的折腾记录 折腾 NAS 2.5G 局域网 Wi-Fi 7 家庭网络">
               <td><a class="file-link" href="/2026/10/01/%E5%86%85%E7%BD%91%E7%9A%84%E6%8A%98%E8%85%BE%E8%AE%B0%E5%BD%95/" title="内网的折腾记录.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">内网的折腾记录<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">折腾</td>
               <td><time datetime="2026-10-01T07:40:00.000Z">2026-10-01</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="写作文档" data-date="1790602800000" data-categories="[&#34;cuidySh0ooKdMJIKqkAK9rWkW&#34;]" data-search="写作文档 写作指南 写作文档 记录 写作文档">
+            <tr class="post-file" data-title="写作文档" data-date="1790602800000" data-categories="[&#34;cuidJo9xBCHgjde0FXEid37jc&#34;]" data-search="写作文档 写作指南 写作文档 记录 写作文档">
               <td><a class="file-link" href="/2026/09/28/%E5%86%99%E4%BD%9C%E6%8C%87%E5%8D%97/" title="写作文档.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">写作文档<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">写作文档</td>
               <td><time datetime="2026-09-28T13:40:00.000Z">2026-09-28</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Markdown 全功能显示测试" data-date="1790490000000" data-categories="[&#34;cuidSMh1AF9iOresW8tjnrXbW&#34;]" data-search="Markdown 全功能显示测试 markdown样式测试 测试 Markdown Test">
+            <tr class="post-file" data-title="Markdown 全功能显示测试" data-date="1790490000000" data-categories="[&#34;cuidUbHK6OKz-loobTteF0-BA&#34;]" data-search="Markdown 全功能显示测试 markdown样式测试 测试 Markdown Test">
               <td><a class="file-link" href="/2026/09/27/markdown%E6%A0%B7%E5%BC%8F%E6%B5%8B%E8%AF%95/" title="Markdown 全功能显示测试.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Markdown 全功能显示测试<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">测试</td>
               <td><time datetime="2026-09-27T06:20:00.000Z">2026-09-27</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Markdown 样式测试" data-date="1790425800000" data-categories="[&#34;cuidn3Z1905KmADoahb1F_iXV&#34;]" data-search="Markdown 样式测试 markdown样式测试lite 主题开发 Markdown 主题测试">
+            <tr class="post-file" data-title="Markdown 样式测试" data-date="1790425800000" data-categories="[&#34;cuidpfqb7OewjmVt-lGZqYA6y&#34;]" data-search="Markdown 样式测试 markdown样式测试lite 主题开发 Markdown 主题测试">
               <td><a class="file-link" href="/2026/09/26/markdown%E6%A0%B7%E5%BC%8F%E6%B5%8B%E8%AF%95lite/" title="Markdown 样式测试.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Markdown 样式测试<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">主题开发</td>
               <td><time datetime="2026-09-26T12:30:00.000Z">2026-09-26</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="OnePlus13刷入crDroid" data-date="1780392006000" data-categories="[&#34;cuidxeqpGanbT0y7P6QfajU6r&#34;]" data-search="OnePlus13刷入crDroid OnePlus13-Rom 记录 刷机">
+            <tr class="post-file" data-title="OnePlus13刷入crDroid" data-date="1780392006000" data-categories="[&#34;cuidHwsWETYb7sARiPbXpuZRs&#34;]" data-search="OnePlus13刷入crDroid OnePlus13-Rom 记录 刷机">
               <td><a class="file-link" href="/2026/06/02/OnePlus13-Rom/" title="OnePlus13刷入crDroid.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">OnePlus13刷入crDroid<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2026-06-02T09:20:06.000Z">2026-06-02</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Bitwarden + Vaultwarden 自托管密码管理" data-date="1772592850000" data-categories="[&#34;cuidxeqpGanbT0y7P6QfajU6r&#34;]" data-search="Bitwarden + Vaultwarden 自托管密码管理 Bitwarden and Bitwarden 记录 密码管理器 Bitwarden Vaultwarden">
+            <tr class="post-file" data-title="Bitwarden + Vaultwarden 自托管密码管理" data-date="1772592850000" data-categories="[&#34;cuidHwsWETYb7sARiPbXpuZRs&#34;]" data-search="Bitwarden + Vaultwarden 自托管密码管理 Bitwarden and Bitwarden 记录 密码管理器 Bitwarden Vaultwarden">
               <td><a class="file-link" href="/2026/03/04/Bitwarden%20and%20Bitwarden/" title="Bitwarden + Vaultwarden 自托管密码管理.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Bitwarden + Vaultwarden 自托管密码管理<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2026-03-04T02:54:10.000Z">2026-03-04</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="RX 9070 功耗解锁" data-date="1768883168000" data-categories="[&#34;cuidxeqpGanbT0y7P6QfajU6r&#34;]" data-search="RX 9070 功耗解锁 RX-9070-power 记录 RX9070 AMD显卡 Linux">
+            <tr class="post-file" data-title="RX 9070 功耗解锁" data-date="1768883168000" data-categories="[&#34;cuidHwsWETYb7sARiPbXpuZRs&#34;]" data-search="RX 9070 功耗解锁 RX-9070-power 记录 RX9070 AMD显卡 Linux">
               <td><a class="file-link" href="/2026/01/20/RX-9070-power/" title="RX 9070 功耗解锁.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">RX 9070 功耗解锁<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2026-01-20T04:26:08.000Z">2026-01-20</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="关于折腾 NAS 的记录" data-date="1768269069000" data-categories="[&#34;cuidUD9cXPkd9ZonfK2mrIdOG&#34;,&#34;cuid8UTa9pOzOxFgoIimtVV5-&#34;]" data-search="关于折腾 NAS 的记录 NAS 经验记录 硬件 NAS 飞牛OS 硬件折腾">
+            <tr class="post-file" data-title="关于折腾 NAS 的记录" data-date="1768269069000" data-categories="[&#34;cuid5MdywrVSuqv25UswB9iUb&#34;,&#34;cuidyY1LaxiMQyc5tnYidp4f3&#34;]" data-search="关于折腾 NAS 的记录 NAS 经验记录 硬件 NAS 飞牛OS 硬件折腾">
               <td><a class="file-link" href="/2026/01/13/NAS/" title="关于折腾 NAS 的记录.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">关于折腾 NAS 的记录<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">经验记录 / 硬件</td>
               <td><time datetime="2026-01-13T01:51:09.000Z">2026-01-13</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Root管理器与一些模块链接" data-date="1760904426000" data-categories="[&#34;cuid7BLpYsbPx5qVNxVAVtREb&#34;]" data-search="Root管理器与一些模块链接 root-modules 链接 刷机 root 模块">
+            <tr class="post-file" data-title="Root管理器与一些模块链接" data-date="1760904426000" data-categories="[&#34;cuidv-PyXZgbaA2p5GuJbfaAG&#34;]" data-search="Root管理器与一些模块链接 root-modules 链接 刷机 root 模块">
               <td><a class="file-link" href="/2025/10/20/root-modules/" title="Root管理器与一些模块链接.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Root管理器与一些模块链接<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">链接</td>
               <td><time datetime="2025-10-19T20:07:06.000Z">2025-10-20</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Redmi k40(alioth)刷入 Pixel OS" data-date="1760530347000" data-categories="[&#34;cuidxeqpGanbT0y7P6QfajU6r&#34;]" data-search="Redmi k40(alioth)刷入 Pixel OS Redmi-k40 记录 刷机">
+            <tr class="post-file" data-title="Redmi k40(alioth)刷入 Pixel OS" data-date="1760530347000" data-categories="[&#34;cuidHwsWETYb7sARiPbXpuZRs&#34;]" data-search="Redmi k40(alioth)刷入 Pixel OS Redmi-k40 记录 刷机">
               <td><a class="file-link" href="/2025/10/15/Redmi-k40/" title="Redmi k40(alioth)刷入 Pixel OS.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Redmi k40(alioth)刷入 Pixel OS<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-10-15T12:12:27.000Z">2025-10-15</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="文章鉴赏《潘嘎之交》" data-date="1759501289000" data-categories="[&#34;cuidfPXaCN4UyrT0d1aY6ntnf&#34;]" data-search="文章鉴赏《潘嘎之交》 pgzj 文章鉴赏 课文《潘嘎之交》">
+            <tr class="post-file" data-title="文章鉴赏《潘嘎之交》" data-date="1759501289000" data-categories="[&#34;cuid-vM-R4nX77qK1rlIMWVIX&#34;]" data-search="文章鉴赏《潘嘎之交》 pgzj 文章鉴赏 课文《潘嘎之交》">
               <td><a class="file-link" href="/2025/10/03/pgzj/" title="文章鉴赏《潘嘎之交》.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">文章鉴赏《潘嘎之交》<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">文章鉴赏</td>
               <td><time datetime="2025-10-03T14:21:29.000Z">2025-10-03</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="文章鉴赏 《偷袭》" data-date="1759415070000" data-categories="[&#34;cuidfPXaCN4UyrT0d1aY6ntnf&#34;]" data-search="文章鉴赏 《偷袭》 MaBaoguo 文章鉴赏 课文《偷袭》">
+            <tr class="post-file" data-title="文章鉴赏 《偷袭》" data-date="1759415070000" data-categories="[&#34;cuid-vM-R4nX77qK1rlIMWVIX&#34;]" data-search="文章鉴赏 《偷袭》 MaBaoguo 文章鉴赏 课文《偷袭》">
               <td><a class="file-link" href="/2025/10/02/MaBaoguo/" title="文章鉴赏 《偷袭》.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">文章鉴赏 《偷袭》<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">文章鉴赏</td>
               <td><time datetime="2025-10-02T14:24:30.000Z">2025-10-02</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="ollama" data-date="1759240654000" data-categories="[&#34;cuidxeqpGanbT0y7P6QfajU6r&#34;]" data-search="ollama ollama 记录 ollama amd ai">
+            <tr class="post-file" data-title="ollama" data-date="1759240654000" data-categories="[&#34;cuidHwsWETYb7sARiPbXpuZRs&#34;]" data-search="ollama ollama 记录 ollama amd ai">
               <td><a class="file-link" href="/2025/09/30/ollama/" title="ollama.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">ollama<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-09-30T13:57:34.000Z">2025-09-30</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Artalk评论系统" data-date="1758966839000" data-categories="[&#34;cuidxeqpGanbT0y7P6QfajU6r&#34;]" data-search="Artalk评论系统 Artalk评论系统 记录 评论">
+            <tr class="post-file" data-title="Artalk评论系统" data-date="1758966839000" data-categories="[&#34;cuidHwsWETYb7sARiPbXpuZRs&#34;]" data-search="Artalk评论系统 Artalk评论系统 记录 评论">
               <td><a class="file-link" href="/2025/09/27/Artalk%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/" title="Artalk评论系统.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Artalk评论系统<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-09-27T09:53:59.000Z">2025-09-27</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Ubuntu部分" data-date="1758810675000" data-categories="[&#34;cuidxeqpGanbT0y7P6QfajU6r&#34;]" data-search="Ubuntu部分 Ubuntu 记录 部署">
+            <tr class="post-file" data-title="Ubuntu部分" data-date="1758810675000" data-categories="[&#34;cuidHwsWETYb7sARiPbXpuZRs&#34;]" data-search="Ubuntu部分 Ubuntu 记录 部署">
               <td><a class="file-link" href="/2025/09/25/Ubuntu/" title="Ubuntu部分.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Ubuntu部分<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-09-25T14:31:15.000Z">2025-09-25</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="显示测试" data-date="1758714000000" data-categories="[&#34;cuidh5GWKrMoHuKAPyv0BzN-S&#34;]" data-search="显示测试 test Test 测试">
+            <tr class="post-file" data-title="显示测试" data-date="1758714000000" data-categories="[&#34;cuid3Rma4UNHcKLI5zMgUUxLH&#34;]" data-search="显示测试 test Test 测试">
               <td><a class="file-link" href="/2025/09/24/test/" title="显示测试.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">显示测试<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">Test</td>
               <td><time datetime="2025-09-24T11:40:00.000Z">2025-09-24</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Hexo" data-date="1758593644000" data-categories="[&#34;cuidxeqpGanbT0y7P6QfajU6r&#34;]" data-search="Hexo Hexo 记录 部署Hexo">
+            <tr class="post-file" data-title="Hexo" data-date="1758593644000" data-categories="[&#34;cuidHwsWETYb7sARiPbXpuZRs&#34;]" data-search="Hexo Hexo 记录 部署Hexo">
               <td><a class="file-link" href="/2025/09/23/Hexo/" title="Hexo.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Hexo<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">记录</td>
               <td><time datetime="2025-09-23T02:14:04.000Z">2025-09-23</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Typora1.9.5" data-date="1758529624000" data-categories="[&#34;cuidqDGqSysFFjdX8FElzkBh5&#34;]" data-search="Typora1.9.5 Typora1.9.5 工具 markdown">
-              <td><a class="file-link" href="/2025/09/22/Typora1.9.5/" title="Typora1.9.5.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Typora1.9.5<span class="file-extension">.md</span></span></a></td>
+            <tr class="post-file" data-title="Scrcpy" data-date="1758529624000" data-categories="[&#34;cuidg9YuxhAKK4xWM-PUt_0Wv&#34;]" data-search="Scrcpy Scrcpy_new 工具 Scrcpy">
+              <td><a class="file-link" href="/2025/09/22/Scrcpy_new/" title="Scrcpy.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Scrcpy<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">工具</td>
               <td><time datetime="2025-09-22T08:27:04.000Z">2025-09-22</time></td>
               <td class="file-type">Markdown</td>
             </tr>
             
-            <tr class="post-file" data-title="Scrcpy" data-date="1758529624000" data-categories="[&#34;cuidqDGqSysFFjdX8FElzkBh5&#34;]" data-search="Scrcpy Scrcpy_new 工具 Scrcpy">
-              <td><a class="file-link" href="/2025/09/22/Scrcpy_new/" title="Scrcpy.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Scrcpy<span class="file-extension">.md</span></span></a></td>
+            <tr class="post-file" data-title="Typora1.9.5" data-date="1758529624000" data-categories="[&#34;cuidg9YuxhAKK4xWM-PUt_0Wv&#34;]" data-search="Typora1.9.5 Typora1.9.5 工具 markdown">
+              <td><a class="file-link" href="/2025/09/22/Typora1.9.5/" title="Typora1.9.5.md"><span class="file-icon" aria-hidden="true">M<span>↓</span></span><span class="file-name">Typora1.9.5<span class="file-extension">.md</span></span></a></td>
               <td class="file-category">工具</td>
               <td><time datetime="2025-09-22T08:27:04.000Z">2025-09-22</time></td>
               <td class="file-type">Markdown</td>
@@ -598,8 +681,8 @@
     <h2 id="site-info-title"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="m8 14-1 7 5-3 5 3-1-7"/></svg>站点信息</h2>
     <dl>
       <div><dt>文章数目</dt><dd>19 篇</dd></div>
-      <div><dt>已运行时间</dt><dd id="site-runtime" data-start="2025-09-19T16:00:00.000Z">395 天</dd></div>
-      <div><dt>本站总字数</dt><dd title="中文按字、英文和数字按词统计">21,950 字</dd></div>
+      <div><dt>已运行时间</dt><dd id="site-runtime" data-start="2025-09-19T16:00:00.000Z">396 天</dd></div>
+      <div><dt>本站总字数</dt><dd title="中文按字、英文和数字按词统计">21,961 字</dd></div>
       <div><dt>最近活动时间</dt><dd><time id="site-last-update" datetime="2026-10-01T07:40:00.000Z" title="最新帖子的发布时间">2026-10-01</time></dd></div>
     </dl>
   </section>
@@ -699,7 +782,7 @@
 </li>
 <li><strong>下载最新的GApps</strong>：<a target="_blank" rel="noopener" href="https://sourceforge.net/projects/nikgapps/">gapps.zip</a></li>
 </ul>
-<h2 id="解锁-Bootloader-BL"><a href="#解锁-Bootloader-BL" class="headerlink" title="解锁 Bootloader (BL)"></a><strong>解锁 Bootloader (BL)</strong></h2><div class="legacy-note"><p>解锁会<strong>强制清除所有数据</strong></p>&#10;</div>
+<h2 id="解锁-Bootloader-BL"><a href="#解锁-Bootloader-BL" class="headerlink" title="解锁 Bootloader (BL)"></a><strong>解锁 Bootloader (BL)</strong></h2><div class="legacy-note legacy-note-warning legacy-note-yellow"><span class="legacy-note-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 4v10M12 19v.01"/></svg></span><div class="legacy-note-body"><p>解锁会<strong>强制清除所有数据</strong></p>&#10;</div></div>
 
 <blockquote>
 <ul>
@@ -934,14 +1017,14 @@
           <div class="browser-card-text"><h2>Hexo</h2><p>梦开始的地方，Hexo基础搭建</p><footer><span>2025-09-23 · 记录</span><span>阅读全文 →</span></footer></div>
         </a>
       
-        <a class="browser-card" href="/2025/09/22/Typora1.9.5/" data-title="Typora1.9.5">
-          
-          <div class="browser-card-text"><h2>Typora1.9.5</h2><p>Typora1.9.5食用方法，有能力建议支持正版</p><footer><span>2025-09-22 · 工具</span><span>阅读全文 →</span></footer></div>
-        </a>
-      
         <a class="browser-card" href="/2025/09/22/Scrcpy_new/" data-title="Scrcpy">
           
           <div class="browser-card-text"><h2>Scrcpy</h2><p>Scrcpy: 开源的高性能工具，它允许你通过 USB 数据线或 WiFi 网络，在电脑上实时显示并控制你的安卓手机或平板设备</p><footer><span>2025-09-22 · 工具</span><span>阅读全文 →</span></footer></div>
+        </a>
+      
+        <a class="browser-card" href="/2025/09/22/Typora1.9.5/" data-title="Typora1.9.5">
+          
+          <div class="browser-card-text"><h2>Typora1.9.5</h2><p>Typora1.9.5食用方法，有能力建议支持正版</p><footer><span>2025-09-22 · 工具</span><span>阅读全文 →</span></footer></div>
         </a>
       
       </div>
@@ -1033,7 +1116,7 @@
 </li>
 <li><strong>下载最新的GApps</strong>：<a target="_blank" rel="noopener" href="https://sourceforge.net/projects/nikgapps/">gapps.zip</a></li>
 </ul>
-<h2 id="解锁-Bootloader-BL"><a href="#解锁-Bootloader-BL" class="headerlink" title="解锁 Bootloader (BL)"></a><strong>解锁 Bootloader (BL)</strong></h2><div class="legacy-note"><p>解锁会<strong>强制清除所有数据</strong></p>&#10;</div>
+<h2 id="解锁-Bootloader-BL"><a href="#解锁-Bootloader-BL" class="headerlink" title="解锁 Bootloader (BL)"></a><strong>解锁 Bootloader (BL)</strong></h2><div class="legacy-note legacy-note-warning legacy-note-yellow"><span class="legacy-note-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 4v10M12 19v.01"/></svg></span><div class="legacy-note-body"><p>解锁会<strong>强制清除所有数据</strong></p>&#10;</div></div>
 
 <blockquote>
 <ul>
@@ -1166,7 +1249,7 @@
 
 <div class="gallery"><p><img src="https://cos.blanktime.cn/assets/images/Screenshot_20260603-195245_Shell.png"></p>&#10;<p><img src="https://cos.blanktime.cn/assets/images/Screenshot_20260603-195347_%E8%AE%BE%E7%BD%AE.png"></p>&#10;</div></div>
 </article>
-</div><p class="noscript-notice">启用 JavaScript 可使用桌面窗口交互。<a href="/">返回首页</a></p><ul class="noscript-posts"><li><a href="/2026/10/01/%E5%86%85%E7%BD%91%E7%9A%84%E6%8A%98%E8%85%BE%E8%AE%B0%E5%BD%95/">内网的折腾记录</a></li><li><a href="/2026/09/28/%E5%86%99%E4%BD%9C%E6%8C%87%E5%8D%97/">写作文档</a></li><li><a href="/2026/09/27/markdown%E6%A0%B7%E5%BC%8F%E6%B5%8B%E8%AF%95/">Markdown 全功能显示测试</a></li><li><a href="/2026/09/26/markdown%E6%A0%B7%E5%BC%8F%E6%B5%8B%E8%AF%95lite/">Markdown 样式测试</a></li><li><a href="/2026/06/02/OnePlus13-Rom/">OnePlus13刷入crDroid</a></li><li><a href="/2026/03/04/Bitwarden%20and%20Bitwarden/">Bitwarden + Vaultwarden 自托管密码管理</a></li><li><a href="/2026/01/20/RX-9070-power/">RX 9070 功耗解锁</a></li><li><a href="/2026/01/13/NAS/">关于折腾 NAS 的记录</a></li><li><a href="/2025/10/20/root-modules/">Root管理器与一些模块链接</a></li><li><a href="/2025/10/15/Redmi-k40/">Redmi k40(alioth)刷入 Pixel OS</a></li><li><a href="/2025/10/03/pgzj/">文章鉴赏《潘嘎之交》</a></li><li><a href="/2025/10/02/MaBaoguo/">文章鉴赏 《偷袭》</a></li><li><a href="/2025/09/30/ollama/">ollama</a></li><li><a href="/2025/09/27/Artalk%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/">Artalk评论系统</a></li><li><a href="/2025/09/25/Ubuntu/">Ubuntu部分</a></li><li><a href="/2025/09/24/test/">显示测试</a></li><li><a href="/2025/09/23/Hexo/">Hexo</a></li><li><a href="/2025/09/22/Typora1.9.5/">Typora1.9.5</a></li><li><a href="/2025/09/22/Scrcpy_new/">Scrcpy</a></li></ul></noscript>
+</div><p class="noscript-notice">启用 JavaScript 可使用桌面窗口交互。<a href="/">返回首页</a></p><ul class="noscript-posts"><li><a href="/2026/10/01/%E5%86%85%E7%BD%91%E7%9A%84%E6%8A%98%E8%85%BE%E8%AE%B0%E5%BD%95/">内网的折腾记录</a></li><li><a href="/2026/09/28/%E5%86%99%E4%BD%9C%E6%8C%87%E5%8D%97/">写作文档</a></li><li><a href="/2026/09/27/markdown%E6%A0%B7%E5%BC%8F%E6%B5%8B%E8%AF%95/">Markdown 全功能显示测试</a></li><li><a href="/2026/09/26/markdown%E6%A0%B7%E5%BC%8F%E6%B5%8B%E8%AF%95lite/">Markdown 样式测试</a></li><li><a href="/2026/06/02/OnePlus13-Rom/">OnePlus13刷入crDroid</a></li><li><a href="/2026/03/04/Bitwarden%20and%20Bitwarden/">Bitwarden + Vaultwarden 自托管密码管理</a></li><li><a href="/2026/01/20/RX-9070-power/">RX 9070 功耗解锁</a></li><li><a href="/2026/01/13/NAS/">关于折腾 NAS 的记录</a></li><li><a href="/2025/10/20/root-modules/">Root管理器与一些模块链接</a></li><li><a href="/2025/10/15/Redmi-k40/">Redmi k40(alioth)刷入 Pixel OS</a></li><li><a href="/2025/10/03/pgzj/">文章鉴赏《潘嘎之交》</a></li><li><a href="/2025/10/02/MaBaoguo/">文章鉴赏 《偷袭》</a></li><li><a href="/2025/09/30/ollama/">ollama</a></li><li><a href="/2025/09/27/Artalk%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/">Artalk评论系统</a></li><li><a href="/2025/09/25/Ubuntu/">Ubuntu部分</a></li><li><a href="/2025/09/24/test/">显示测试</a></li><li><a href="/2025/09/23/Hexo/">Hexo</a></li><li><a href="/2025/09/22/Scrcpy_new/">Scrcpy</a></li><li><a href="/2025/09/22/Typora1.9.5/">Typora1.9.5</a></li></ul></noscript>
 </body>
 </html>
 

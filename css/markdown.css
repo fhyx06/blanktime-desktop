@@ -188,3 +188,42 @@
 .post-content .footnotes li { padding-left:.3em; scroll-margin-top:24px; }
 .post-content [data-footnote-ref] { padding:0 .15em; scroll-margin-top:24px; text-decoration:none; }
 .post-content [data-footnote-backref] { margin-left:.35em; text-decoration:none; }
+
+/* Volantis-compatible notes and link cards. */
+.post-content .legacy-note {--note-rgb:112,125,140;display:flex;align-items:center;gap:10px;margin:1em 0;padding:16px 16px 16px 8px;border:0;border-left:4px solid rgb(var(--note-rgb));border-radius:4px;background:rgba(var(--note-rgb),.1);color:inherit;}
+.post-content .legacy-note-blue {--note-rgb:49,130,206;}
+.post-content .legacy-note-yellow {--note-rgb:255,189,43;}
+.post-content .legacy-note-red {--note-rgb:254,95,88;}
+.post-content .legacy-note-green {--note-rgb:61,197,80;}
+.post-content .legacy-note-cyan {--note-rgb:27,148,169;}
+.post-content .legacy-note-purple {--note-rgb:147,93,190;}
+.post-content .legacy-note-clear {background:transparent;}
+.post-content .legacy-note-light {background:rgba(128,128,128,.04);}
+.post-content .legacy-note-icon {display:flex;align-items:center;justify-content:center;flex:0 0 20px;color:rgb(var(--note-rgb));}
+.post-content .legacy-note-icon svg {display:block;width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.post-content .legacy-note-body {min-width:0;flex:1;}
+.post-content .legacy-note-body > :first-child {margin-top:0;}
+.post-content .legacy-note-body > :last-child {margin-bottom:0;}
+.reader-window[data-theme="dark"] .post-content .legacy-note {background:rgba(var(--note-rgb),.13);border-color:rgba(var(--note-rgb),.4);border-left-color:rgb(var(--note-rgb));color:inherit;}
+.reader-window[data-theme="dark"] .post-content .legacy-note-blue {--note-rgb:106,172,235;}
+.reader-window[data-theme="dark"] .post-content .legacy-note-yellow {--note-rgb:224,179,79;}
+.reader-window[data-theme="dark"] .post-content .legacy-note-red {--note-rgb:236,126,135;}
+.reader-window[data-theme="dark"] .post-content .legacy-note-green {--note-rgb:108,197,149;}
+.reader-window[data-theme="dark"] .post-content .legacy-note-cyan {--note-rgb:93,191,207;}
+.reader-window[data-theme="dark"] .post-content .legacy-note-purple {--note-rgb:190,149,225;}
+.reader-window[data-theme="dark"] .post-content .legacy-note-clear {background:transparent;}
+.reader-window[data-theme="dark"] .post-content .legacy-note-light {background:rgba(255,255,255,.04);}
+.post-content a.legacy-link {display:flex;align-items:center;gap:14px;box-sizing:border-box;width:100%;max-width:520px;margin:16px 0;padding:15px 18px;border:1px solid #dde3e9;border-radius:12px;background:#f7f9fb;color:#35434d;text-decoration:none;line-height:1.5;transition:border-color .18s,box-shadow .18s;}
+.post-content a.legacy-link:hover {text-decoration:none;border-color:var(--md-link-color,#409eff);box-shadow:0 4px 16px #0000000d;}
+.post-content .legacy-link-icon {display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;border-radius:10px;background:#fff;color:var(--md-link-color,#409eff);overflow:hidden;}
+.post-content .legacy-link-icon img {display:block;width:36px;height:36px;object-fit:contain;border-radius:0;}
+.post-content .legacy-link-icon svg {width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;}
+.post-content .legacy-link-text {display:flex;flex-direction:column;gap:4px;min-width:0;flex:1;}
+.post-content .legacy-link-text strong {font-size:15px;overflow-wrap:anywhere;}
+.post-content .legacy-link-url {display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:#76828e;}
+.post-content .legacy-link-arrow {flex-shrink:0;color:#88939f;font-size:20px;}
+.reader-window[data-theme="dark"] .post-content a.legacy-link {background:#2a3039;border-color:#424c59;color:#e0e5eb;}
+.reader-window[data-theme="dark"] .post-content a.legacy-link:hover {border-color:var(--md-link-color,#409eff);}
+.reader-window[data-theme="dark"] .post-content .legacy-link-icon {background:#343d49;}
+.reader-window[data-theme="dark"] .post-content .legacy-link-url {color:#a4b0bf;}
+@media(max-width:760px) {.post-content a.legacy-link {padding:12px;gap:10px;}}

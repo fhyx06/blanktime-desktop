@@ -55,7 +55,7 @@
   let userScrollUntil = 0, seeking = false, rememberedVolume = 0.5;
   const id = playlistId(win.dataset.playlist);
   const closed = () => win.dataset.state === 'closed';
-  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const setStatus = message => { status.textContent = message; };
   function icon(id, name, label) {
     $(id).innerHTML = ICON[name];
@@ -319,14 +319,72 @@
     button.setAttribute('aria-label', button.title);
     if (visible) { userScrollUntil = 0; layoutLyrics(); syncLyrics(true); upgradeCover(); }
   }
+  let viewMotion;
+  function finishViewTransition() {
+    const motion = viewMotion; viewMotion = null;
+    motion?.forEach(animation => { animation.onfinish = null; animation.oncancel = null; animation.cancel(); });
+    win.classList.remove('music-view-transition');
+  }
+  function animateView(visible, from, radius) {
+    win.classList.add('music-view-transition');
+    const cover = $('openLyrics'), to = cover.getBoundingClientRect();
+    if (!from.width || !from.height || !to.width || !to.height) { finishViewTransition(); return; }
+    const duration = matchMedia('(max-width:760px)').matches ? 320 : 420;
+    const motion = new Set(); viewMotion = motion;
+    const animate = (element, frames, delay = 0) => {
+      const animation = element.animate(frames, {
+        duration:duration - delay, delay, easing:'cubic-bezier(.22,1,.36,1)', fill:'both'
+      });
+      motion.add(animation);
+      animation.onfinish = () => {
+        if (viewMotion !== motion) return;
+        motion.delete(animation); animation.onfinish = null; animation.oncancel = null; animation.cancel();
+        if (!motion.size) finishViewTransition();
+      };
+      animation.oncancel = () => { if (viewMotion === motion) finishViewTransition(); };
+    };
+    try {
+      // FLIP the live cover from its current on-screen position, including when
+      // reversing an unfinished transition. The audio and controls stay intact.
+      animate(cover,[
+        {transformOrigin:'0 0',transform:`translate(${from.left - to.left}px, ${from.top - to.top}px) scale(${from.width / to.width}, ${from.height / to.height})`,borderRadius:radius},
+        {transformOrigin:'0 0',transform:'translate(0px, 0px) scale(1, 1)',borderRadius:getComputedStyle(cover).borderRadius}
+      ]);
+      const reveal = (element, distance, delay = 0) => animate(element,[
+        {opacity:0,transform:`translateY(${distance}px)`},
+        {opacity:1,transform:'translateY(0px)'}
+      ],delay);
+      ['.now-meta','.transport','.utility'].forEach((selector,i) => reveal(win.querySelector(selector),visible ? 14 : -8,30 + i * 20));
+      if (visible) {
+        reveal($('lyrics'),18,70);
+        reveal(win.querySelector('.listening-heading'),8,30);
+      } else reveal(win.querySelector('.body'),-12);
+    } catch { finishViewTransition(); }
+  }
   function switchLyrics(visible) {
+    if (visible === win.classList.contains('is-lyrics-view')) return;
+    const cover = $('openLyrics');
+    const animated = !win.hidden && !win.inert && !reducedMotion.matches && typeof cover.animate === 'function' && !win.classList.contains('music-is-starting');
+    const from = animated ? cover.getBoundingClientRect() : null;
+    const radius = animated ? getComputedStyle(cover).borderRadius : '';
+    finishViewTransition();
+    themePopup(false);
     setLyricsVisible(visible); store.set('lyrics-visible', String(visible));
-    (visible ? $('backToList') : $('btnLyrics')).focus();
+    (visible ? $('backToList') : $('btnLyrics')).focus({preventScroll:true});
+    if (animated) animateView(visible,from,radius);
   }
   $('btnLyrics').addEventListener('click', () => switchLyrics($('lyrics').hidden));
   $('openLyrics').addEventListener('click', () => switchLyrics(true));
   $('backToList').addEventListener('click', () => switchLyrics(false));
   setLyricsVisible(store.get('lyrics-visible') === 'true');
+  reducedMotion.addEventListener?.('change', () => { if (reducedMotion.matches) finishViewTransition(); });
+  window.addEventListener('resize',finishViewTransition);
+  const workspace = win.querySelector('.music-workspace');
+  let viewWidth = workspace.clientWidth, viewHeight = workspace.clientHeight;
+  new ResizeObserver(() => {
+    if (workspace.clientWidth !== viewWidth || workspace.clientHeight !== viewHeight) finishViewTransition();
+    viewWidth = workspace.clientWidth; viewHeight = workspace.clientHeight;
+  }).observe(workspace);
   function layoutLyrics() {
     if ($('lyrics').hidden) return;
     lyricInner.style.paddingTop = Math.max(0,lyricScroll.clientHeight / 2 - 16) + 'px';
@@ -336,7 +394,7 @@
   function centerLine(i,instant = false) {
     const line = lyricInner.children[i];
     if ($('lyrics').hidden || !line || Date.now() < userScrollUntil) return;
-    lyricScroll.scrollTo({top:Math.max(0,line.offsetTop + line.offsetHeight/2 - lyricScroll.clientHeight/2),behavior:instant || reducedMotion ? 'instant' : 'smooth'});
+    lyricScroll.scrollTo({top:Math.max(0,line.offsetTop + line.offsetHeight/2 - lyricScroll.clientHeight/2),behavior:instant || reducedMotion.matches ? 'instant' : 'smooth'});
   }
   function syncLyrics(force = false) {
     let next = -1;
@@ -468,6 +526,11 @@
     else selectSong(nextIndex(index,songs.length,loop,1),true);
   });
   audio.addEventListener('error',() => {audio.pause();playingUI();setStatus('音源暂时不可用，请切换歌曲或在网易云打开。');});
+  // Pause at the close action, before the visual exit completes.
+  win.addEventListener('blanktime:window-hidden', event => {
+    finishViewTransition();
+    if (event.detail.state === 'closed') audio.pause();
+  });
   new ResizeObserver(layoutLyrics).observe(lyricScroll);
   new MutationObserver(() => {
     if(closed()) {

@@ -477,3 +477,54 @@ html[data-system-theme="dark"] #music .listening-view .lyric-line.active { color
  #music.is-lyrics-view .song-name { font-size:16px; }
  #music.is-lyrics-view .transport { gap:6px; }
 }
+
+/* Let the shared cover travel between the playback bar and listening view. */
+#music.music-view-transition .music-workspace {overflow:hidden;}
+#music.music-view-transition .listening-content,
+#music.music-view-transition .listening-player {overflow:visible;}
+#music.music-view-transition .cover {z-index:3;will-change:transform;}
+#music.music-view-transition .now-meta,
+#music.music-view-transition .transport,
+#music.music-view-transition .utility {will-change:transform,opacity;}
+
+/* A short vinyl overture, separate from the dock minimize/restore journey. */
+.music-launch {position:fixed;pointer-events:none;isolation:isolate;}
+.music-launch-record {position:absolute;inset:0;display:grid;place-items:center;border-radius:50%;background:repeating-radial-gradient(circle at center,#16171c 0 2px,#2a2b32 3px,#17181d 4px 6px);box-shadow:0 18px 45px #0006,inset 0 0 0 1px #ffffff35;animation:music-record-arrive var(--music-launch-duration) both;}
+.music-launch-record::before {content:"";position:absolute;inset:0;border-radius:inherit;background:conic-gradient(from 25deg,transparent 0deg,#ffffff30 45deg,transparent 85deg,transparent 180deg,#ffffff24 225deg,transparent 265deg);}
+.music-launch-label {position:relative;width:46%;height:46%;border-radius:50%;overflow:hidden;background:rgb(var(--launch-accent));box-shadow:0 0 0 5px #111318,0 0 0 6px #ffffff17;}
+.music-launch-label img {display:block;width:100%;height:100%;object-fit:cover;}
+.music-launch-label::after {content:"";position:absolute;left:calc(50% - 4px);top:calc(50% - 4px);width:8px;height:8px;background:#14151b;border-radius:50%;box-shadow:0 0 0 2px #ffffff55;}
+.music-launch-wave {position:absolute;inset:-8px;border:1px solid rgba(var(--launch-accent),.65);border-radius:50%;box-shadow:0 0 18px rgba(var(--launch-accent),.14);animation:music-record-wave var(--music-launch-duration) both;}
+.music-launch-wave-outer {inset:-24px;animation-name:music-record-wave-outer;}
+#music.music-is-starting .music-workspace {animation:music-launch-content var(--music-launch-duration) both;}
+#music.music-is-starting .player {animation:music-launch-controls var(--music-launch-duration) both;}
+@keyframes music-record-arrive {
+  0% {opacity:0;transform:translateY(12px) scale(.7) rotate(-24deg);}
+  20% {opacity:1;transform:translateY(0) scale(1) rotate(-10deg);}
+  52% {opacity:1;transform:scale(1) rotate(4deg);}
+  82%,100% {opacity:0;transform:scale(1.12) rotate(12deg);}
+}
+@keyframes music-record-wave {
+  0%,12% {opacity:0;transform:scale(.8);}
+  28% {opacity:.7;}
+  85%,100% {opacity:0;transform:scale(1.85);}
+}
+@keyframes music-record-wave-outer {
+  0%,24% {opacity:0;transform:scale(.85);}
+  40% {opacity:.35;}
+  100% {opacity:0;transform:scale(1.9);}
+}
+@keyframes music-launch-content {
+  0%,45% {opacity:0;transform:translateY(10px);}
+  100% {opacity:1;transform:translateY(0);}
+}
+@keyframes music-launch-controls {
+  0%,58% {opacity:0;transform:translateY(6px);}
+  100% {opacity:1;transform:translateY(0);}
+}
+@media(prefers-reduced-motion:reduce) {.music-launch {display:none;}}
+
+/* Closing uses reversible Web Animations on the same vinyl artwork. */
+.music-launch.music-close .music-launch-record,
+.music-launch.music-close .music-launch-wave {animation:none;}
+.music-launch.music-close .music-launch-wave-outer {display:none;}

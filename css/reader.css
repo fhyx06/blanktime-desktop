@@ -62,7 +62,7 @@
 .reader-window[data-theme="dark"] .post-content th { background: #2d343e; }
 .reader-window[data-theme="dark"] .post-content kbd { background: #303844; }
 .reader-window[data-theme="dark"] .post-content summary { color: #a3c99e; }
-.reader-window[data-theme="dark"] .post-content .legacy-note { background: #383329; color: #ddd3bf; }
+
 .reader-window[data-theme="dark"] .post-content mark { background: #bda24a; color: #171b20; }
 .reader-window[data-theme="dark"] .spoiler { background: #aab5c2; }
 .reader-window[data-theme="dark"] .spoiler:hover,
