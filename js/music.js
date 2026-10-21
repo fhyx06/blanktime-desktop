@@ -56,7 +56,35 @@
   const id = playlistId(win.dataset.playlist);
   const closed = () => win.dataset.state === 'closed';
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  const setStatus = message => { status.textContent = message; };
+  const setStatus = message => { status.textContent = message; publishState(); };
+  function getState() {
+    const song = songs[index] || songs[0];
+    return {
+      title: song?.name || '', artist: song?.artist || '', cover: song?.cover || '',
+      playing: index >= 0 && !closed() && !audio.paused && !audio.ended,
+      loading, ready: songs.length > 0 && !loading,
+      currentTime: index >= 0 && Number.isFinite(audio.currentTime) ? Math.max(0, audio.currentTime) : 0,
+      duration: index >= 0 ? duration() : 0,
+      loadState: win.dataset.loadState || 'idle', status: status.textContent,
+      windowState: win.dataset.state || (win.hidden ? 'closed' : 'open')
+    };
+  }
+  function publishState() {
+    document.dispatchEvent(new CustomEvent('blanktime:music-state', {detail:getState()}));
+  }
+  function openPlayer() { window.blanktimeDesktop.openWindow(win); }
+  function togglePlayback() {
+    if (!songs.length || loading) return;
+    // Reopen a closed player within the same user gesture, but leave minimized playback alone.
+    if (closed()) openPlayer();
+    if (index < 0) selectSong(0, false);
+    return audio.paused ? playAudio() : audio.pause();
+  }
+  function stepSong(direction) {
+    if (!songs.length || loading) return;
+    if (closed()) openPlayer();
+    selectSong(nextIndex(index < 0 ? 0 : index, songs.length, loop, direction), true);
+  }
   function icon(id, name, label) {
     $(id).innerHTML = ICON[name];
     if (label) { $(id).title = label; $(id).setAttribute('aria-label', label); }
@@ -73,6 +101,7 @@
       row.classList.toggle('is-playing',i === index && playing && !buffering);
       row.setAttribute('aria-current',i === index ? 'true' : 'false');
     });
+    publishState();
   }
   function listState(message, retry = false) {
     const panel = $('listState');
@@ -144,7 +173,10 @@
       .filter(value => typeof value === 'string')
       .map(value => safeURL(value.replace(/:server/g,'netease').replace(/:type/g,'playlist').replace(/:id/g,id).replace(/:r/g,String(Date.now()))))
       .filter(Boolean))];
-    if (!id || !urls.length) { listState('请在主题配置中设置有效歌单和接口地址。'); return; }
+    if (!id || !urls.length) {
+      const message = '请在主题配置中设置有效歌单和接口地址。';
+      win.dataset.loadState = 'error'; listState(message); setStatus(message); return;
+    }
     loading = true;
     win.dataset.loadState = 'loading';
     $('reload').disabled = true;
@@ -196,7 +228,7 @@
       setStatus(message); controlsEnabled(songs.length > 0);
       win.dataset.loadState = 'error';
     } finally {
-      if (request === playlistRequest) { loading = false; $('reload').disabled = false; }
+      if (request === playlistRequest) { loading = false; $('reload').disabled = false; publishState(); }
     }
   }
   const largeCovers = new Map();
@@ -423,6 +455,7 @@
     let buffered = 0;
     for(let i=0;i<audio.buffered.length;i++) if(audio.buffered.start(i)<=time) buffered=audio.buffered.end(i);
     $('buffer').style.width = (d ? Math.min(100,buffered/d*100) : 0)+'%';
+    publishState();
   }
   function seek(ratio) {
     if (!duration()) return;
@@ -530,6 +563,7 @@
   win.addEventListener('blanktime:window-hidden', event => {
     finishViewTransition();
     if (event.detail.state === 'closed') audio.pause();
+    publishState();
   });
   new ResizeObserver(layoutLyrics).observe(lyricScroll);
   new MutationObserver(() => {
@@ -540,7 +574,9 @@
       if (!songs.length && !loading && !win.dataset.loadState) loadPlaylist();
       else if (songs.length && index < 0 && !loading) selectSong(0,false);
     }
+    publishState();
   }).observe(win,{attributes:true,attributeFilter:['data-state','hidden']});
+  window.blanktimeMusic = {getState, togglePlayback, previous:() => stepSong(-1), next:() => stepSong(1), open:openPlayer};
   icon('btnPrev','prev');icon('btnNext','next');icon('btnLink','link');
   setLoop(store.get('loop'));accent(store.get('accent') || defaultAccent);
   const volume = Number(store.get('volume') ?? win.dataset.volume);

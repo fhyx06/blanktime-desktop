@@ -9,6 +9,27 @@
   const MAX_ZOOM = 8, PADDING = 32;
   let naturalWidth = 0, naturalHeight = 0, scale = 1, angle = 0, mode = 'fit', panX = 0, panY = 0, drag, pinch;
   const pointers = new Map();
+  const mobile = window.matchMedia?.('(max-width:760px)');
+  const chrome = [...win.querySelectorAll('[data-image-viewer-chrome]')];
+  let controlsVisible = false, tap;
+  function setControlsVisible(visible) {
+    controlsVisible = visible;
+    const hidden = !!mobile?.matches && !visible;
+    win.classList.toggle('is-controls-hidden',hidden);
+    if (hidden && chrome.some(element => element.contains(document.activeElement))) $('toggle').focus({preventScroll:true});
+    chrome.forEach(element => {
+      element.inert = hidden;
+      if (hidden) element.setAttribute('aria-hidden','true');
+      else element.removeAttribute('aria-hidden');
+    });
+    const label = hidden ? '显示图片操作' : '隐藏图片操作';
+    $('toggle').setAttribute('aria-expanded',String(!hidden));
+    $('toggle').setAttribute('aria-label',label);
+    $('toggle').title = label;
+  }
+  $('toggle').addEventListener('click',() => setControlsVisible(!controlsVisible));
+  mobile?.addEventListener('change',() => { endGesture(); setControlsVisible(false); draw(); });
+  setControlsVisible(false);
   const ready = () => naturalWidth > 0 && naturalHeight > 0;
   function rotatedSize() {
     return angle % 180 === 0 ? [naturalWidth, naturalHeight] : [naturalHeight, naturalWidth];
@@ -24,7 +45,7 @@
   }
   function endGesture() {
     const ids = [...pointers.keys()];
-    pointers.clear(); drag = null; pinch = null;
+    pointers.clear(); drag = null; pinch = null; tap = null;
     stage.classList.remove('is-panning');
     ids.forEach(id => { if (stage.hasPointerCapture?.(id)) stage.releasePointerCapture(id); });
   }
@@ -97,14 +118,18 @@
     stage.classList.toggle('is-panning',pointers.size > 0 && stage.classList.contains('can-pan'));
   }
   stage.addEventListener('pointerdown', event => {
-    if (!ready() || win.hidden || (event.target !== photo && event.target !== stage) || event.button !== 0 || pointers.size >= 2) return;
+    // A second finger invalidates the whole tap, even after one finger lifts.
+    if (pointers.size) tap = null;
+    const surface = event.target === photo || event.target === stage || event.target === $('feedback') || event.target === message;
+    if ((!ready() && !mobile?.matches) || win.hidden || !surface || event.button !== 0 || pointers.size >= 2) return;
     const touch = event.pointerType === 'touch';
     // Track the first finger even while the whole image fits, so the second
-    // finger can start a pinch. Mouse dragging still requires an enlarged image.
-    if (!touch && (event.target !== photo || event.isPrimary === false || pointers.size || !stage.classList.contains('can-pan'))) return;
+    // finger can start a pinch. Desktop mouse dragging requires an enlarged image.
+    if (!touch && (event.isPrimary === false || pointers.size || (!mobile?.matches && (event.target !== photo || !stage.classList.contains('can-pan'))))) return;
     if (touch && [...pointers.values()].some(point => point.type !== 'touch')) return;
     event.preventDefault();
     pointers.set(event.pointerId,{x:event.clientX,y:event.clientY,type:event.pointerType});
+    if (mobile?.matches && pointers.size === 1) tap = {id:event.pointerId,x:event.clientX,y:event.clientY,time:performance.now()};
     stage.setPointerCapture(event.pointerId);
     startGesture();
   });
@@ -113,6 +138,8 @@
     if (!point) return;
     event.preventDefault();
     point.x = event.clientX; point.y = event.clientY;
+    if (tap && Math.hypot(point.x - tap.x,point.y - tap.y) > 8) tap = null;
+    if (!ready()) return;
     if (pinch) {
       const current = pinchPosition();
       // Coincident fingers have no useful scale; rebase once they separate.
@@ -128,9 +155,12 @@
   });
   stage.addEventListener('pointerup', event => {
     if (!pointers.delete(event.pointerId)) return;
+    const tapped = tap?.id === event.pointerId && performance.now() - tap.time < 400 && Math.hypot(event.clientX - tap.x,event.clientY - tap.y) <= 8;
+    tap = null;
     if (stage.hasPointerCapture?.(event.pointerId)) stage.releasePointerCapture(event.pointerId);
     // Lifting either finger continues as a one-finger pan without a jump.
     startGesture();
+    if (tapped && mobile?.matches) setControlsVisible(!controlsVisible);
   });
   ['pointercancel','lostpointercapture'].forEach(type => stage.addEventListener(type, event => {
     if (pointers.has(event.pointerId)) endGesture();
@@ -200,7 +230,7 @@
     finally { fullscreenPending = false; }
   }
   fullscreenButton.addEventListener('click',toggleFullscreen);
-  stage.addEventListener('dblclick',event => { if (event.target === photo && ready()) { event.preventDefault(); toggleFullscreen(); } });
+  stage.addEventListener('dblclick',event => { if (!mobile?.matches && event.target === photo && ready()) { event.preventDefault(); toggleFullscreen(); } });
   document.addEventListener('fullscreenchange',() => {
     const active = document.fullscreenElement === win;
     fullscreenButton.textContent = active ? '退出全屏' : '全屏';
@@ -243,6 +273,7 @@
     img.alt = item.name; img.draggable = false; img.hidden = true;
     img.addEventListener('load', () => {
       if (current !== version || settled) return;
+      endGesture();
       settled = true; clearTimeout(imageTimer); $('feedback').hidden = true;
       stage.setAttribute('aria-busy','false'); message.hidden = true; img.hidden = false;
       apply.disabled = !item.wallpaper;
@@ -255,7 +286,7 @@
       if (timedOut) img.removeAttribute('src');
       resetView(); stage.setAttribute('aria-busy','false');
       if (albumMode) setMetadata('resolution');
-      message.textContent = timedOut ? '图片加载超时，请重试或切换其他图片。' : '图片加载失败，请重试或切换其他图片。';
+      message.textContent = timedOut ? 'Timeout：俺的图图呢？' : 'Error：俺的图图呢？';
       $('feedback').hidden = false; $('retry').hidden = false;
       message.hidden = false; img.hidden = true; apply.disabled = true;
     };
@@ -273,6 +304,7 @@
     const nextIndex = normalized.slice(0, selected).filter(Boolean).length;
     items = normalized.filter(Boolean); trigger = context.trigger; source = context.source || '';
     albumMode = context.kind === 'album';
+    setControlsVisible(false);
     show(nextIndex);
     window.blanktimeDesktop.openWindow(win);
     draw();
@@ -281,6 +313,7 @@
   $('prev').addEventListener('click', () => show(index - 1));
   $('next').addEventListener('click', () => show(index + 1));
   win.addEventListener('keydown', event => {
+    if (event.key === 'Tab' && mobile?.matches) setControlsVisible(true);
     if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
     if (event.target.closest('input,textarea,select,[contenteditable=true]')) return;
     if (event.key === 'Escape') {
@@ -331,7 +364,7 @@
     return {url, name:img.alt || img.title || fileName(url), wallpaper:false};
   }
   function prepareArticle(article) {
-    const images = [...article.querySelectorAll('.post-content img')];
+    const images = [...article.querySelectorAll('.article-cover img, .post-content img')];
     const sequence = images.filter(img => articleItem(img));
     sequence.forEach(img => {
       img.classList.add('image-viewer-trigger');

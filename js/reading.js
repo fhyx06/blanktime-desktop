@@ -1,6 +1,17 @@
 (() => {
   'use strict';
   const $ = selector => document.querySelector(selector);
+  function setupArticleHeader(article, onChange = () => {}) {
+    article.querySelectorAll('.article-cover img,.article-author-avatar img').forEach(img => {
+      const fallback = () => {
+        const cover = img.closest('.article-cover');
+        (cover || img).hidden = true;
+        onChange();
+      };
+      img.addEventListener('error',fallback,{once:true});
+      if (img.complete && !img.naturalWidth) fallback();
+    });
+  }
   function toast(message) {
     const el = $('#announcement'); el.textContent = message; el.hidden = false;
     clearTimeout(toast.timer); toast.timer = setTimeout(() => el.hidden = true, 5000);
@@ -62,5 +73,5 @@
       if (language.toLowerCase() === 'mermaid') window.blanktimeMermaid.setup(block, text, onChange);
     });
   }
-  window.blanktimeReading = {setupCodeBlocks};
+  window.blanktimeReading = {setupArticleHeader,setupCodeBlocks};
 })();

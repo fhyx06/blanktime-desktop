@@ -158,6 +158,7 @@
       if (!source) throw new Error('Missing article');
       if (!tabs.has(tab.key)) return;
       const article = document.importNode(source, true); tab.article = article;
+      article.dataset.url = new URL(tab.url.pathname + tab.url.search, tab.url).href;
       // Prefix IDs to avoid collisions between article tabs.
       article.querySelectorAll('[id]').forEach(node => { node.id = tab.prefix + node.id; });
       for (const attribute of ['aria-controls','aria-labelledby','aria-describedby','for']) {
@@ -194,6 +195,7 @@
         headings.forEach((heading, i) => { if (heading.getBoundingClientRect().top <= boundary) index = i; });
         links.forEach((link, i) => { link.classList.toggle('active', i === index); if (i === index) link.setAttribute('aria-current','location'); else link.removeAttribute('aria-current'); });
       }
+      window.blanktimeReading.setupArticleHeader(article, progress);
       window.blanktimeImages.prepareArticle(article);
       window.blanktimeReading.setupCodeBlocks(article, tab.prefix, progress);
       headings.forEach((heading, i) => {

@@ -583,7 +583,10 @@
   });
   function clock() { $('#clock').textContent = new Intl.DateTimeFormat('zh-CN',{hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date()); }
   clock(); setInterval(clock, 30000);
-  window.blanktimeDesktop = {openWindow, closeWindow: win => hideWindow(win, 'closed')};
+  window.blanktimeDesktop = {
+    openWindow, closeWindow: win => hideWindow(win, 'closed'),
+    selectFile: row => { if (fileRows.includes(row) && !row.hidden) selectFile(row); }
+  };
   const initialArticle = document.getElementById('article-source')?.content.querySelector('[data-article]');
   if (initialArticle || welcomeDismissed) { welcome.hidden = true; welcome.dataset.state = 'closed'; syncDock(); }
   else openWindow(welcome, false);
