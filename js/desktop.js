@@ -34,9 +34,11 @@
   const windowLaunch = new WeakMap();
   const musicLaunched = new WeakSet();
   const albumLaunched = new WeakSet();
+  const filesLaunched = new WeakSet();
+  const browserLaunched = new WeakSet();
   const windowClose = new WeakMap();
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  function settleLaunch(win) {
+  function settleLaunch(win, finished = false) {
     const launch = windowLaunch.get(win);
     if (!launch) return;
     windowLaunch.delete(win);
@@ -46,8 +48,15 @@
       animation.cancel();
     });
     launch.scene.remove();
-    win.classList.remove('music-is-starting', 'album-is-starting');
+    launch.cleanup?.();
+    win.classList.remove('music-is-starting', 'album-is-starting', 'files-is-starting', 'browser-is-starting');
     win.style.removeProperty('--music-launch-duration');
+    if (win.id === 'files' || win.id === 'browser') {
+      if (finished && win.dataset.state === 'open') {
+        // Release the window's layer after the landing, not on the text's final frame.
+        scheduleWindowLayerRelease(win);
+      } else releaseWindowLayer(win);
+    }
   }
   function vinylScene(win, rect, duration) {
     const size = Math.min(152, rect.width * .36, rect.height * .36);
@@ -87,9 +96,14 @@
       animation.cancel();
     });
     closing.scene.remove();
-    win.classList.remove('album-is-starting', 'album-is-closing');
+    closing.cleanup?.();
+    win.classList.remove('album-is-starting', 'album-is-closing', 'files-is-starting', 'files-is-closing', 'browser-is-starting', 'browser-is-closing');
     win.inert = false;
     win.hidden = win.dataset.state !== 'open';
+    if (win.id === 'files' || win.id === 'browser') {
+      if (win.hidden) releaseWindowLayer(win);
+      else scheduleWindowLayerRelease(win);
+    }
   }
   function directClose(win, closing) {
     const motion = windowClose.get(win);
@@ -99,6 +113,59 @@
       animation.play();
     });
     win.inert = closing;
+    if (win.id === 'files') {
+      win.classList.toggle('files-is-closing', closing);
+      // A reversed introduction resumes its loading illustration only when reopened.
+      if (motion.closingRate === -1) motion.scene.classList.toggle('files-close', closing);
+    }
+    if (win.id === 'browser') win.classList.toggle('browser-is-closing', closing);
+    return true;
+  }
+  function launchBrowser(win) {
+    if (win.id !== 'browser' || reducedMotion.matches || typeof win.animate !== 'function' || !window.blanktimeBrowserMotion) return;
+    const repeated = browserLaunched.has(win);
+    releaseWindowLayer(win);
+    const motion = window.blanktimeBrowserMotion.create(win, {duration:mobile() ? (repeated ? 300 : 450) : (repeated ? 420 : 700)});
+    if (!motion) return;
+    browserLaunched.add(win);
+    win.classList.add('browser-is-starting', 'browser-flight-layer');
+    windowLaunch.set(win, motion);
+    motion.animation.onfinish = () => {
+      if (windowLaunch.get(win) === motion) settleLaunch(win, true);
+    };
+    motion.animation.oncancel = () => {
+      if (windowLaunch.get(win) === motion) settleLaunch(win);
+    };
+  }
+  function closeBrowser(win) {
+    if (win.id !== 'browser') return false;
+    if (reducedMotion.matches || typeof win.animate !== 'function' || !window.blanktimeBrowserMotion) {
+      settleMotion(win);
+      return false;
+    }
+    if (directClose(win, true)) return true;
+    const launch = windowLaunch.get(win);
+    if (launch) {
+      if (!(launch.animation.currentTime > 0)) { settleLaunch(win); return false; }
+      windowLaunch.delete(win);
+      windowClose.set(win, {...launch, closingRate:-1});
+      launch.animation.onfinish = launch.animation.oncancel = () => {
+        if (windowClose.get(win)?.animation === launch.animation) settleClose(win);
+      };
+      directClose(win, true);
+      return true;
+    }
+    const style = getComputedStyle(win), from = {transform:style.transform, opacity:style.opacity};
+    settleMotion(win);
+    win.hidden = false;
+    const motion = window.blanktimeBrowserMotion.create(win, {closing:true, duration:mobile() ? 320 : 460, from});
+    if (!motion) return false;
+    win.classList.add('browser-is-closing', 'browser-flight-layer');
+    windowClose.set(win, motion);
+    win.inert = true;
+    motion.animation.onfinish = motion.animation.oncancel = () => {
+      if (windowClose.get(win) === motion) settleClose(win);
+    };
     return true;
   }
   function closeMusic(win) {
@@ -270,6 +337,174 @@
       if (windowLaunch.get(win)?.animation === animation) settleLaunch(win);
     };
   }
+  function filesScene(win, rect) {
+    const compact = mobile();
+    const size = Math.min(compact ? 112 : 144, rect.width * .34, rect.height * .3);
+    const sceneHeight = size * .94;
+    const initialWindowScale = `scale(${size / rect.width}, ${sceneHeight / rect.height})`;
+    const expandedFolderScale = `scale(${rect.width / size}, ${rect.height / sceneHeight})`;
+    const scene = document.createElement('div');
+    scene.className = 'files-launch';
+    scene.setAttribute('aria-hidden', 'true');
+    Object.assign(scene.style, {
+      left:`${rect.left + rect.width / 2 - size / 2}px`,
+      top:`${rect.top + (rect.height - sceneHeight) / 2}px`,
+      width:`${size}px`, height:`${sceneHeight}px`, zIndex:win.style.zIndex
+    });
+    // A brief illustration of reading files; the real list is already present.
+    scene.innerHTML = '<span class="files-launch-folder"><span class="files-launch-back"></span><span class="files-launch-paper"><span class="files-launch-caption">加载文件…</span><i class="files-launch-line"></i><i class="files-launch-line"></i><i class="files-launch-line"></i></span><span class="files-launch-front"></span></span>';
+    win.after(scene);
+    return {scene, initialWindowScale, expandedFolderScale, rise:compact ? 24 : 36};
+  }
+  function launchFiles(win) {
+    if (win.id !== 'files' || reducedMotion.matches || typeof win.animate !== 'function') return;
+    const rect = win.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const compact = mobile(), repeated = filesLaunched.has(win);
+    const duration = compact ? (repeated ? 300 : 480) : (repeated ? 360 : 600);
+    const expandAt = .48, settleAt = .96, expandEase = 'cubic-bezier(.22, .8, .25, 1)';
+    filesLaunched.add(win);
+    releaseWindowLayer(win);
+    const {scene, initialWindowScale, expandedFolderScale, rise} = filesScene(win, rect);
+    win.classList.add('files-is-starting', 'files-launch-layer');
+    const options = {duration, easing:'linear', fill:'both'}, animations = [];
+    const add = (element, frames, extra = {}) => {
+      const animation = element.animate(frames, {...options, ...extra});
+      animations.push(animation); return animation;
+    };
+    // Reciprocal scales keep the illustration and window bounds aligned throughout expansion.
+    add(scene, [
+      {transform:'scale(1, 1)', offset:0},
+      {transform:'scale(1, 1)', offset:expandAt, easing:expandEase},
+      {transform:expandedFolderScale, offset:settleAt},
+      {transform:expandedFolderScale, offset:1}
+    ], {id:'files-launch-expand'});
+    add($('.files-launch-folder', scene), [
+      {opacity:0, transform:'translateY(12px) scale(.8)', offset:0, easing:'cubic-bezier(.2, .7, .3, 1)'},
+      {opacity:1, transform:'translateY(0) scale(1)', offset:.2},
+      {opacity:1, transform:'translateY(0) scale(1)', offset:expandAt, easing:'ease-out'},
+      {opacity:0, transform:'translateY(0) scale(1)', offset:.8},
+      {opacity:0, transform:'translateY(0) scale(1)', offset:1}
+    ]);
+    add($('.files-launch-front', scene), [
+      {transform:'perspective(480px) rotateX(0deg)', offset:0},
+      {transform:'perspective(480px) rotateX(0deg)', offset:.18, easing:'cubic-bezier(.22, .8, .3, 1)'},
+      {transform:'perspective(480px) rotateX(-32deg)', offset:.48},
+      {transform:'perspective(480px) rotateX(-32deg)', offset:1}
+    ]);
+    add($('.files-launch-paper', scene), [
+      {opacity:0, transform:'translateY(10px)', offset:0},
+      {opacity:0, transform:'translateY(10px)', offset:.18, easing:'cubic-bezier(.22, .8, .3, 1)'},
+      {opacity:1, transform:`translateY(-${rise}px)`, offset:.42},
+      {opacity:1, transform:`translateY(-${rise}px)`, offset:1}
+    ]);
+    add($('.files-launch-caption', scene), [
+      {opacity:1, offset:0}, {opacity:1, offset:expandAt, easing:'ease-out'},
+      {opacity:0, offset:.6}, {opacity:0, offset:1}
+    ]);
+    scene.querySelectorAll('.files-launch-line').forEach((line, index) => add(line, [
+      {opacity:0, transform:'scaleX(.2)', offset:0},
+      {opacity:0, transform:'scaleX(.2)', offset:.28 + index * .07, easing:'ease-out'},
+      {opacity:1, transform:'scaleX(1)', offset:.43 + index * .07},
+      {opacity:0, transform:'scaleX(1)', offset:.7},
+      {opacity:0, transform:'scaleX(1)', offset:1}
+    ]));
+    const animation = add(win, [
+      {opacity:0, transform:initialWindowScale, offset:0},
+      {opacity:0, transform:initialWindowScale, offset:expandAt, easing:expandEase},
+      {opacity:1, transform:'scale(1, 1)', offset:settleAt},
+      {opacity:1, transform:'scale(1, 1)', offset:1}
+    ], {id:'files-launch'});
+    add($('.files-layout', win), [
+      {opacity:0, offset:0},
+      {opacity:0, offset:.62, easing:'ease-out'},
+      {opacity:1, offset:settleAt},
+      {opacity:1, offset:1}
+    ]);
+    windowLaunch.set(win, {animation, animations, scene});
+    animation.onfinish = () => {
+      if (windowLaunch.get(win)?.animation === animation) settleLaunch(win, true);
+    };
+    animation.oncancel = () => {
+      if (windowLaunch.get(win)?.animation === animation) settleLaunch(win);
+    };
+  }
+  function closeFiles(win) {
+    if (win.id !== 'files') return false;
+    if (reducedMotion.matches || typeof win.animate !== 'function') {
+      settleMotion(win);
+      return false;
+    }
+    if (directClose(win, true)) return true;
+    const launch = windowLaunch.get(win);
+    if (launch) {
+      // Retrace the same folder and window from their currently displayed size.
+      if (!(launch.animation.currentTime > 0)) { settleLaunch(win); return false; }
+      windowLaunch.delete(win);
+      windowClose.set(win, {...launch, closingRate:-1});
+      launch.animation.onfinish = launch.animation.oncancel = () => {
+        if (windowClose.get(win)?.animation === launch.animation) settleClose(win);
+      };
+      directClose(win, true);
+      return true;
+    }
+    const content = $('.files-layout', win), style = getComputedStyle(win);
+    const from = {transform:style.transform, opacity:style.opacity, contentOpacity:getComputedStyle(content).opacity};
+    settleMotion(win);
+    win.hidden = false;
+    const rect = win.getBoundingClientRect();
+    if (!rect.width || !rect.height) return false;
+    const {scene, initialWindowScale, expandedFolderScale, rise} = filesScene(win, rect);
+    scene.classList.add('files-close');
+    win.classList.add('files-is-closing', 'files-launch-layer');
+    const options = {duration:mobile() ? 300 : 380, easing:'linear', fill:'both'}, animations = [];
+    const add = (element, frames, extra = {}) => {
+      const animation = element.animate(frames, {...options, ...extra});
+      animations.push(animation); return animation;
+    };
+    const foldAt = .64, foldEase = 'cubic-bezier(.4, 0, .2, 1)';
+    const fromTransform = from.transform && from.transform !== 'none' ? from.transform : '';
+    // Reciprocal scales also align the folder when close interrupts a Dock restoration.
+    add(scene, [
+      {transform:`${fromTransform} ${expandedFolderScale}`.trim(), offset:0, easing:foldEase},
+      {transform:'scale(1, 1)', offset:foldAt},
+      {transform:'scale(1, 1)', offset:1}
+    ], {id:'files-close-contract'});
+    add($('.files-launch-folder', scene), [
+      {opacity:0, transform:'translateY(0) scale(1)', offset:0},
+      {opacity:0, transform:'translateY(0) scale(1)', offset:.08, easing:'ease-out'},
+      {opacity:1, transform:'translateY(0) scale(1)', offset:.4},
+      {opacity:1, transform:'translateY(0) scale(1)', offset:.8, easing:'ease-in'},
+      {opacity:0, transform:'translateY(8px) scale(.82)', offset:1}
+    ]);
+    add($('.files-launch-paper', scene), [
+      {opacity:1, transform:`translateY(-${rise}px)`, offset:0},
+      {opacity:1, transform:`translateY(-${rise}px)`, offset:.46, easing:foldEase},
+      {opacity:0, transform:'translateY(10px)', offset:.84},
+      {opacity:0, transform:'translateY(10px)', offset:1}
+    ]);
+    add($('.files-launch-front', scene), [
+      {transform:'perspective(480px) rotateX(-32deg)', offset:0},
+      {transform:'perspective(480px) rotateX(-32deg)', offset:.58, easing:foldEase},
+      {transform:'perspective(480px) rotateX(0deg)', offset:.84},
+      {transform:'perspective(480px) rotateX(0deg)', offset:1}
+    ]);
+    add(content, [
+      {opacity:from.contentOpacity || 1, offset:0, easing:'ease-out'},
+      {opacity:0, offset:.3}, {opacity:0, offset:1}
+    ]);
+    const animation = add(win, [
+      {opacity:from.opacity || 1, transform:fromTransform || 'scale(1, 1)', offset:0, easing:foldEase},
+      {opacity:0, transform:initialWindowScale, offset:foldAt},
+      {opacity:0, transform:initialWindowScale, offset:1}
+    ], {id:'files-close'});
+    windowClose.set(win, {animation, animations, scene});
+    win.inert = true;
+    animation.onfinish = animation.oncancel = () => {
+      if (windowClose.get(win)?.animation === animation) settleClose(win);
+    };
+    return true;
+  }
   function closeAlbum(win) {
     if (win.id !== 'album') return false;
     if (reducedMotion.matches || typeof win.animate !== 'function') {
@@ -324,12 +559,20 @@
     };
     return true;
   }
+  function scheduleWindowLayerRelease(win) {
+    clearTimeout(windowLayerCleanup.get(win));
+    const timer = setTimeout(() => {
+      if (windowLayerCleanup.get(win) === timer) releaseWindowLayer(win);
+    }, 120);
+    windowLayerCleanup.set(win, timer);
+  }
   function releaseWindowLayer(win) {
     clearTimeout(windowLayerCleanup.get(win));
     windowLayerCleanup.delete(win);
-    win.classList.remove('is-window-moving');
+    win.classList.remove('is-window-moving', 'files-launch-layer', 'browser-flight-layer');
   }
   function settleMotion(win, finished = false) {
+    delete win.dataset.windowMotion;
     settleLaunch(win);
     settleClose(win);
     const animation = windowMotion.get(win);
@@ -350,14 +593,19 @@
     } else releaseWindowLayer(win);
   }
   function animateWindow(win, minimizing) {
+    const interruptedScene = minimizing && (win.id === 'files' || win.id === 'browser') && (windowLaunch.has(win) || windowClose.has(win));
     settleClose(win);
     settleLaunch(win);
+    if (win.id === 'files' || win.id === 'browser') releaseWindowLayer(win);
+    // Dismiss an unfinished scene without flashing a full-size window.
+    if (interruptedScene) return false;
     if (reducedMotion.matches || typeof win.animate !== 'function' || document.fullscreenElement === win) {
       settleMotion(win);
       return false;
     }
     const running = windowMotion.get(win);
     if (running) {
+      win.dataset.windowMotion = 'true';
       // Reverse the current journey instead of jumping back to either endpoint.
       running.updatePlaybackRate(minimizing ? 1 : -1);
       running.play();
@@ -392,6 +640,7 @@
       {transform:`translate(${dx}px, ${dy}px) scale(${scale})`, opacity:0, transformOrigin:'center'}
     ], {duration, easing, fill:'both'});
     windowMotion.set(win, animation);
+    win.dataset.windowMotion = 'true';
     win.inert = minimizing;
     animation.onfinish = () => {
       if (windowMotion.get(win) === animation) settleMotion(win, true);
@@ -409,22 +658,24 @@
   reducedMotion.addEventListener?.('change', () => {
     if (reducedMotion.matches) windows.forEach(win => settleMotion(win));
   });
-  function openWindow(win, focus = true) {
+  function openWindow(win, focus = true, {animate = true} = {}) {
     const restoring = win.dataset.state === 'minimized';
     const starting = win.dataset.state === 'closed';
+    if (!animate) settleMotion(win);
     win.hidden = false;
     win.dataset.state = 'open';
     win.inert = false;
-    if (restoring) animateWindow(win, false);
+    if (animate && restoring) animateWindow(win, false);
     focusWindow(win);
-    if (starting && !directClose(win, false)) { launchMusic(win); launchAlbum(win); }
+    if (animate && starting && !directClose(win, false)) { launchMusic(win); launchAlbum(win); launchFiles(win); launchBrowser(win); }
     if (focus) win.focus({preventScroll: true});
+    win.dispatchEvent(new CustomEvent('blanktime:window-opened'));
   }
   function hideWindow(win, state) {
     if (win.dataset.state === state) return;
     const wasOpen = win.dataset.state === 'open';
     win.dataset.state = state;
-    const animating = wasOpen && (state === 'closed' ? closeMusic(win) || closeAlbum(win) : animateWindow(win, true));
+    const animating = wasOpen && (state === 'closed' ? closeMusic(win) || closeAlbum(win) || closeFiles(win) || closeBrowser(win) : animateWindow(win, true));
     if (!animating && state === 'closed') settleMotion(win);
     if (!animating) win.hidden = true;
     if (win === welcome) dismissWelcome();
@@ -585,6 +836,7 @@
   clock(); setInterval(clock, 30000);
   window.blanktimeDesktop = {
     openWindow, closeWindow: win => hideWindow(win, 'closed'),
+    settleWindowMotion: settleMotion,
     selectFile: row => { if (fileRows.includes(row) && !row.hidden) selectFile(row); }
   };
   const initialArticle = document.getElementById('article-source')?.content.querySelector('[data-article]');

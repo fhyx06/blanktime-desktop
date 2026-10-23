@@ -1,0 +1,2 @@
+.wallpaper .koi-wallpaper {position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;}
+.wallpaper.has-live-wallpaper::after {content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle,transparent 40%,#0009 100%);}

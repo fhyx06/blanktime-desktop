@@ -1,0 +1,11 @@
+.article-comments{width:100%;max-width:880px;margin:0 auto;padding:0 46px 56px;color:var(--browser-text);font-size:14px;line-height:1.7;overflow-wrap:anywhere}
+.article-comments>h2{margin:0 0 24px;padding-top:28px;border-top:1px solid var(--browser-border);font-size:21px;font-weight:600;line-height:1.4}
+.article-comments-status{display:flex;align-items:center;flex-wrap:wrap;gap:12px;min-height:90px;padding:20px;color:var(--browser-muted);border:1px solid var(--browser-border);border-radius:10px;background:var(--browser-bg)}
+.article-comments-status button{padding:6px 16px;border:1px solid var(--browser-border);border-radius:6px;background:var(--browser-paper);color:var(--accent)}
+.article-comments .artalk{--at-color-main:var(--accent);--at-color-font:var(--browser-text);--at-color-bg:var(--browser-paper);--at-color-bg-grey:var(--browser-bg);--at-color-border:var(--browser-border);--at-color-grey:var(--browser-muted);font-family:inherit}
+/* Desktop icons use outlined SVGs; Artalk supplies filled icon paths. */
+:is(.artalk,.atk-layer-wrap) svg{fill:currentColor;stroke:none;stroke-width:0}
+.article-comments .atk-main-editor{border-radius:10px}
+.article-comments .atk-textarea{min-height:120px}
+@media(max-width:1100px){.article-comments{padding-right:30px;padding-left:30px}}
+@media(max-width:760px){.article-comments{padding:0 16px 32px}.article-comments>h2{font-size:19px;margin-bottom:20px}.article-comments-status{padding:16px}.article-comments input,.article-comments textarea{font-size:16px}}

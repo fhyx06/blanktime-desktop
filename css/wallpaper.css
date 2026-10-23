@@ -1,0 +1,106 @@
+.wallpaper-window {left:max(84px,calc(50vw - 475px));top:5vh;width:min(1040px,calc(100vw - 112px));height:min(780px,90dvh);color:var(--sys-text,#30363d);}
+.wallpaper-content {container-type:inline-size;flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;margin:0 8px;border-radius:10px;background:var(--sys-base,#fff);padding:26px 28px 30px;}
+.wallpaper-toolbar {display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px;}
+.wallpaper-toolbar h2 {margin:0;font-size:23px;font-weight:650;}
+.wallpaper-toolbar p {margin:6px 0 0;font-size:12px;color:var(--sys-muted,#8a939e);}
+#wallpaper-reset {flex-shrink:0;min-height:36px;padding:8px 13px;border:1px solid var(--sys-border,#e1e5eb);border-radius:8px;background:var(--sys-base,#fff);font-size:12px;}
+#wallpaper-reset:hover {background:var(--sys-raised,#f5f7fa);}
+.wallpaper-current {display:flex;align-items:center;gap:24px;margin-bottom:30px;}
+.wallpaper-current-preview {position:relative;display:grid;place-items:center;flex:0 0 264px;aspect-ratio:16/10;overflow:hidden;border-radius:12px;background:var(--sys-raised,#f2f4f7);box-shadow:inset 0 0 0 1px var(--sys-border,#e6e9ee);}
+.wallpaper-current-preview > svg {width:42px;height:42px;color:var(--sys-muted,#a1a9b3);stroke-width:1.2;}
+.wallpaper-current-preview img {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.wallpaper-current-preview img:not([src]) {display:none;}
+.wallpaper-current-details {min-width:0;}
+.wallpaper-current-details > span {font-size:12px;color:var(--sys-muted,#8a939e);}
+.wallpaper-current-details strong {display:block;margin:9px 0;font-size:17px;line-height:1.5;font-weight:600;overflow-wrap:anywhere;}
+.wallpaper-current-details p {font-size:12px;line-height:1.6;color:var(--sys-muted,#8a939e);margin:0;}
+.wallpaper-list-heading {display:flex;align-items:baseline;gap:9px;margin:0 0 16px;font-size:15px;font-weight:600;}
+.wallpaper-list-heading span {font-size:12px;font-weight:400;color:var(--sys-muted,#8a939e);}
+.wallpaper-choices {display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,165px),1fr));gap:20px 16px;}
+.wallpaper-choice {display:block;min-width:0;padding:0;text-align:left;border-radius:10px;}
+.wallpaper-choice-image {position:relative;display:grid;place-items:center;aspect-ratio:16/10;overflow:hidden;border:2px solid transparent;border-radius:10px;background:var(--sys-raised,#f2f4f7);box-shadow:inset 0 0 0 1px var(--sys-border,#e6e9ee);transition:border-color .18s,box-shadow .18s;}
+.wallpaper-choice-image > svg {width:32px;height:32px;color:var(--sys-muted,#a1a9b3);stroke-width:1.2;}
+.wallpaper-choice-image > img {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .16s;}
+.wallpaper-choice[data-load-state="loaded"] .wallpaper-choice-image > img {opacity:1;}
+.wallpaper-choice:hover .wallpaper-choice-image {border-color:color-mix(in srgb,var(--accent) 55%,transparent);}
+.wallpaper-choice.is-selected .wallpaper-choice-image {border-color:var(--accent);box-shadow:0 0 0 2px var(--sys-base,#fff),0 0 0 3px var(--accent);}
+.wallpaper-choice-name {display:block;margin:9px 2px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;line-height:1.5;}
+.wallpaper-choice.is-selected .wallpaper-choice-name {color:var(--accent);font-weight:600;}
+.wallpaper-choice-check {position:absolute;z-index:1;top:7px;left:7px;display:none;place-items:center;width:22px;height:22px;border:2px solid #fff;border-radius:50%;background:var(--accent);color:#fff;box-shadow:0 1px 5px #0002;}
+.wallpaper-choice-check svg {width:14px;height:14px;stroke-width:2.2;}
+.wallpaper-choice.is-selected .wallpaper-choice-check {display:grid;}
+.wallpaper-choice-state {position:absolute;inset:0;display:grid;place-items:center;padding:10px;text-align:center;font-size:12px;line-height:1.5;color:var(--sys-muted,#8a939e);background:var(--sys-raised,#f2f4f7);}
+.wallpaper-choice-state:empty,.wallpaper-choice[data-load-state="loaded"] .wallpaper-choice-state {display:none;}
+.wallpaper-choice[data-load-state="error"] .wallpaper-choice-state {color:var(--accent);}
+.wallpaper-choice.is-pending .wallpaper-choice-image::after {content:"应用中…";position:absolute;inset:0;display:grid;place-items:center;background:#18233188;color:#fff;font-size:12px;}
+.wallpaper-empty {grid-column:1/-1;margin:0;padding:48px 12px;border:1px dashed var(--sys-border,#e1e5eb);border-radius:10px;text-align:center;font-size:13px;color:var(--sys-muted,#8a939e);}
+.wallpaper-window > .window-status {flex-basis:auto;min-height:30px;padding:7px 14px;border-top:0;gap:14px;}
+#wallpaper-status {min-width:0;overflow-wrap:anywhere;}
+.wallpaper-window > .window-status > span:last-child {flex-shrink:0;}
+.wallpaper-live-section {margin-top:30px;padding-top:24px;border-top:1px solid var(--sys-border,#e6e9ee);}
+.wallpaper-live-choice {display:block;min-width:0;padding:0;text-align:left;border-radius:10px;}
+.wallpaper-live-image {position:relative;display:block;aspect-ratio:16/10;overflow:hidden;border:2px solid transparent;border-radius:10px;background:#0b3d4f;transition:border-color .18s,box-shadow .18s;}
+.wallpaper-koi-art {display:block;width:100%;height:100%;fill:none;stroke:none;}
+.wallpaper-koi-preview {position:absolute;inset:0;}
+.wallpaper-live-choice:hover .wallpaper-live-image {border-color:color-mix(in srgb,var(--accent) 55%,transparent);}
+.wallpaper-live-choice.is-selected .wallpaper-live-image {border-color:var(--accent);box-shadow:0 0 0 2px var(--sys-base,#fff),0 0 0 3px var(--accent);}
+.wallpaper-live-choice.is-selected .wallpaper-choice-check {display:grid;}
+.wallpaper-live-choice.is-selected .wallpaper-choice-name {color:var(--accent);font-weight:600;}
+.wallpaper-live-choice.is-pending .wallpaper-live-image::after {content:"加载中…";position:absolute;inset:0;display:grid;place-items:center;background:#18233188;color:#fff;font-size:12px;}
+.wallpaper-live-status {margin:15px 0 0;font-size:12px;line-height:1.7;color:var(--sys-muted,#8a939e);}
+.wallpaper-koi-credit {margin:10px 2px 0;font-size:11px;line-height:1.7;color:var(--sys-muted,#8a939e);overflow-wrap:anywhere;}
+.wallpaper-koi-credit a {color:var(--accent);text-decoration:none;}
+.wallpaper-koi-credit a:hover,.wallpaper-koi-credit a:focus-visible {text-decoration:underline;text-underline-offset:3px;}
+.wallpaper-live-layout {display:grid;grid-template-columns:184px minmax(0,1fr);gap:24px;align-items:start;}
+.wallpaper-live-choices {grid-template-columns:minmax(0,1fr);}
+.wallpaper-koi-settings {min-width:0;padding:18px 20px;border:1px solid var(--sys-border,#e6e9ee);border-radius:12px;background:var(--sys-raised,#f5f7fa);}
+.wallpaper-koi-settings-heading {display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px;}
+.wallpaper-koi-settings-heading h4 {display:flex;align-items:center;gap:8px;margin:0;font-size:14px;font-weight:600;}
+#wallpaper-koi-profile {padding:3px 7px;border-radius:5px;background:var(--sys-base,#fff);color:var(--sys-muted,#8a939e);font-size:11px;font-weight:400;}
+#wallpaper-koi-settings-reset {min-height:32px;padding:6px 10px;border:1px solid var(--sys-border,#e1e5eb);border-radius:7px;background:var(--sys-base,#fff);font-size:11px;}
+#wallpaper-koi-settings-reset:hover:not(:disabled) {color:var(--accent);border-color:var(--accent);}
+#wallpaper-koi-settings-reset:disabled {opacity:.5;cursor:default;}
+.wallpaper-koi-fields {display:grid;gap:13px;}
+.wallpaper-koi-field {display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center;min-width:0;font-size:12px;}
+.wallpaper-koi-field output {font-variant-numeric:tabular-nums;color:var(--sys-muted,#8a939e);}
+.wallpaper-koi-field input[type=range] {grid-column:1/-1;display:block;width:100%;min-width:0;height:28px;margin:0;accent-color:var(--accent);cursor:var(--cursor-pointer,pointer);}
+.wallpaper-koi-field input[type=range]:focus-visible {outline:2px solid var(--accent);outline-offset:3px;border-radius:4px;}
+.wallpaper-koi-field input[type=range]:disabled {opacity:.45;cursor:default;}
+#wallpaper-koi-fish-size {touch-action:none;}
+/* Keep the live control in its original layout; hidden windows retain their state. */
+body.koi-size-preview > :not(.wallpaper):not(.desktop),
+body.koi-size-preview .desktop * {visibility:hidden!important;}
+body.koi-size-preview .wallpaper-koi-size-preview-field,
+body.koi-size-preview .wallpaper-koi-size-preview-field * {visibility:visible!important;}
+body.koi-size-preview .wallpaper-koi-size-preview-field {position:relative;isolation:isolate;}
+body.koi-size-preview .wallpaper-koi-size-preview-field::before {content:"";position:absolute;z-index:-1;inset:-12px -14px;border:1px solid var(--sys-border,#e1e5eb);border-radius:12px;background:var(--sys-base,#fff);box-shadow:0 4px 22px #0002;pointer-events:none;}
+.wallpaper-koi-native {display:flex;align-items:center;gap:8px;min-height:36px;margin-top:10px;font-size:12px;cursor:var(--cursor-pointer,pointer);}
+.wallpaper-koi-native input {width:16px;height:16px;margin:0;accent-color:var(--accent);}
+.wallpaper-koi-native input:focus-visible {outline:2px solid var(--accent);outline-offset:3px;}
+#wallpaper-koi-native-note {margin-top:0;}
+.wallpaper-koi-settings-note {margin:13px 0 0;font-size:11px;line-height:1.7;color:var(--sys-muted,#8a939e);}
+@container (max-width:620px) {
+  .wallpaper-live-layout {grid-template-columns:minmax(0,1fr);gap:18px;}
+  .wallpaper-live-choices {max-width:220px;}
+}
+@container (max-width:500px) {
+  .wallpaper-current {align-items:flex-start;gap:16px;}
+  .wallpaper-current-preview {flex-basis:48%;}
+  .wallpaper-current-details strong {font-size:14px;margin:6px 0;}
+  .wallpaper-choices {grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 12px;}
+  .wallpaper-live-choices {grid-template-columns:minmax(0,1fr);}
+}
+@media(max-width:760px) {
+  .wallpaper-content {margin:0 5px;padding:20px 16px 24px;}
+  .wallpaper-toolbar {gap:12px;margin-bottom:22px;}
+  .wallpaper-toolbar h2 {font-size:21px;}
+  #wallpaper-reset {min-height:40px;padding:8px 10px;}
+  .wallpaper-current {margin-bottom:26px;}
+  .wallpaper-current-preview {border-radius:9px;}
+  .wallpaper-current-details p {font-size:11px;}
+  .wallpaper-koi-settings {padding:16px;}
+  #wallpaper-koi-settings-reset {min-height:40px;}
+  .wallpaper-koi-field input[type=range] {height:36px;}
+  .wallpaper-window > .window-status {min-height:32px;font-size:10px;padding:8px 12px;}
+  .wallpaper-window > .window-status > span:last-child {display:none;}
+}

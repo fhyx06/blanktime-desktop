@@ -1,4 +1,10 @@
-.image-viewer-window {left:max(85px,calc(50vw - 450px));top:40px;width:min(980px,calc(100vw - 112px));height:min(760px,calc(100dvh - 64px));}
+.image-viewer-window {
+  --window-default-width:min(max(1200px,72vw),calc(100vw - 112px));
+  --window-default-height:min(max(840px,83dvh),calc(100dvh - 64px));
+  width:var(--window-default-width);height:var(--window-default-height);
+  left:max(85px,calc((100vw - var(--window-default-width)) / 2 + 38px));
+  top:max(32px,calc((100dvh - var(--window-default-height)) / 2));
+}
 .image-viewer-toggle {display:none;}
 .image-viewer-bottom {display:contents;}
 .image-viewer-toolbar {display:flex;align-items:center;gap:16px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--sys-base,#fff);}

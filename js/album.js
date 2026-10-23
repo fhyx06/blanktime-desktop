@@ -102,5 +102,4 @@
   document.getElementById('album').addEventListener('keydown', event => {
     if (event.key === 'Escape' && !view.hidden) { event.preventDefault(); showFolders(); }
   });
-  window.addEventListener('blanktime:open-wallpapers', () => showFolder('wallpapers'));
 })();

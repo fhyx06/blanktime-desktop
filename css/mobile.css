@@ -76,7 +76,8 @@
   #music .player {padding:10px 12px;gap:8px;}
   #music .ctrl,#music .vol-btn,#music .lyrics-toggle,#music .theme-btn {min-width:40px;min-height:40px;}
   #music .lyrics-toggle {border:0;}
-  #music .controls {gap:12px;}
+  #music .controls {grid-template-columns:repeat(5,40px);gap:12px;}
+  #music.is-lyrics-view .controls {grid-template-columns:40px minmax(0,1fr) 44px minmax(0,1fr) 40px;}
   #music .utility {gap:4px;}
   #music .vol-num {display:none;}
   #music .track,#music .vol-track {min-height:28px;}

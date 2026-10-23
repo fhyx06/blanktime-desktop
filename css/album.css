@@ -2,7 +2,13 @@
 .album-icon-art {width:46px;height:46px;display:block;flex-shrink:0;border-radius:12px;box-shadow:0 3px 8px #0002;}
 .dock-button > .album-icon-art {width:28px;height:28px;border-radius:7px;}
 .window-caption > .album-icon-art {width:20px;height:20px;border-radius:5px;box-shadow:none;}
-.album-window {width:min(940px,calc(100vw - 112px));height:min(720px,calc(100dvh - 64px));left:max(85px,calc(50vw - 430px));top:32px;}
+.album-window {
+  --window-default-width:min(max(1120px,67vw),calc(100vw - 112px));
+  --window-default-height:min(max(780px,76dvh),calc(100dvh - 64px));
+  width:var(--window-default-width);height:var(--window-default-height);
+  left:max(85px,calc((100vw - var(--window-default-width)) / 2 + 38px));
+  top:max(32px,calc((100dvh - var(--window-default-height)) / 2));
+}
 .album-content {position:relative;flex:1;min-height:0;overflow:auto;background:#fff;margin:0 8px;border-radius:8px;}
 .album-toolbar {display:flex;align-items:center;justify-content:space-between;padding:22px 24px 14px;}
 .album-toolbar h2 {font-size:22px;margin:0 0 5px;}

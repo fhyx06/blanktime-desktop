@@ -518,7 +518,7 @@
   $('btnPrev').addEventListener('click',() => selectSong(nextIndex(index,songs.length,loop,-1),true));
   $('btnNext').addEventListener('click',() => selectSong(nextIndex(index,songs.length,loop,1),true));
   $('btnLoop').addEventListener('click',() => setLoop(modes[(modes.indexOf(loop)+1)%3]));
-  $('btnLink').addEventListener('click',() => { if(id) window.open('https://music.163.com/#/playlist?id='+id,'_blank','noopener,noreferrer'); });
+  $('btnLink')?.addEventListener('click',() => { if(id) window.open('https://music.163.com/#/playlist?id='+id,'_blank','noopener,noreferrer'); });
   $('reload').addEventListener('click',loadPlaylist);
   list.addEventListener('click',event => {
     const row=event.target.closest('.row'); if(row) selectSong(Number(row.dataset.index),true);
@@ -577,7 +577,8 @@
     publishState();
   }).observe(win,{attributes:true,attributeFilter:['data-state','hidden']});
   window.blanktimeMusic = {getState, togglePlayback, previous:() => stepSong(-1), next:() => stepSong(1), open:openPlayer};
-  icon('btnPrev','prev');icon('btnNext','next');icon('btnLink','link');
+  icon('btnPrev','prev');icon('btnNext','next');
+  if ($('btnLink')) icon('btnLink','link');
   setLoop(store.get('loop'));accent(store.get('accent') || defaultAccent);
   const volume = Number(store.get('volume') ?? win.dataset.volume);
   setVolume(Number.isFinite(volume) ? volume : .5);

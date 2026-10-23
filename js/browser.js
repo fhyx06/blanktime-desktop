@@ -24,6 +24,7 @@
   let theme = window.blanktimeAppearance.getTheme();
   function applyTheme() {
     win.dataset.theme = theme;
+    tabs.forEach(tab => tab.comments?.setTheme(theme));
     themeButton.setAttribute('aria-pressed', String(theme === 'dark'));
     themeButton.setAttribute('aria-label', theme === 'dark' ? '切换到浅色模式' : '切换到深色模式');
     themeButton.title = themeButton.getAttribute('aria-label');
@@ -35,8 +36,9 @@
     // The toolbar adjusts this reading session; the system preference stays unchanged.
   });
   function suspend(tab) {
-    tab.page.querySelectorAll('audio,video').forEach(media => media.pause());
-    tab.page.querySelectorAll('iframe').forEach(frame => {
+    tab.comments?.setActive(false);
+    tab.article?.querySelectorAll('audio,video').forEach(media => media.pause());
+    tab.article?.querySelectorAll('iframe').forEach(frame => {
       const placeholder = document.createElement('template');
       tab.frames.push({placeholder, frame: frame.cloneNode(true)});
       frame.replaceWith(placeholder);
@@ -45,6 +47,7 @@
   function resume(tab) {
     tab.frames.forEach(({placeholder, frame}) => placeholder.replaceWith(frame));
     tab.frames = [];
+    tab.comments?.setActive(true);
   }
   function updateTools() {
     const article = active !== home;
@@ -60,7 +63,10 @@
     status.textContent = article ? (active.summary || '正在加载文章…') : `共 ${cards.filter(card => !card.hidden).length} 篇文章`;
   }
   function activate(tab, focus = true, navigate = true) {
-    if (active && active !== tab) suspend(active);
+    if (active && active !== tab) {
+      window.blanktimeDesktop.settleWindowMotion?.(win);
+      suspend(active);
+    }
     active = tab;
     if (navigate) route(tab, tab.url?.hash || "");
     tabs.forEach(item => {
@@ -68,7 +74,7 @@
       item.button.setAttribute('aria-selected', String(item === tab));
       item.button.tabIndex = item === tab ? 0 : -1;
     });
-    if (!win.hidden) resume(tab);
+    if (!win.hidden && win.dataset.state === 'open') resume(tab);
     updateTools();
     if (focus) { tab.button.focus(); tab.button.scrollIntoView({block:'nearest', inline:'nearest'}); }
   }
@@ -97,6 +103,7 @@
   function close(tab) {
     const list = [...tabs.values()], index = list.indexOf(tab);
     suspend(tab); tab.controller.abort(); tab.observer?.disconnect(); tabs.delete(tab.key);
+    tab.comments?.destroy();
     tab.wrap.remove(); tab.page.remove(); tab.frames = [];
     if (active === tab) activate(list[index - 1] || home);
   }
@@ -106,6 +113,7 @@
   tocButton.addEventListener('click', () => { setToc(!tocVisible); });
   screenMode.addEventListener('change', () => { tocVisible = readToc(); updateTools(); });
   $('.browser-search').addEventListener('input', event => {
+    window.blanktimeDesktop.settleWindowMotion?.(win);
     const query = event.target.value.trim().toLocaleLowerCase();
     cards.forEach(card => { card.hidden = !card.textContent.toLocaleLowerCase().includes(query); });
     $('.browser-empty').hidden = cards.some(card => !card.hidden); updateTools();
@@ -115,7 +123,7 @@
     img.addEventListener('error', fallback);
     if (img.complete && !img.naturalWidth) fallback();
   });
-  function openArticle(url, title, source = null, navigate = true) {
+  function openArticle(url, title, source = null, {navigate = true, focus = true, animate = true} = {}) {
     let tab = tabs.get(url.pathname);
     if (!tab) {
       const page = document.createElement('div'); page.className = 'browser-page browser-article-page reading-layout'; pages.append(page);
@@ -123,8 +131,11 @@
       tab.url = url; load(tab, source);
     }
     tab.url = url;
-    window.blanktimeDesktop.openWindow(win);
-    activate(tab, true, navigate);
+    // Choose the destination before startup snapshots the currently visible page.
+    activate(tab, false, navigate);
+    window.blanktimeDesktop.openWindow(win, focus, {animate});
+    if (focus) tab.button.focus({preventScroll:true});
+    tab.button.scrollIntoView({block:'nearest', inline:'nearest'});
     if (url.hash && tab.article) jump(tab, url.hash);
   }
   function jump(tab, hash) {
@@ -145,6 +156,7 @@
     } catch {}
   }
   async function load(tab, initialSource = null) {
+    tab.comments?.destroy(); tab.comments = null;
     tab.page.replaceChildren(); tab.page.setAttribute('aria-busy', 'true');
     const message = document.createElement('div'); message.className = 'browser-message'; message.textContent = '正在加载文章…'; tab.page.append(message);
     try {
@@ -223,9 +235,11 @@
         });
       });
       article.querySelectorAll('img,iframe').forEach(node => { node.loading = 'lazy'; });
+      tab.comments = window.blanktimeComments?.create({article, scroll, theme});
+      tab.comments?.setActive(active === tab && !win.hidden && win.dataset.state === 'open');
       scroll.addEventListener('scroll', progress, {passive:true});
       tab.observer = new ResizeObserver(progress); tab.observer.observe(scroll);
-      if (active !== tab || win.hidden) suspend(tab);
+      if (active !== tab || win.hidden || win.dataset.state === 'closed') suspend(tab);
       if (active === tab) { updateTools(); progress(); if (tab.url.hash) jump(tab, tab.url.hash); }
     } catch (error) {
       if (error.name === 'AbortError') return;
@@ -237,7 +251,7 @@
   // Article links share the same tabbed reading surface.
   win.addEventListener('click', event => {
     const link = event.target.closest('a[href]');
-    if (!link || link.closest('.browser-toc') || event.defaultPrevented) return;
+    if (!link || link.closest('.browser-toc,.article-comments') || event.defaultPrevented) return;
     const href = link.getAttribute('href');
     if (href.startsWith('#') && active.article) { event.preventDefault(); event.stopPropagation(); jump(active, href); active.url.hash = href; route(active, href, true); return; }
     let url; try { url = new URL(link.href); } catch { return; }
@@ -249,8 +263,13 @@
     }
   });
   new MutationObserver(() => {
-    if (win.hidden) tabs.forEach(suspend); else if (active) resume(active);
+    if (win.hidden || win.dataset.state === 'closed') tabs.forEach(suspend); else if (active) resume(active);
   }).observe(win, {attributes:true, attributeFilter:['hidden']});
+  win.addEventListener('blanktime:window-hidden', event => {
+    tabs.forEach(tab => tab.comments?.setActive(false));
+    if (event.detail?.state === 'closed') tabs.forEach(suspend);
+  });
+  win.addEventListener('blanktime:window-opened', () => { if (active) resume(active); });
   document.addEventListener('blanktime:open-article', event => {
     const url = new URL(event.detail.href, location.href);
     const card = posts.get(url.pathname);
@@ -258,12 +277,13 @@
   });
   addEventListener('popstate', () => {
     if (location.pathname === homePath) {
-      window.blanktimeDesktop.openWindow(win); activate(home, false, false); document.title = siteTitle;
+      activate(home, false, false); window.blanktimeDesktop.openWindow(win); document.title = siteTitle;
     } else {
       const card = posts.get(location.pathname);
-      if (card) { openArticle(new URL(location.href), card.dataset.title, null, false); document.title = card.dataset.title + ' · ' + siteTitle; }
+      if (card) { openArticle(new URL(location.href), card.dataset.title, null, {navigate:false}); document.title = card.dataset.title + ' · ' + siteTitle; }
     }
   });
   const initial = document.getElementById('article-source')?.content.querySelector('[data-article]');
-  if (initial) openArticle(new URL(location.href), initial.dataset.title, initial, false);
+  // A page load restores content directly, without a launch scene or moving focus.
+  if (initial) openArticle(new URL(location.href), initial.dataset.title, initial, {navigate:false, focus:false, animate:false});
 })();

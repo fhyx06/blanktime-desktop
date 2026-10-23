@@ -69,7 +69,14 @@
 #music .track.dragging .knob,
 #music .track:focus-visible .knob{opacity:1;transform:translateY(-50%) scale(1);}
 #music .track:focus-visible .rail{box-shadow:0 0 0 3px var(--accent-soft);}
-#music .controls { display:flex; align-items:center; justify-content:center; gap:14px; }
+/* Keep the play button centered even when the optional platform link is absent. */
+#music .controls { display:grid; grid-template-columns:repeat(2,34px) 36px repeat(2,34px); align-items:center; justify-items:center; justify-content:center; gap:14px; }
+#music .controls > .ctrl { grid-row:1; }
+#music-btnLoop { grid-column:1; }
+#music-btnPrev { grid-column:2; }
+#music-btnPlay { grid-column:3; }
+#music-btnNext { grid-column:4; }
+#music-btnLink { grid-column:5; }
 #music .ctrl{
     width:34px;height:34px;
     display:flex;align-items:center;justify-content:center;
@@ -442,7 +449,7 @@
 #music.is-lyrics-view .song-artist { margin-top:6px; font-size:12px; }
 #music.is-lyrics-view .transport { gap:15px; }
 #music.is-lyrics-view .progress { order:-1; }
-#music.is-lyrics-view .controls { justify-content:space-between; gap:10px; }
+#music.is-lyrics-view .controls { grid-template-columns:34px minmax(0,1fr) 44px minmax(0,1fr) 34px; gap:10px; }
 #music.is-lyrics-view .ctrl.play { width:44px; height:44px; }
 #music.is-lyrics-view .utility { justify-content:space-between; }
 #music.is-lyrics-view #music-btnLyrics { display:none; }

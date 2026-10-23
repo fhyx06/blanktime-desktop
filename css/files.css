@@ -58,6 +58,27 @@
 .files-empty svg { width: 36px; height: 36px; color: #b5c6d3; }
 .files-empty strong { color: #73818b; font-weight: 500; }
 .files-empty button { color: #327ced; font-size: 11px; padding: 8px; }
+/* The folder and loading sheet are decorative; the actual table keeps its layout. */
+.files-launch {position:fixed;pointer-events:none;isolation:isolate;transform-origin:center;will-change:transform;}
+.files-launch-folder {position:absolute;inset:0;display:block;}
+.files-launch-back {position:absolute;inset:24% 0 0;border-radius:10px;background:linear-gradient(#008cec,#1f9cf3);box-shadow:0 12px 28px #133f5d30;}
+.files-launch-back::before {content:"";position:absolute;left:0;top:-10px;width:52%;height:18px;border-radius:9px 9px 0 0;background:#1598f0;}
+.files-launch-paper {position:absolute;inset:20% 8% 7%;display:flex;flex-direction:column;gap:7px;padding:12px 13px;border:1px solid #ffffffbd;border-radius:6px;background:linear-gradient(145deg,#fff,#eaf6ff);box-shadow:0 2px 10px #154e741c;}
+.files-launch-caption {margin-bottom:2px;white-space:nowrap;font-size:12px;font-weight:500;line-height:1.4;letter-spacing:.02em;color:#527991;}
+.files-close .files-launch-caption {visibility:hidden;}
+.files-launch-line {display:block;flex-shrink:0;width:100%;height:5px;border-radius:3px;background:#96c8e7;transform-origin:left;}
+.files-launch-line:nth-of-type(2) {width:82%;}
+.files-launch-line:nth-of-type(3) {width:60%;}
+.files-launch-front {position:absolute;inset:46% 0 0;border-radius:7px 7px 10px 10px;border-top:1px solid #d3f3ffd9;background:linear-gradient(#69d4ff,#30b0f6);box-shadow:0 5px 14px #0867a124;transform-origin:center bottom;}
+.files-launch-layer {transform-origin:center;will-change:transform,opacity;}
+html[data-system-theme="dark"] .files-launch-back {box-shadow:0 16px 32px #0005;}
+html[data-system-theme="dark"] .files-launch-paper {background:linear-gradient(145deg,#f2f9ff,#dceefa);}
+@media(max-width:760px) {
+  .files-launch-paper {padding:9px 8px;gap:5px;}
+  .files-launch-caption {font-size:11px;}
+  .files-launch-line {height:4px;}
+}
+@media(prefers-reduced-motion:reduce) {.files-launch {display:none;}}
 @media(max-width: 1000px) { .files-window { left: 85px; width: calc(100vw - 110px); } .files-sidebar { flex-basis: 138px; } .files-location-bar { flex-wrap: wrap; gap: 8px; } .files-search { width: 100%; } }
 @media(max-width: 760px) {
   .desktop-file-icon { left: 64px; top: 58px; width: 76px; }
