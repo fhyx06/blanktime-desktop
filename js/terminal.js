@@ -8,38 +8,86 @@
   try { config = JSON.parse($('config').textContent); } catch {}
   if (!config || typeof config !== 'object' || Array.isArray(config)) config = {};
   const presentation = window.blanktimeTerminalCore.configure(config);
+  win.style.setProperty('--terminal-font-size',presentation.fontSize + 'px');
   Object.entries(presentation.colors).forEach(([role,color]) => {
     win.style.setProperty('--terminal-color-' + role,color);
   });
   const message = (key,values) => presentation.message(key,values);
   const username = /^[a-zA-Z0-9_-]{1,32}$/.test(config.username) ? config.username : 'visitor';
   const hostname = /^[a-zA-Z0-9_.-]{1,64}$/.test(config.hostname) ? config.hostname : 'blanktime';
-  const identity = `${username}@${hostname}`;
   let shell, history = [], historyIndex = 0, draft = '', composing = false;
-  let lastLogin = null;
+  let lastLogin = null, lastLoginIP = '', loginRequest = null;
   const LOGIN_KEY = 'blanktime:terminal:last-login:v1';
+  const LOGIN_IP_KEY = 'blanktime:terminal:last-login-ip:v1';
+  const ipService = window.blanktimeIP;
   const MAX_HISTORY = 100, MAX_BLOCKS = 160;
+  const LIST_CLASSES = new Map([
+    ['permission','ll-perm'], ['owner','ll-own'], ['size','ll-size'], ['date','ll-date'],
+    ['directory','ll-name is-dir'], ['image','ll-name is-img'], ['document','ll-name is-doc'], ['name','ll-name']
+  ]);
   input.maxLength = 4096;
 
   function loginMessage(now) {
-    let previous = lastLogin;
+    let previous = lastLogin, previousIP = lastLoginIP;
     try {
       const saved = Number(localStorage.getItem(LOGIN_KEY));
-      if (Number.isFinite(saved) && saved > 0 && saved <= now.getTime()) previous = new Date(saved);
+      if (Number.isFinite(saved) && saved > 0 && saved <= now.getTime()) {
+        if (previous?.getTime() !== saved) previousIP = '';
+        previous = new Date(saved);
+        if (ipService?.enabled) {
+          const savedIP = JSON.parse(localStorage.getItem(LOGIN_IP_KEY));
+          if (savedIP?.time === saved) previousIP = ipService.validate(savedIP.ip);
+        }
+      }
     } catch {}
     const date = previous || now;
     const weekdays = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const time = [date.getHours(),date.getMinutes(),date.getSeconds()].map(value => String(value).padStart(2,'0')).join(':');
     lastLogin = now;
-    // Store only the previous session's opening time, never commands or output.
-    try { localStorage.setItem(LOGIN_KEY,String(now.getTime())); } catch {}
-    return message('last_login',{date:`${weekdays[date.getDay()]} ${months[date.getMonth()]} ${String(date.getDate()).padStart(2,' ')} ${time} ${date.getFullYear()}`});
+    lastLoginIP = '';
+    // Keep only the latest login; IP metadata is paired by timestamp, never with another session.
+    try {
+      localStorage.setItem(LOGIN_KEY,String(now.getTime()));
+      if (ipService?.enabled) localStorage.removeItem(LOGIN_IP_KEY);
+    } catch {}
+    const line = message('last_login',{date:`${weekdays[date.getDay()]} ${months[date.getMonth()]} ${String(date.getDate()).padStart(2,' ')} ${time} ${date.getFullYear()}`});
+    if (ipService?.enabled && previousIP) line.text += message('last_login_ip',{ip:previousIP}).text;
+    return {line,firstLogin:!previous};
+  }
+  function cancelLoginRequest() {
+    if (!loginRequest) return;
+    loginRequest.controller.abort();
+    loginRequest = null;
+  }
+  async function lookupLoginIP(startedAt, row, line) {
+    if (!ipService?.enabled) return;
+    const controller = new AbortController();
+    const request = {controller,session:shell};
+    loginRequest = request;
+    try {
+      const ip = await ipService.query({signal:controller.signal});
+      if (!ip || controller.signal.aborted || loginRequest !== request || shell !== request.session) return;
+      lastLoginIP = ip;
+      try {
+        // Another browser tab may have opened a newer session while this request was pending.
+        if (localStorage.getItem(LOGIN_KEY) === String(startedAt.getTime())) {
+          localStorage.setItem(LOGIN_IP_KEY,JSON.stringify({time:startedAt.getTime(),ip}));
+        }
+      } catch {}
+      // Only the first-ever login uses the current address. Older logins keep their own address.
+      if (row && output.contains(row)) row.textContent = line.text + message('last_login_ip',{ip}).text;
+    } catch {
+      // An unavailable lookup must never block the prompt or add a terminal error.
+    } finally {
+      if (loginRequest === request) loginRequest = null;
+    }
   }
 
   // Build metadata only when the terminal opens. Listing an album never loads its images.
   function initialize() {
     if (shell) return;
+    win.classList.add('terminal-entering');
     const startedAt = new Date();
     const posts = [...document.querySelectorAll('#files-list .post-file')].map(row => ({
       title:row.dataset.title, date:Number(row.dataset.date), search:row.dataset.search,
@@ -60,12 +108,25 @@
     shell = window.blanktimeTerminalCore.create({...config,username,hostname,posts,albums,apps,createdAt:startedAt.getTime()});
     const welcome = typeof config.welcome === 'string' ? config.welcome.slice(0,2000) : 'Blanktime Terminal';
     if (welcome) write([{text:welcome,kind:'welcome'}]);
-    write([loginMessage(startedAt)]);
+    const login = loginMessage(startedAt);
+    const loginRow = write([login.line]).firstElementChild;
+    lookupLoginIP(startedAt,login.firstLogin ? loginRow : null,login.line);
     refreshPrompt();
   }
-  function prompt() { return `${identity}:${shell.getPromptPath()}$`; }
+  function part(className,text) {
+    const span = document.createElement('span');
+    span.className = className;
+    span.textContent = text;
+    return span;
+  }
+  function paintPrompt(target) {
+    target.replaceChildren(
+      part('pt-user',username),part('pt-sep','@'),part('pt-host',hostname),part('pt-sep',':'),
+      part('pt-path',shell ? shell.getPromptPath() : '~'),part('pt-dollar','$')
+    );
+  }
   function refreshPrompt() {
-    $('prompt').textContent = prompt();
+    paintPrompt($('prompt'));
   }
   function scrollToInput() { screen.scrollTop = screen.scrollHeight; }
   function write(lines, command) {
@@ -75,14 +136,18 @@
       const echo = document.createElement('div');
       echo.className = 'terminal-echo';
       const label = document.createElement('span');
-      label.className = 'terminal-prompt'; label.textContent = prompt() + ' ';
-      echo.append(label,document.createTextNode(command)); block.append(echo);
+      label.className = 'terminal-prompt'; paintPrompt(label);
+      echo.append(label,document.createTextNode(' ' + command)); block.append(echo);
     }
     lines.forEach(line => {
       const row = document.createElement('div');
       const kind = ['error','muted','directory','success','welcome','warning','info'].includes(line.kind) ? line.kind : 'text';
       row.className = 'terminal-line terminal-' + kind;
       row.textContent = String(line.text ?? '');
+      if (Array.isArray(line.parts)) {
+        row.replaceChildren(...line.parts.map(item => LIST_CLASSES.has(item.role)
+          ? part(LIST_CLASSES.get(item.role),item.text) : document.createTextNode(item.text)));
+      }
       const columns = kind === 'welcome' ? Math.max(...row.textContent.split('\n').map(value => value.length)) : 0;
       if (columns > 60 && row.textContent.includes('\n')) {
         row.classList.add('terminal-banner');
@@ -97,6 +162,7 @@
       output.firstElementChild.remove();
     }
     scrollToInput();
+    return block;
   }
   function actionError(key,values) {
     const line = message(key,values);
@@ -233,11 +299,18 @@
   win.addEventListener('blanktime:window-opened',() => {
     initialize(); input.focus({preventScroll:true}); resizeForKeyboard(); scrollToInput();
   });
+  ['animationend','animationcancel'].forEach(type => win.addEventListener(type,event => {
+    if (event.target === win && event.animationName === 'terminal-enter') win.classList.remove('terminal-entering');
+  }));
+  // End the visual scale before the window manager measures a drag or resize.
+  win.addEventListener('pointerdown',() => win.classList.remove('terminal-entering'),{capture:true});
   win.addEventListener('blanktime:window-hidden',event => {
+    win.classList.remove('terminal-entering');
     input.blur(); resizeForKeyboard();
     if (event.detail?.state !== 'closed') return;
+    cancelLoginRequest();
     shell = null; history = []; historyIndex = 0; draft = ''; composing = false;
     input.value = ''; output.replaceChildren();
-    $('prompt').textContent = `${identity}:~$`;
+    refreshPrompt();
   });
 })();

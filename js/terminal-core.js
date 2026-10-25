@@ -6,12 +6,16 @@
   const COMMANDS = ['help', 'pwd', 'ls', 'll', 'cd', 'open', 'search', 'clear', 'exit'];
   const MAX_INPUT = 4096;
   const MAX_LINES = 1000;
+  const DEFAULT_FONT_SIZE = 14.5;
   const cleanText = value => String(value ?? '').replace(/[\u0000-\u001f\u007f-\u009f]/g, ' ');
   const KINDS = ['text', 'muted', 'directory', 'error', 'success', 'welcome', 'warning', 'info'];
   const DEFAULT_COLORS = {
     text:'#d6e1ed', muted:'#97a8ba', directory:'#83bcf3', error:'#ffabb0',
     success:'#86d6af', welcome:'#f0f5fa', warning:'#f2c97d', info:'#83bcf3',
-    prompt:'#86d6af', background:'#151c24', input:'#f0f5fa', caret:'#b1e5c8'
+    prompt:'#86d6af', background:'#151c24', input:'#f0f5fa', caret:'#b1e5c8',
+    prompt_separator:'#5f7189', prompt_symbol:'#b8c7d8', list_meta:'#5f7189', list_owner:'#7e90a5',
+    image:'#f3a8c8', document:'#e9d6a8', background_glow:'#1d2a38',
+    banner_start:'#86d6af', banner_middle:'#83bcf3', banner_end:'#f3a8c8'
   };
   const COMMAND_DETAILS = {
     help:['{command}', '显示命令帮助'], pwd:['{command}', '显示当前目录'],
@@ -38,6 +42,7 @@
     too_many_results:['Output truncated (limit: {limit} lines).', 'muted'],
     total:['total {total}', 'text'],
     last_login:['Last login: {date}', 'muted'],
+    last_login_ip:[' from {ip}', 'muted'],
     operation_failed:['{shell}: operation failed', 'error'],
     app_unavailable:['{command}: {name}: application unavailable', 'error'],
     viewer_unavailable:['{command}: image viewer unavailable', 'error'],
@@ -46,6 +51,12 @@
   const record = value => value && typeof value === 'object' && !Array.isArray(value) ? value : {};
   const own = (value, key) => Object.prototype.hasOwnProperty.call(value, key) ? value[key] : undefined;
   const configuredText = (value, fallback) => typeof value === 'string' ? value.slice(0, 2000) : fallback;
+  function fontSize(value) {
+    if (typeof value === 'string' && /^\d+(?:\.\d*)?(?:px)?$/i.test(value.trim())) {
+      value = Number(value.trim().replace(/px$/i, ''));
+    }
+    return typeof value === 'number' && Number.isFinite(value) && value >= 10 && value <= 24 ? value : DEFAULT_FONT_SIZE;
+  }
   // Replacement values are never parsed again, so a path containing {command} stays a path.
   const interpolate = (template, values) => template.replace(/\{([a-z_]+)\}/g, (match, key) =>
     Object.prototype.hasOwnProperty.call(values, key) ? cleanText(values[key]) : match);
@@ -91,7 +102,7 @@
       messages.set(key, {text:configuredText(typeof value === 'string' ? value : setting.text, text),
         kind:KINDS.includes(setting.color) ? setting.color : kind});
     });
-    return {commands, colors, shell, resolveCommand:name => registry.get(name),
+    return {commands, colors, shell, fontSize:fontSize(options.font_size), resolveCommand:name => registry.get(name),
       message(key, values = {}) {
         const template = messages.get(key) || {text:String(key), kind:'text'};
         return {text:interpolate(template.text, {...variables, ...record(values)}), kind:template.kind};
@@ -252,8 +263,8 @@
       let action, command = '', commandId, failed = false;
       line = String(line || '');
       const context = () => ({command, input:line, usage:commandDetails.get(commandId)?.usage || ''});
-      const out = (text, kind = commandDetails.get(commandId)?.color || 'text') =>
-        lines.push({text:String(text), ...(kind !== 'text' ? {kind} : {})});
+      const out = (text, kind = commandDetails.get(commandId)?.color || 'text', parts) =>
+        lines.push({text:String(text), ...(kind !== 'text' ? {kind} : {}), ...(parts ? {parts} : {})});
       const message = (key, values = {}) => presentation.message(key, {...context(), ...values});
       const report = (key, values) => lines.push(message(key, values));
       try {
@@ -300,9 +311,18 @@
           entries.forEach(entry => {
             const directory = entry.type === 'directory';
             const name = entry.name + (directory ? '/' : '');
-            if (empty) out('drwxr-xr-x  ' + sizeLabel(entry.size, human) + '  ' + username + ' ' + username + '  ' + dateLabel(entry.date) + '  ' + name, 'directory');
-            else if (long) out((directory ? 'drwxr-xr-x' : '-r--r--r--') + '  ' + username + ' ' + username + '  ' + sizeLabel(entry.size, human).padStart(6) + '  ' + dateLabel(entry.date).padEnd(16) + '  ' + name, directory ? 'directory' : undefined);
-            else out(name, directory ? 'directory' : undefined);
+            if (empty || long) {
+              const size = sizeLabel(entry.size, human), date = dateLabel(entry.date);
+              const nameRole = directory ? 'directory' : entry.type === 'image' ? 'image' : entry.type === 'article' ? 'document' : 'name';
+              const parts = [{text:directory ? 'drwxr-xr-x' : '-r--r--r--', role:'permission'}, {text:'  '}];
+              // Empty directories retain their original size-before-owner column order.
+              if (empty) parts.push({text:size, role:'size'}, {text:'  '});
+              parts.push({text:username, role:'owner'}, {text:' '}, {text:username, role:'owner'});
+              if (!empty) parts.push({text:'  ' + ' '.repeat(Math.max(0, 6 - size.length))}, {text:size, role:'size'});
+              parts.push({text:'  '}, {text:date, role:'date'},
+                {text:(empty ? '' : ' '.repeat(Math.max(0, 16 - date.length))) + '  '}, {text:name, role:nameRole});
+              out(parts.map(part => part.text).join(''), directory ? 'directory' : undefined, parts);
+            } else out(name, directory ? 'directory' : undefined);
           });
         } else if (commandId === 'open') {
           requireCount(1, 1);

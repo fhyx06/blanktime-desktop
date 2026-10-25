@@ -8,7 +8,7 @@
   const number = value => typeof value === 'number' && Number.isFinite(value);
   const positive = value => number(value) && value > 0;
   const enabled = value => typeof value === 'boolean' ? (value ? '已启用' : '已关闭') : null;
-  let active = false, generation = 0, timer, batteryPromise, gpuInfo;
+  let active = false, generation = 0, timer, batteryPromise, gpuInfo, ipController;
   let listeners = [];
 
   function set(key, value) {
@@ -134,6 +134,17 @@
     set('gpu', typeof gpuInfo.renderer === 'string' ? gpuInfo.renderer : null);
     syncGroups();
   }
+  async function publicIP(run) {
+    set('public-ip', null);
+    const service = read(window, 'blanktimeIP');
+    if (typeof read(service, 'query') !== 'function') return;
+    ipController = new AbortController();
+    let ip;
+    try { ip = await service.query({signal:ipController.signal}); } catch { /* Keep unavailable IP information hidden. */ }
+    if (!active || run !== generation) return;
+    set('public-ip', typeof ip === 'string' ? ip : null);
+    syncGroups();
+  }
   function battery(run) {
     if (typeof read(navigator, 'getBattery') !== 'function') return;
     // Share a pending request across reopenings; a late response must not restart a hidden window.
@@ -158,7 +169,7 @@
     if (active) return;
     active = true;
     const run = ++generation;
-    browserInfo(); clock(); display(); language(); network(); hardware(); battery(run);
+    browserInfo(); clock(); display(); language(); network(); hardware(); battery(run); publicIP(run);
     timer = setInterval(clock, 1000);
     listen(window, 'resize', display);
     listen(window, 'languagechange', language);
@@ -179,6 +190,10 @@
   function stop() {
     active = false;
     ++generation;
+    ipController?.abort();
+    ipController = undefined;
+    set('public-ip', null);
+    syncGroups();
     clearInterval(timer);
     listeners.forEach(remove => remove());
     listeners = [];

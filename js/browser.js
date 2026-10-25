@@ -52,7 +52,7 @@
   function updateTools() {
     const article = active !== home;
     tocButton.disabled = !article || !active.toc;
-    tocButton.setAttribute('aria-expanded', String(article && tocVisible));
+    tocButton.setAttribute('aria-expanded', String(article && !!active.toc && tocVisible));
     tocButton.setAttribute('aria-label', tocVisible ? '隐藏目录' : '显示目录');
     tocButton.title = tocButton.getAttribute('aria-label');
     if (active.toc) {
@@ -155,8 +155,86 @@
       }
     } catch {}
   }
+  function prepareContent(tab, root) {
+    // Decrypted content arrives later and needs the same tab-local IDs/URLs.
+    if (root.id) root.id = tab.prefix + root.id;
+    root.querySelectorAll('[id]').forEach(node => { node.id = tab.prefix + node.id; });
+    for (const attribute of ['aria-controls','aria-labelledby','aria-describedby','for']) {
+      root.querySelectorAll(`[${attribute}]`).forEach(node => node.setAttribute(attribute, node.getAttribute(attribute).split(/\s+/).map(id => tab.prefix + id).join(' ')));
+    }
+    root.querySelectorAll('[src],a[href]').forEach(node => {
+      const attr = node.hasAttribute('src') ? 'src' : 'href', value = node.getAttribute(attr);
+      if (value && !value.startsWith('#')) {
+        try { node.setAttribute(attr, new URL(value, tab.url).href); } catch {}
+      }
+    });
+    root.querySelectorAll('a[href]').forEach(link => {
+      try {
+        const url = new URL(link.href);
+        if (!link.getAttribute('href').startsWith('#') && (url.origin !== location.origin || !posts.has(url.pathname))) { link.target = '_blank'; link.rel = 'noopener noreferrer'; }
+      } catch {}
+    });
+  }
+  function renderContent(tab) {
+    if (tab.ready) return;
+    tab.ready = true;
+    const article = tab.article, scroll = tab.scroll;
+    const toc = document.createElement('aside'); toc.className = 'toc-panel'; toc.setAttribute('aria-label','文章目录');
+    const label = document.createElement('div'); label.className = 'toc-heading'; label.textContent = '本文目录';
+    const nav = document.createElement('nav'); nav.className = 'browser-toc'; toc.append(label, nav); tab.toc = toc;
+    const plain = article.querySelector('.post-content').cloneNode(true); plain.querySelectorAll('.katex-mathml').forEach(node => node.remove());
+    const count = (plain.textContent.match(/[\u3400-\u9fff]|[a-zA-Z0-9]+/g) || []).length;
+    tab.summary = `${count.toLocaleString()} 字 · 约 ${Math.max(1, Math.ceil(count / 400))} 分钟`;
+    tab.page.append(toc);
+    const headings = [...article.querySelectorAll('.post-content :is(h1,h2,h3,h4,h5,h6)')];
+    const links = [], minLevel = Math.min(...headings.map(h => Number(h.tagName.slice(1))));
+    function progress() {
+      if (active !== tab) return;
+      const max = scroll.scrollHeight - scroll.clientHeight;
+      const percentage = max <= 1 ? 100 : Math.min(100, Math.round(scroll.scrollTop / max * 100));
+      status.textContent = `${tab.summary} · 已读 ${percentage}%`;
+      let index = 0; const boundary = scroll.getBoundingClientRect().top + 90;
+      headings.forEach((heading, i) => { if (heading.getBoundingClientRect().top <= boundary) index = i; });
+      links.forEach((link, i) => { link.classList.toggle('active', i === index); if (i === index) link.setAttribute('aria-current','location'); else link.removeAttribute('aria-current'); });
+    }
+    tab.progress = progress;
+    window.blanktimeImages.prepareArticle(article);
+    window.blanktimeReading.setupCodeBlocks(article, tab.prefix, progress);
+    headings.forEach((heading, i) => {
+      if (!heading.id) heading.id = `${tab.prefix}section-${i}`;
+      const link = document.createElement('a'); link.href = '#' + encodeURIComponent(heading.id); link.textContent = heading.textContent;
+      link.style.setProperty('--level', Math.min(4, Number(heading.tagName.slice(1)) - minLevel));
+      link.addEventListener('click', event => {
+        event.preventDefault(); heading.scrollIntoView({block:'start'});
+        tab.url.hash = '#' + encodeURIComponent(heading.id.slice(tab.prefix.length));
+        route(tab, tab.url.hash, true);
+        if (matchMedia('(max-width:760px)').matches) { setToc(false); }
+      }); nav.append(link); links.push(link);
+    });
+    if (!headings.length) nav.textContent = '这篇文章没有章节标题';
+    article.querySelectorAll('.legacy-tabs').forEach(group => {
+      const buttons = [...group.querySelectorAll('[role=tab]')], panels = [...group.querySelectorAll('[role=tabpanel]')];
+      const select = index => buttons.forEach((button, i) => { button.setAttribute('aria-selected', String(index === i)); button.tabIndex = index === i ? 0 : -1; panels[i].hidden = index !== i; });
+      group.classList.add('is-enhanced'); select(0);
+      buttons.forEach((button, i) => {
+        button.addEventListener('click', () => { select(i); progress(); });
+        button.addEventListener('keydown', event => {
+          const index = event.key === 'ArrowRight' ? (i + 1) % buttons.length : event.key === 'ArrowLeft' ? (i - 1 + buttons.length) % buttons.length : event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : -1;
+          if (index >= 0) { event.preventDefault(); select(index); buttons[index].focus(); }
+        });
+      });
+    });
+    article.querySelectorAll('img,iframe').forEach(node => { node.loading = 'lazy'; });
+    tab.comments = window.blanktimeComments?.create({article, scroll, theme});
+    tab.comments?.setActive(active === tab && !win.hidden && win.dataset.state === 'open');
+    scroll.addEventListener('scroll', progress, {passive:true});
+    tab.observer = new ResizeObserver(progress); tab.observer.observe(scroll);
+    if (active !== tab || win.hidden || win.dataset.state === 'closed') suspend(tab);
+    if (active === tab) { updateTools(); progress(); if (tab.url.hash) jump(tab, tab.url.hash); }
+  }
   async function load(tab, initialSource = null) {
     tab.comments?.destroy(); tab.comments = null;
+    tab.observer?.disconnect(); tab.toc = null; tab.article = null; tab.progress = null; tab.ready = false;
     tab.page.replaceChildren(); tab.page.setAttribute('aria-busy', 'true');
     const message = document.createElement('div'); message.className = 'browser-message'; message.textContent = '正在加载文章…'; tab.page.append(message);
     try {
@@ -171,78 +249,27 @@
       if (!tabs.has(tab.key)) return;
       const article = document.importNode(source, true); tab.article = article;
       article.dataset.url = new URL(tab.url.pathname + tab.url.search, tab.url).href;
-      // Prefix IDs to avoid collisions between article tabs.
-      article.querySelectorAll('[id]').forEach(node => { node.id = tab.prefix + node.id; });
-      for (const attribute of ['aria-controls','aria-labelledby','aria-describedby','for']) {
-        article.querySelectorAll(`[${attribute}]`).forEach(node => node.setAttribute(attribute, node.getAttribute(attribute).split(/\s+/).map(id => tab.prefix + id).join(' ')));
-      }
-      article.querySelectorAll('[src],a[href]').forEach(node => {
-        const attr = node.hasAttribute('src') ? 'src' : 'href', value = node.getAttribute(attr);
-        if (value && !value.startsWith('#')) {
-          try { node.setAttribute(attr, new URL(value, tab.url).href); } catch {}
-        }
-      });
-      article.querySelectorAll('a[href]').forEach(link => {
-        try {
-          const url = new URL(link.href);
-          if (!link.getAttribute('href').startsWith('#') && (url.origin !== location.origin || !posts.has(url.pathname))) { link.target = '_blank'; link.rel = 'noopener noreferrer'; }
-        } catch {}
-      });
+      const locked = window.blanktimeEncryption?.prepare(article) || article.dataset.encrypted === 'true';
+      prepareContent(tab, article);
       const scroll = document.createElement('div'); scroll.className = 'article-scroll'; scroll.tabIndex = 0; scroll.setAttribute('aria-label','文章正文'); scroll.append(article);
-      const toc = document.createElement('aside'); toc.className = 'toc-panel'; toc.setAttribute('aria-label','文章目录');
-      const label = document.createElement('div'); label.className = 'toc-heading'; label.textContent = '本文目录';
-      const nav = document.createElement('nav'); nav.className = 'browser-toc'; toc.append(label, nav); tab.toc = toc;
-      const plain = article.querySelector('.post-content').cloneNode(true); plain.querySelectorAll('.katex-mathml').forEach(node => node.remove());
-      const count = (plain.textContent.match(/[\u3400-\u9fff]|[a-zA-Z0-9]+/g) || []).length;
-      tab.summary = `${count.toLocaleString()} 字 · 约 ${Math.max(1, Math.ceil(count / 400))} 分钟`;
-      tab.page.replaceChildren(scroll, toc);
-      const headings = [...article.querySelectorAll('.post-content :is(h1,h2,h3,h4,h5,h6)')];
-      const links = [], minLevel = Math.min(...headings.map(h => Number(h.tagName.slice(1))));
-      function progress() {
-        if (active !== tab) return;
-        const max = scroll.scrollHeight - scroll.clientHeight;
-        const percentage = max <= 1 ? 100 : Math.min(100, Math.round(scroll.scrollTop / max * 100));
-        status.textContent = `${tab.summary} · 已读 ${percentage}%`;
-        let index = 0; const boundary = scroll.getBoundingClientRect().top + 90;
-        headings.forEach((heading, i) => { if (heading.getBoundingClientRect().top <= boundary) index = i; });
-        links.forEach((link, i) => { link.classList.toggle('active', i === index); if (i === index) link.setAttribute('aria-current','location'); else link.removeAttribute('aria-current'); });
-      }
-      window.blanktimeReading.setupArticleHeader(article, progress);
-      window.blanktimeImages.prepareArticle(article);
-      window.blanktimeReading.setupCodeBlocks(article, tab.prefix, progress);
-      headings.forEach((heading, i) => {
-        if (!heading.id) heading.id = `${tab.prefix}section-${i}`;
-        const link = document.createElement('a'); link.href = '#' + encodeURIComponent(heading.id); link.textContent = heading.textContent;
-        link.style.setProperty('--level', Math.min(4, Number(heading.tagName.slice(1)) - minLevel));
-        link.addEventListener('click', event => {
-          event.preventDefault(); heading.scrollIntoView({block:'start'});
-          tab.url.hash = '#' + encodeURIComponent(heading.id.slice(tab.prefix.length));
-          route(tab, tab.url.hash, true);
-          if (matchMedia('(max-width:760px)').matches) { setToc(false); }
-        }); nav.append(link); links.push(link);
-      });
-      if (!headings.length) nav.textContent = '这篇文章没有章节标题';
-      article.querySelectorAll('.legacy-tabs').forEach(group => {
-        const buttons = [...group.querySelectorAll('[role=tab]')], panels = [...group.querySelectorAll('[role=tabpanel]')];
-        const select = index => buttons.forEach((button, i) => { button.setAttribute('aria-selected', String(index === i)); button.tabIndex = index === i ? 0 : -1; panels[i].hidden = index !== i; });
-        group.classList.add('is-enhanced'); select(0);
-        buttons.forEach((button, i) => {
-          button.addEventListener('click', () => { select(i); progress(); });
-          button.addEventListener('keydown', event => {
-            const index = event.key === 'ArrowRight' ? (i + 1) % buttons.length : event.key === 'ArrowLeft' ? (i - 1 + buttons.length) % buttons.length : event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : -1;
-            if (index >= 0) { event.preventDefault(); select(index); buttons[index].focus(); }
-          });
+      tab.scroll = scroll;
+      tab.page.replaceChildren(scroll);
+      window.blanktimeReading.setupArticleHeader(article, () => tab.progress?.());
+      if (locked) {
+        tab.summary = '加密文章 · 请输入密码';
+        window.blanktimeEncryption?.mount(article, {
+          signal:tab.controller.signal,
+          onUnlock: content => {
+            if (!tabs.has(tab.key) || tab.controller.signal.aborted) return;
+            prepareContent(tab, content);
+            renderContent(tab);
+          }
         });
-      });
-      article.querySelectorAll('img,iframe').forEach(node => { node.loading = 'lazy'; });
-      tab.comments = window.blanktimeComments?.create({article, scroll, theme});
-      tab.comments?.setActive(active === tab && !win.hidden && win.dataset.state === 'open');
-      scroll.addEventListener('scroll', progress, {passive:true});
-      tab.observer = new ResizeObserver(progress); tab.observer.observe(scroll);
-      if (active !== tab || win.hidden || win.dataset.state === 'closed') suspend(tab);
-      if (active === tab) { updateTools(); progress(); if (tab.url.hash) jump(tab, tab.url.hash); }
+        if (active === tab) updateTools();
+      } else renderContent(tab);
     } catch (error) {
       if (error.name === 'AbortError') return;
+      tab.page.replaceChildren(message);
       message.textContent = '文章加载失败，请检查连接后重试。';
       const retry = document.createElement('button'); retry.textContent = '重试'; retry.addEventListener('click', () => load(tab)); message.append(document.createElement('br'), retry);
       tab.summary = '文章加载失败'; if (active === tab) updateTools();

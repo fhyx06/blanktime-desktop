@@ -1,0 +1,15 @@
+.post-content .hbe-container{max-width:480px;margin:40px auto 64px;padding:30px;border:1px solid var(--browser-border);border-radius:16px;background:var(--browser-bg);color:var(--browser-text)}
+.post-content .hbe-form{display:flex;flex-direction:column;gap:16px;margin:0}
+.post-content .hbe-input{display:flex;flex-direction:column;gap:16px}
+.post-content .hbe-input-label{order:-1;font-size:16px;font-weight:600;line-height:1.7}
+.post-content .hbe-input-field{width:100%;min-width:0;padding:12px 14px;border:1px solid var(--browser-border);border-radius:8px;background:var(--browser-paper);color:var(--browser-text);font:inherit;font-size:16px;box-sizing:border-box}
+.post-content .hbe-input-field:focus{outline:2px solid var(--accent);outline-offset:2px}
+.post-content .hbe-button{align-self:flex-start;padding:10px 24px;background:var(--accent);color:#fff;border:0;border-radius:8px;font:inherit;font-size:14px;cursor:var(--cursor-pointer,pointer)}
+.post-content .hbe-button:disabled{opacity:.55;cursor:wait}
+.post-content .hbe-button-hidden{display:none}
+.post-content .hbe-error{color:#c03945;font-size:13px;line-height:1.7;overflow-wrap:anywhere}
+.post-content .hbe-error:empty{display:none}
+.post-content .encryption-retry{margin-left:8px;text-decoration:underline;color:var(--accent);font:inherit}
+.browser-window[data-theme=dark] .hbe-error{color:#ff9ca5}
+.post-content .hbe-decrypted-content{margin:0;padding:0}
+@media(max-width:760px){.post-content .hbe-container{margin:24px auto 40px;padding:22px 18px}}
