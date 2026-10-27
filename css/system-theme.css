@@ -32,12 +32,13 @@ html[data-system-theme="dark"] :is(.welcome-profile,.welcome-card,.poem-refresh)
 html[data-system-theme="dark"] .poem-feedback {color:#c5b39d;}
 /* File manager. */
 html[data-system-theme="dark"] :is(.files-main,.files-table th) {background:var(--sys-base);}
-html[data-system-theme="dark"] :is(.files-breadcrumb,.files-search,.files-actions>button,.files-table th,.files-table td) {border-color:var(--sys-border);}
-html[data-system-theme="dark"] :is(.files-breadcrumb,.files-sort-label,.files-table th,.files-category small,.files-category svg,.files-sidebar-label,.file-extension,.files-empty) {color:var(--sys-muted);}
-html[data-system-theme="dark"] :is(.file-link,.files-table td,.files-breadcrumb strong,.files-search input,.files-empty strong) {color:var(--sys-text);}
+html[data-system-theme="dark"] :is(.files-breadcrumb,.files-search,.files-actions>button,.files-table th,.files-table td,.files-history-buttons,.files-history-buttons button+button,#files-up) {border-color:var(--sys-border);}
+html[data-system-theme="dark"] :is(.files-sort-label,.files-table th,.files-crumb-divider,.file-extension,.files-empty) {color:var(--sys-muted);}
+html[data-system-theme="dark"] :is(.file-link,.files-tree-row,.files-table td,.files-breadcrumb,.files-search input,.files-empty strong,.files-navigation button) {color:var(--sys-text);}
 html[data-system-theme="dark"] .files-sort-label select {background:var(--sys-raised);color:var(--sys-text);border-color:var(--sys-border);}
-html[data-system-theme="dark"] :is(.files-category:hover,.post-file:hover,.files-actions>button:enabled:hover) {background:var(--sys-hover);}
-html[data-system-theme="dark"] :is(.files-category.is-selected,.post-file.is-selected) {background:#293e59;color:#80b6ff;}
+html[data-system-theme="dark"] :is(.files-tree-row:hover,.files-crumbs button:hover,.file-row:hover,.files-actions>button:enabled:hover,.files-navigation button:enabled:hover) {background:var(--sys-hover);}
+html[data-system-theme="dark"] :is(.files-tree-row.is-selected,.file-row.is-selected) {background:#293e59;color:#80b6ff;}
+html[data-system-theme="dark"] .files-error {background:#493824;color:#efbd7d;}
 html[data-system-theme="dark"] .file-icon {background:linear-gradient(145deg,#3c4958,#2b3540);border-color:#566374;color:#c4d6e3;}
 /* Album. */
 html[data-system-theme="dark"] .album-content {background:var(--sys-base);border-color:var(--sys-border);}

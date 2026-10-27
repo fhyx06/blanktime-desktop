@@ -52,6 +52,7 @@
   let songs = [], index = -1, lyrics = [], lyricIndex = -1, loop = 'list';
   let buffering = true;
   let loading = false, playlistRequest = 0, trackRequest = 0, lyricController;
+  let playlistStatus = '';
   let userScrollUntil = 0, seeking = false, rememberedVolume = 0.5;
   const id = playlistId(win.dataset.playlist);
   const closed = () => win.dataset.state === 'closed';
@@ -72,7 +73,25 @@
   function publishState() {
     document.dispatchEvent(new CustomEvent('blanktime:music-state', {detail:getState()}));
   }
+  function getPlaylist() {
+    return {
+      tracks:songs.map(song => ({...song})),
+      state:win.dataset.loadState || 'idle', status:playlistStatus
+    };
+  }
+  function publishPlaylist() {
+    document.dispatchEvent(new CustomEvent('blanktime:music-playlist', {detail:getPlaylist()}));
+  }
   function openPlayer() { window.blanktimeDesktop.openWindow(win); }
+  function playTrack(key) {
+    if (loading) return false;
+    const selected = songs.findIndex(song => song.key === key);
+    if (selected < 0) return false;
+    openPlayer();
+    // Select synchronously so opening's observer cannot replace it with the first song.
+    selectSong(selected, true);
+    return true;
+  }
   function togglePlayback() {
     if (!songs.length || loading) return;
     // Reopen a closed player within the same user gesture, but leave minimized playback alone.
@@ -175,7 +194,8 @@
       .filter(Boolean))];
     if (!id || !urls.length) {
       const message = '请在主题配置中设置有效歌单和接口地址。';
-      win.dataset.loadState = 'error'; listState(message); setStatus(message); return;
+      win.dataset.loadState = 'error'; playlistStatus = message;
+      listState(message); setStatus(message); publishPlaylist(); return;
     }
     loading = true;
     win.dataset.loadState = 'loading';
@@ -184,12 +204,14 @@
     audio.pause();
     const request = ++playlistRequest;
     listState('正在加载歌单…'); setStatus('正在加载歌单…');
+    playlistStatus = '正在加载歌单…'; publishPlaylist();
     try {
       let result, lastError;
       for (let attempt = 0; attempt < urls.length; attempt++) {
         if (attempt) {
           const message = `正在尝试备用接口（${attempt + 1}/${urls.length}）…`;
           listState(songs.length ? '' : message); setStatus(message);
+          playlistStatus = message;
         }
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 6000);
@@ -208,7 +230,9 @@
       }
       if (request !== playlistRequest) return;
       if (!result?.length) throw lastError;
-      songs = result;
+      // Keys belong to this successful response; an old directory entry must not
+      // address a different song after a refresh changes the playlist order.
+      songs = result.map((song, i) => ({...song, key:`track-${request}-${i}`}));
       index = -1;
       renderList(); listState('');
       controlsEnabled(true);
@@ -216,6 +240,7 @@
       if (!win.hidden && !closed()) selectSong(0,false);
       else setStatus('歌单已就绪');
       win.dataset.loadState = 'ready';
+      playlistStatus = '歌单已就绪';
     } catch (error) {
       if (request !== playlistRequest) return;
       const message = error.name === 'AbortError' ? '歌单加载超时，请重试。'
@@ -227,8 +252,11 @@
       listState(songs.length ? '' : message,true);
       setStatus(message); controlsEnabled(songs.length > 0);
       win.dataset.loadState = 'error';
+      playlistStatus = message;
     } finally {
-      if (request === playlistRequest) { loading = false; $('reload').disabled = false; publishState(); }
+      if (request === playlistRequest) {
+        loading = false; $('reload').disabled = false; publishState(); publishPlaylist();
+      }
     }
   }
   const largeCovers = new Map();
@@ -576,7 +604,8 @@
     }
     publishState();
   }).observe(win,{attributes:true,attributeFilter:['data-state','hidden']});
-  window.blanktimeMusic = {getState, togglePlayback, previous:() => stepSong(-1), next:() => stepSong(1), open:openPlayer};
+  window.blanktimeMusic = {getState, getPlaylist, retryPlaylist:loadPlaylist, playTrack,
+    togglePlayback, previous:() => stepSong(-1), next:() => stepSong(1), open:openPlayer};
   icon('btnPrev','prev');icon('btnNext','next');
   if ($('btnLink')) icon('btnLink','link');
   setLoop(store.get('loop'));accent(store.get('accent') || defaultAccent);

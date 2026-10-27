@@ -59,7 +59,15 @@
       active.toc.hidden = !tocVisible;
       active.toc.classList.toggle('is-open', tocVisible);
     }
-    $('.browser-location').textContent = article ? '空白时间 / ' + active.title : '空白时间 / 所有文章';
+    // The desktop address describes the shared file tree; real article URLs still
+    // drive navigation, fetching, relative assets and comment identity.
+    const filesystem = window.blanktimeFS;
+    const filePath = article ? filesystem?.articlePath?.(active.url?.href || active.key)
+      : filesystem?.home ? filesystem.home + '/Documents/Posts/' : null;
+    const address = $('.browser-location');
+    address.textContent = filePath ? 'http://127.0.0.1' + filePath
+      : article ? '空白时间 / ' + active.title : '空白时间 / 所有文章';
+    address.title = address.textContent;
     status.textContent = article ? (active.summary || '正在加载文章…') : `共 ${cards.filter(card => !card.hidden).length} 篇文章`;
   }
   function activate(tab, focus = true, navigate = true) {

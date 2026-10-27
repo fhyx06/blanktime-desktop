@@ -35,6 +35,7 @@
 .terminal-window .pt-sep {color:var(--terminal-color-prompt_separator,#5f7189);}
 .terminal-window .pt-path {color:var(--terminal-color-directory,#83bcf3);}
 .terminal-window .pt-dollar {color:var(--terminal-color-prompt_symbol,#b8c7d8);}
+.terminal-window .is-root .pt-user,.terminal-window .is-root .pt-dollar {color:var(--terminal-color-root_prompt,#f2c97d);}
 .terminal-window .ll-perm,.terminal-window .ll-size,.terminal-window .ll-date {color:var(--terminal-color-list_meta,#5f7189);}
 .terminal-window .ll-own {color:var(--terminal-color-list_owner,#7e90a5);}
 .terminal-window .ll-name.is-dir {color:var(--terminal-color-directory,#83bcf3);font-weight:700;}
@@ -54,6 +55,18 @@
   box-shadow:none;caret-shape:block;
 }
 #terminal-form:focus-within {box-shadow:0 1px color-mix(in srgb,var(--terminal-color-prompt,#86d6af) 14%,transparent);}
+/* Only paint a fixed caret for the terminal's no-echo keyboard target. */
+#terminal-form.is-password {position:relative;}
+#terminal-form.is-password #terminal-secret-input:not([hidden]) {
+  position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;opacity:0;font:inherit;
+  font-size:max(16px,var(--terminal-font-size,14.5px));appearance:none;
+}
+#terminal-secret-input::-webkit-search-cancel-button,
+#terminal-secret-input::-webkit-search-decoration {display:none;}
+#terminal-form.is-password:focus-within::after {
+  content:'';display:block;align-self:center;width:.6ch;height:1.1em;
+  background:var(--terminal-color-caret,#b1e5c8);
+}
 .terminal-shortcuts {display:none;}
 @media (max-width:760px) {
   .terminal-screen {padding:16px 14px;}

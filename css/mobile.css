@@ -16,14 +16,32 @@
     gap:0;
     padding:4px max(4px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(4px,env(safe-area-inset-left));
     border-radius:16px 16px 0 0;
+    overflow:hidden;
+  }
+  .dock-apps {
+    --dock-fade-left:#000;
+    --dock-fade-right:#000;
+    display:flex;
+    flex:1 1 0;
+    min-width:0;
+    height:44px;
+    min-height:44px;
+    align-items:center;
     overflow-x:auto;
     overflow-y:hidden;
     scrollbar-width:none;
     overscroll-behavior-x:contain;
+    -webkit-mask-image:linear-gradient(to right,var(--dock-fade-left),#000 10px,#000 calc(100% - 10px),var(--dock-fade-right));
+    mask-image:linear-gradient(to right,var(--dock-fade-left),#000 10px,#000 calc(100% - 10px),var(--dock-fade-right));
   }
-  .dock::-webkit-scrollbar {display:none;}
+  .dock-apps::-webkit-scrollbar {display:none;}
+  .dock-apps.can-scroll-left {--dock-fade-left:transparent;}
+  .dock-apps.can-scroll-right {--dock-fade-right:transparent;}
+  .dock-tools {display:flex;flex:0 0 auto;align-items:center;}
+  .dock-tools > .dock-button {flex:0 0 44px;}
   .dock-divider,.dock-space {display:none;}
   .dock-button {flex:1 0 44px;width:44px;min-width:44px;height:44px;}
+  .dock-apps .dock-button:focus-visible {outline-offset:-3px;}
   .dock-button .running-dot {left:calc(50% - 6px);top:auto;bottom:0;width:12px;height:3px;}
   body .app-window:not(:fullscreen) {
     left:var(--mobile-left)!important;
@@ -62,7 +80,7 @@
   .files-category {min-height:40px;}
   .album-toolbar {flex-wrap:wrap;gap:12px;}
   .album-toolbar button,.album-folder-heading button {min-height:40px;}
-  #album-folders {grid-template-columns:repeat(auto-fill,minmax(120px,150px));justify-content:space-between;}
+  #album-folders {grid-template-columns:repeat(auto-fill,minmax(120px,150px));justify-content:space-evenly;}
   .browser-toolbar button {min-width:40px;height:40px;}
   .browser-tab {min-height:40px;}
   .browser-location {min-width:0;}

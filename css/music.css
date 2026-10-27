@@ -1,6 +1,6 @@
 .desktop-music-icon { top: 155px; }
-.music-icon-art { width: 46px; height: 46px; display: block; object-fit: cover; border-radius: 12px; box-shadow: 0 0 0 1px #ffffff26,0 3px 8px #0002; }
-.window-caption > .music-icon-art { width: 20px; height: 20px; flex-shrink: 0; border-radius: 5px; box-shadow: none; }
+.music-icon-art { width: 46px; height: 46px; display: block; object-fit: contain; filter: drop-shadow(0 3px 8px #0002); }
+.window-caption > .music-icon-art { width: 20px; height: 20px; flex-shrink: 0; filter: none; }
 #music {
     /* 主色调：只改 --accent-rgb 这一处，其余色值全部由它派生 */
     --accent-rgb:236,65,65;                 /* 默认：网易云红 */
@@ -535,3 +535,28 @@ html[data-system-theme="dark"] #music .listening-view .lyric-line.active { color
 .music-launch.music-close .music-launch-record,
 .music-launch.music-close .music-launch-wave {animation:none;}
 .music-launch.music-close .music-launch-wave-outer {display:none;}
+
+/* Light appearance from the standalone preview; the listening controls stay transparent. */
+html:not([data-system-theme="dark"]) #music {
+  --text:#1b1f27; --text-2:#5b6475; --line:#dce0e9;
+  --window-bg:#f1f3f8; --panel-bg:#e8ebf2; --hover:rgba(255,255,255,.75);
+  background:var(--window-bg); border-color:rgba(27,31,39,.10);
+  box-shadow:0 22px 60px -12px rgba(27,38,60,.28),0 2px 8px rgba(27,38,60,.08);
+}
+html:not([data-system-theme="dark"]) #music .titlebar {background:var(--panel-bg);border-bottom:1px solid var(--line);}
+html:not([data-system-theme="dark"]) #music .window-controls button:not([data-action="close"]):hover {background:rgba(27,31,39,.07);}
+html:not([data-system-theme="dark"]) #music .music-search {background:#fff;border-color:var(--line);transition:background .15s,box-shadow .15s,border-color .15s;}
+html:not([data-system-theme="dark"]) #music .music-search:hover {border-color:#c9cfdb;}
+html:not([data-system-theme="dark"]) #music .music-search:focus-within {background:#fff;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+html:not([data-system-theme="dark"]) #music .row:hover {background:var(--hover);}
+html:not([data-system-theme="dark"]) #music .row.active {background:rgba(var(--accent-rgb),.11);}
+html:not([data-system-theme="dark"]) #music .row.active:not(.bad) :is(.row-name,.row-idx) {color:var(--accent-dark);color:color-mix(in srgb,var(--accent) 68%,#000);}
+html:not([data-system-theme="dark"]) #music .row-cover {background:rgba(var(--accent-rgb),.12);}
+html:not([data-system-theme="dark"]) #music .list-state {background:rgba(241,243,248,.94);}
+html:not([data-system-theme="dark"]) #music:not(.is-lyrics-view) .player {background:var(--panel-bg);box-shadow:0 -10px 24px -18px rgba(27,38,60,.25);}
+html:not([data-system-theme="dark"]) #music :is(.rail,.vol-rail) {background:rgba(27,31,39,.17);}
+html:not([data-system-theme="dark"]) #music .buffer {background:rgba(27,31,39,.10);}
+html:not([data-system-theme="dark"]) #music .playlist::-webkit-scrollbar-thumb {background:rgba(27,31,39,.20);background-clip:content-box;}
+html:not([data-system-theme="dark"]) #music .playlist::-webkit-scrollbar-thumb:hover {background:rgba(27,31,39,.34);background-clip:content-box;}
+/* Match the visual weight of Chinese and Latin song titles. */
+#music :is(.row,.row.active) .row-name,#music .song-name {font-weight:700;}

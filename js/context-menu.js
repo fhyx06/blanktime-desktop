@@ -120,6 +120,12 @@
       const win = document.getElementById(app.id === 'desktop-files' ? 'files' : app.dataset.open);
       return win ? {group:'window', items:windowItems(win)} : null;
     }
+    const imageFile = target.closest('#files .file-row[data-type="image"]');
+    if (imageFile?.fileNode) return {group:'file_image', select:() => window.blanktimeFiles?.selectFile(imageFile), items:[
+      item('view-image','查看大图',() => window.blanktimeFiles?.openFile(imageFile.dataset.path)),
+      copyItem('复制图片地址',imageFile.fileNode.url),
+      item('details','详细信息',() => window.blanktimeFileDetails?.open(imageFile.fileNode),!window.blanktimeFileDetails)
+    ]};
     const row = target.closest('.post-file, .browser-card');
     if (row) {
       const link = row.matches('a[href]') ? row : row.querySelector('a[href]');

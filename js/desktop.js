@@ -4,6 +4,8 @@
   const windows = [...document.querySelectorAll('.app-window')];
   const welcome = $('#welcome');
   const mobile = () => matchMedia('(max-width: 760px)').matches;
+  const dockApps = $('.dock-apps');
+  let suppressDockReveal = false;
   let topZ = 10, activeWindow, desktopRestore = [];
   const loadArticle = href => document.dispatchEvent(new CustomEvent('blanktime:open-article', {detail:{href}}));
   let welcomeDismissed = false;
@@ -12,6 +14,38 @@
     welcomeDismissed = true;
     try { sessionStorage.setItem('welcome-dismissed', 'yes'); } catch {}
   }
+  function updateDockOverflow(clamp = false) {
+    if (!dockApps) return;
+    if (!mobile()) {
+      dockApps.classList.remove('can-scroll-left', 'can-scroll-right');
+      return;
+    }
+    const maximum = Math.max(0, dockApps.scrollWidth - dockApps.clientWidth);
+    const position = Math.max(0, Math.min(maximum, dockApps.scrollLeft));
+    // Clamp when icons disappear or the viewport changes, but leave touch overscroll alone.
+    if (clamp && position !== dockApps.scrollLeft) dockApps.scrollLeft = position;
+    dockApps.classList.toggle('can-scroll-left', position > 1);
+    dockApps.classList.toggle('can-scroll-right', maximum - position > 1);
+  }
+  function revealDockButton(button) {
+    if (!mobile() || !dockApps?.contains(button) || button.hidden) return;
+    const area = dockApps.getBoundingClientRect(), target = button.getBoundingClientRect();
+    if (!area.width || !target.width) return;
+    const inset = 6;
+    let offset = 0;
+    if (target.left < area.left + inset) offset = target.left - area.left - inset;
+    else if (target.right > area.right - inset) offset = target.right - area.right + inset;
+    if (offset) {
+      const maximum = Math.max(0, dockApps.scrollWidth - dockApps.clientWidth);
+      dockApps.scrollLeft = Math.max(0, Math.min(maximum, dockApps.scrollLeft + offset));
+    }
+    updateDockOverflow();
+  }
+  dockApps?.addEventListener('scroll', () => updateDockOverflow(), {passive:true});
+  dockApps?.addEventListener('focusin', event => {
+    const button = event.target.closest('.dock-button[data-open]');
+    if (!suppressDockReveal && button?.matches(':focus-visible')) revealDockButton(button);
+  });
   function syncDock() {
     document.querySelectorAll('[data-open]').forEach(button => {
       const win = document.getElementById(button.dataset.open);
@@ -19,6 +53,7 @@
       button.classList.toggle('is-running', win.dataset.state !== 'closed');
       button.classList.toggle('is-focused', activeWindow === win && win.dataset.state === 'open');
     });
+    updateDockOverflow(true);
   }
   function focusWindow(win, raise = true) {
     activeWindow = win;
@@ -617,8 +652,9 @@
     if (!target?.width || !target.height || !rect.width || !rect.height) return false;
     const scale = Math.min(target.width / rect.width, target.height / rect.height);
     let x = target.left + target.width / 2, y = target.top + target.height / 2;
-    const bar = dock.closest('.dock').getBoundingClientRect();
-    // A narrow phone dock can scroll: keep the destination within its visible edge.
+    const appArea = mobile() && dockApps?.getBoundingClientRect();
+    const bar = appArea?.width && appArea.height ? appArea : dock.closest('.dock').getBoundingClientRect();
+    // Scrolled-out applications land at the app strip's edge, never on the fixed tools.
     if (bar.width && bar.height) {
       x = Math.max(bar.left + target.width / 2, Math.min(bar.right - target.width / 2, x));
       y = Math.max(bar.top + target.height / 2, Math.min(bar.bottom - target.height / 2, y));
@@ -665,8 +701,9 @@
     win.hidden = false;
     win.dataset.state = 'open';
     win.inert = false;
-    if (animate && restoring) animateWindow(win, false);
     focusWindow(win);
+    if (focus) revealDockButton($(`.dock [data-open="${win.id}"]`));
+    if (animate && restoring) animateWindow(win, false);
     if (animate && starting && !directClose(win, false)) { launchMusic(win); launchAlbum(win); launchFiles(win); launchBrowser(win); }
     if (focus) win.focus({preventScroll: true});
     win.dispatchEvent(new CustomEvent('blanktime:window-opened'));
@@ -684,7 +721,10 @@
     else {
       activeWindow = null;
       const opener = $(`[data-open="${win.id}"]`);
-      (state === 'closed' && opener?.hasAttribute('data-running-only') ? $('#settings-toggle') : opener)?.focus();
+      // Returning focus after hiding a window must not move the user's chosen dock position.
+      suppressDockReveal = true;
+      (state === 'closed' && opener?.hasAttribute('data-running-only') ? $('#settings-toggle') : opener)?.focus({preventScroll:true});
+      suppressDockReveal = false;
     }
     syncDock();
     win.dispatchEvent(new CustomEvent('blanktime:window-hidden', {detail:{state}}));
@@ -753,68 +793,11 @@
   }));
   const filesWindow = $('#files'), desktopFiles = $('#desktop-files');
   desktopFiles.addEventListener('click', () => openWindow(filesWindow));
-  const fileRows = [...document.querySelectorAll('.post-file')];
-  const fileSearch = $('#files-search'), fileSort = $('#files-sort'), openFileButton = $('#files-open');
-  let fileCategory = 'all', selectedFile = null;
-  function selectFile(row) {
-    selectedFile = row;
-    fileRows.forEach(item => item.classList.toggle('is-selected', item === row));
-    openFileButton.disabled = !row;
-    updateFileCount();
-  }
-  function updateFileCount() {
-    const count = fileRows.filter(row => !row.hidden).length;
-    $('#files-count').textContent = `共 ${count} 项${count !== fileRows.length ? ` / 全部 ${fileRows.length} 项` : ''}${selectedFile ? ' · 已选中 1 项' : ''}`;
-  }
-  function filterFiles() {
-    const query = fileSearch.value.trim().toLocaleLowerCase();
-    for (const row of fileRows) {
-      const categories = JSON.parse(row.dataset.categories);
-      const matchesCategory = fileCategory === 'all' || (fileCategory === 'uncategorized' ? categories.length === 0 : categories.includes(fileCategory));
-      row.hidden = !matchesCategory || !row.dataset.search.toLocaleLowerCase().includes(query);
-    }
-    if (selectedFile?.hidden) selectFile(null);
-    const sorted = [...fileRows].sort((a,b) => fileSort.value === 'title'
-      ? a.dataset.title.localeCompare(b.dataset.title, 'zh-CN')
-      : (Number(a.dataset.date) - Number(b.dataset.date)) * (fileSort.value === 'oldest' ? 1 : -1));
-    $('#files-list').append(...sorted);
-    $('.files-empty').hidden = fileRows.some(row => !row.hidden);
-    updateFileCount();
-  }
-  function changeCategory(button) {
-    fileCategory = button.dataset.category;
-    document.querySelectorAll('.files-category').forEach(item => {
-      item.classList.toggle('is-selected', item === button);
-      if (item === button) item.setAttribute('aria-current','page'); else item.removeAttribute('aria-current');
-    });
-    $('#files-location').textContent = $('span', button).textContent;
-    selectFile(null); filterFiles();
-  }
-  document.querySelectorAll('.files-category').forEach(button => button.addEventListener('click', () => changeCategory(button)));
-  fileSearch.addEventListener('input', filterFiles);
-  fileSort.addEventListener('change', filterFiles);
-  $('#files-reset').addEventListener('click', () => { fileSearch.value = ''; changeCategory($('.files-category[data-category="all"]')); });
   $('#welcome-start-reading').addEventListener('click', () => {
-    fileSearch.value = '';
-    fileSort.value = 'newest';
-    changeCategory($('.files-category[data-category="all"]'));
-    $('.files-list-scroll').scrollTop = 0;
-    openWindow(filesWindow);
+    if (window.blanktimeFiles?.openPath(window.blanktimeFS.home + '/Documents/Posts')) {
+      const sort = $('#files-sort'); sort.value = 'newest'; sort.dispatchEvent(new Event('change'));
+    } else openWindow($('#browser'));
   });
-  openFileButton.addEventListener('click', () => { if (selectedFile) loadArticle($('.file-link', selectedFile).href); });
-  fileRows.forEach(row => {
-    const link = $('.file-link', row);
-    row.addEventListener('click', event => {
-      if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
-      event.preventDefault(); selectFile(row);
-      if (mobile() || (event.target.closest('a') && event.detail === 0)) loadArticle(link.href);
-    });
-    row.addEventListener('dblclick', event => {
-      if (mobile() || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
-      event.preventDefault(); loadArticle(link.href);
-    });
-  });
-  filterFiles();
   $('.desktop-toggle').addEventListener('click', () => {
     const visible = windows.filter(win => win.dataset.state === 'open');
     if (visible.length) {
@@ -824,6 +807,7 @@
   });
   addEventListener('resize', () => {
     windows.forEach(win => settleMotion(win));
+    updateDockOverflow(true);
     if (mobile()) return;
     windows.forEach(win => {
       if (document.fullscreenElement === win || !win.style.width || win.classList.contains('is-maximized')) return;
@@ -837,7 +821,7 @@
   window.blanktimeDesktop = {
     openWindow, closeWindow: win => hideWindow(win, 'closed'),
     settleWindowMotion: settleMotion,
-    selectFile: row => { if (fileRows.includes(row) && !row.hidden) selectFile(row); }
+    selectFile: row => window.blanktimeFiles?.selectFile(row)
   };
   const initialArticle = document.getElementById('article-source')?.content.querySelector('[data-article]');
   if (initialArticle || welcomeDismissed) { welcome.hidden = true; welcome.dataset.state = 'closed'; syncDock(); }

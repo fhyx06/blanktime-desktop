@@ -1,9 +1,9 @@
 (function(root, factory) {
-  if (typeof module === 'object' && module.exports) module.exports = factory();
-  else root.blanktimeTerminalCore = factory();
-})(typeof window !== 'undefined' ? window : this, function() {
+  if (typeof module === 'object' && module.exports) module.exports = factory(require('./filesystem-core.js'));
+  else root.blanktimeTerminalCore = factory(root.blanktimeFilesystemCore);
+})(typeof window !== 'undefined' ? window : this, function(filesystemCore) {
   'use strict';
-  const COMMANDS = ['help', 'pwd', 'ls', 'll', 'cd', 'open', 'search', 'clear', 'exit'];
+  const COMMANDS = ['help', 'pwd', 'ls', 'll', 'cd', 'open', 'search', 'clear', 'exit', 'su', 'rm'];
   const MAX_INPUT = 4096;
   const MAX_LINES = 1000;
   const DEFAULT_FONT_SIZE = 14.5;
@@ -12,21 +12,25 @@
   const DEFAULT_COLORS = {
     text:'#d6e1ed', muted:'#97a8ba', directory:'#83bcf3', error:'#ffabb0',
     success:'#86d6af', welcome:'#f0f5fa', warning:'#f2c97d', info:'#83bcf3',
-    prompt:'#86d6af', background:'#151c24', input:'#f0f5fa', caret:'#b1e5c8',
+    prompt:'#86d6af', root_prompt:'#f2c97d', background:'#151c24', input:'#f0f5fa', caret:'#b1e5c8',
     prompt_separator:'#5f7189', prompt_symbol:'#b8c7d8', list_meta:'#5f7189', list_owner:'#7e90a5',
     image:'#f3a8c8', document:'#e9d6a8', background_glow:'#1d2a38',
     banner_start:'#86d6af', banner_middle:'#83bcf3', banner_end:'#f3a8c8'
   };
   const COMMAND_DETAILS = {
-    help:['{command}', '显示命令帮助'], pwd:['{command}', '显示当前目录'],
+    help:['{command} [name]', '显示命令帮助'], pwd:['{command}', '显示当前目录'],
     ls:['{command} [-lah] [路径]', '列出目录；-l 详细信息，-a 隐藏项，-h 易读大小'],
     ll:['{command} [路径]', '等同于 {ls} -l（也可搭配 -a、-h）'],
     cd:['{command} [路径]', '切换目录；无参数返回 ~'],
-    open:['{command} 路径', '打开文章、图片、应用或目录'],
-    search:['{command} 关键词', '搜索文章与相册图片'],
-    clear:['{command}', '清空终端输出'], exit:['{command}', '关闭终端']
+    open:['{command} 路径', '打开文章、图片、音乐、应用或目录'],
+    search:['{command} 关键词', '搜索文章、相册图片与音乐'],
+    clear:['{command}', '清空终端输出'], exit:['{command}', '退出当前 shell'],
+    su:['{command} [-] [root]', 'Switch user; - starts a login shell.'],
+    rm:['{command} [-rf] PATH...', 'Remove files or directories.']
   };
   const DEFAULT_MESSAGES = {
+    help_intro:["These shell commands are defined internally.  Type `{help}' to see this list.Type `{help}' to see this list.\nType `{help} name' to find out more about the function `name'.", 'muted'],
+    help_not_found:["{shell}: {command}: no help topics match `{target}'.", 'error'],
     no_such_path:['{shell}: {command}: {path}: No such file or directory', 'error'],
     not_directory:['{shell}: {command}: {path}: Not a directory', 'error'],
     unknown_command:['{command}: command not found', 'error'],
@@ -46,7 +50,18 @@
     operation_failed:['{shell}: operation failed', 'error'],
     app_unavailable:['{command}: {name}: application unavailable', 'error'],
     viewer_unavailable:['{command}: image viewer unavailable', 'error'],
-    folder_unavailable:['{command}: {path}: album directory not found', 'error']
+    folder_unavailable:['{command}: {path}: directory is outside the file manager scope or unavailable', 'error'],
+    su_password:['Password:', 'text'],
+    su_auth_failed:['{command}: Authentication failure', 'error'],
+    su_locked:['{command}: root account is locked', 'error'],
+    su_unknown_user:['{command}: user {name} does not exist', 'error'],
+    su_auth_unavailable:['{command}: authentication unavailable (HTTPS required)', 'error'],
+    permission_denied:['{shell}: {command}: {path}: Permission denied', 'error'],
+    rm_permission_denied:["{command}: cannot remove '{path}': Permission denied", 'error'],
+    rm_read_only:["{command}: cannot remove '{path}': Read-only file system", 'error'],
+    rm_missing:["{command}: cannot remove '{path}': No such file or directory", 'error'],
+    rm_directory:["{command}: cannot remove '{path}': Is a directory", 'error'],
+    rm_missing_operand:['{command}: missing operand\nusage: {usage}', 'error']
   };
   const record = value => value && typeof value === 'object' && !Array.isArray(value) ? value : {};
   const own = (value, key) => Object.prototype.hasOwnProperty.call(value, key) ? value[key] : undefined;
@@ -113,22 +128,6 @@
     error.terminalKey = key; error.terminalValues = values;
     return error;
   }
-  function fileName(value, fallback) {
-    const name = cleanText(value).replace(/\//g, '／').replace(/\\/g, '＼').trim().slice(0, 200);
-    return name && name !== '.' && name !== '..' ? name : fallback;
-  }
-  function imageName(name, url) {
-    const extension = /\.(jpe?g|png|webp|gif|avif|bmp|svg|ico|tiff?)$/i;
-    const label = fileName(name, '未命名图片');
-    if (extension.test(label)) return label;
-    // Only the original pathname identifies a format; signed/query URLs stay untouched.
-    try {
-      const path = new URL(String(url), 'https://terminal.invalid/').pathname;
-      const suffix = decodeURIComponent(path.slice(path.lastIndexOf('/') + 1)).match(extension);
-      if (suffix) return label + '.' + suffix[1].toLowerCase();
-    } catch {}
-    return label;
-  }
   function accountName(value, fallback) {
     const name = String(value || '').replace(/[^a-zA-Z0-9_.-]/g, '').slice(0, 40);
     return name && name !== '.' && name !== '..' ? name : fallback;
@@ -156,11 +155,6 @@
   function shellWord(value) {
     return value.replace(/[\\\s'"$`]/g, '\\$&');
   }
-  function validDate(value) {
-    if (value === null || value === undefined || value === '') return null;
-    const date = new Date(typeof value === 'string' && /^\d{11,}$/.test(value) ? Number(value) : value);
-    return Number.isFinite(date.valueOf()) ? date : null;
-  }
   function dateLabel(value) {
     if (!value) return '—';
     const pad = number => String(number).padStart(2, '0');
@@ -179,86 +173,39 @@
     const presentation = configure(options);
     const commandDetails = new Map(presentation.commands.map(command => [command.id, command]));
     const commandNames = presentation.commands.flatMap(command => [command.name, ...command.aliases]);
-    const username = accountName(options.username, 'visitor');
+    const filesystem = options.filesystem || filesystemCore.create({...options, rootEnabled:record(options.root).enable === true});
+    const {username, home, nodes, pathOf} = filesystem;
     const hostname = accountName(options.hostname, 'blanktime');
-    const home = '/home/' + username;
-    const createdAt = validDate(options.createdAt) || new Date();
-    const root = {name:'', type:'directory', parent:null, children:new Map(), size:0, date:createdAt};
-    const nodes = new Map([['/', root]]);
-    function pathOf(node) {
-      if (!node.parent) return '/';
-      return (pathOf(node.parent).replace(/\/$/, '')) + '/' + node.name;
-    }
-    function insert(parent, proposedName, type, data = {}) {
-      let name = proposedName, count = 2;
-      const dot = proposedName.lastIndexOf('.');
-      const stem = dot > 0 ? proposedName.slice(0, dot) : proposedName;
-      const extension = dot > 0 ? proposedName.slice(dot) : '';
-      while (parent.children.has(name)) name = stem + ' (' + count++ + ')' + extension;
-      const node = {name, type, parent, size:null, date:null, ...data};
-      if (type === 'directory') {
-        node.children = new Map();
-        node.size = 0;
-        node.date = createdAt;
-      }
-      parent.children.set(name, node);
-      nodes.set(pathOf(node), node);
-      return node;
-    }
-    const homes = insert(root, 'home', 'directory');
-    const userHome = insert(homes, username, 'directory');
-    const desktop = insert(userHome, 'Desktop', 'directory');
-    const documents = insert(userHome, 'Documents', 'directory');
-    const postsRoot = insert(documents, 'Posts', 'directory');
-    const pictures = insert(userHome, 'Pictures', 'directory');
-    const albumsRoot = insert(pictures, 'Albums', 'directory');
-    insert(userHome, 'Music', 'directory');
-    (Array.isArray(options.apps) ? options.apps : []).forEach(app => {
-      if (!app || !app.id) return;
-      insert(desktop, fileName(app.name, String(app.id)).replace(/\.desktop$/i, '') + '.desktop', 'app', {appId:String(app.id)});
-    });
-    // Source identifiers establish a stable order for duplicate visible names.
-    (Array.isArray(options.posts) ? options.posts : []).filter(post => post && post.url).slice().sort((a, b) => String(a.url).localeCompare(String(b.url))).forEach(post => {
-      insert(postsRoot, fileName(post.title, '未命名文章').replace(/\.md$/i, '') + '.md', 'article', {
-        url:String(post.url), date:validDate(post.date), search:cleanText(post.search || post.title)
-      });
-    });
-    (Array.isArray(options.albums) ? options.albums : []).filter(Boolean).slice().sort((a, b) => String(a.id).localeCompare(String(b.id))).forEach(album => {
-      const folder = insert(albumsRoot, fileName(album.name, String(album.id || '未命名相册')), 'directory', {folderId:String(album.id || '')});
-      folder.images = [];
-      (Array.isArray(album.images) ? album.images : []).forEach(image => {
-        if (!image || !image.url) return;
-        const item = {name:imageName(image.name, image.url), url:String(image.url), wallpaper:image.wallpaper === true,
-          size:image.size !== '' && image.size !== null && image.size !== undefined && Number.isSafeInteger(Number(image.size)) && Number(image.size) >= 0 ? Number(image.size) : null};
-        const index = folder.images.length;
-        folder.images.push(item);
-        const node = insert(folder, item.name, 'image', {size:item.size, imageIndex:index});
-        item.name = node.name;
-      });
-    });
+    const rootOptions = record(options.root), verifier = record(rootOptions.verifier);
+    const rootEnabled = rootOptions.enable === true;
+    const rootConfigured = rootEnabled && verifier.algorithm === 'PBKDF2-SHA256' &&
+      verifier.iterations === 210000 &&
+      typeof verifier.salt === 'string' && /^[a-f\d]{32}$/i.test(verifier.salt) &&
+      typeof verifier.hash === 'string' && /^[a-f\d]{64}$/i.test(verifier.hash);
+    let identity = {username, home, isRoot:false}, pendingAuthentication = null;
+    const sessions = [];
     let cwd = home;
-    function lookup(value = '.') {
-      let path = String(value);
-      if (!path) throw failure('no_such_path', {path:value});
-      if (path === '~') path = home;
-      else if (path.startsWith('~/')) path = home + path.slice(1);
-      let node = path.startsWith('/') ? root : nodes.get(cwd);
-      // Resolve in traversal order: file/.. and missing/.. must not become valid paths.
-      for (const part of path.split('/').filter(Boolean)) {
-        if (node.type !== 'directory') throw failure('not_directory', {path:value});
-        if (part === '.') continue;
-        if (part === '..') node = node.parent || root;
-        else {
-          node = node.children.get(part);
-          if (!node) throw failure('no_such_path', {path:value});
-        }
-      }
-      if (path.endsWith('/') && node.type !== 'directory') throw failure('not_directory', {path:value});
-      return node;
+    const lookup = value => filesystem.resolve(value, {cwd, home:identity.home, isRoot:identity.isRoot});
+    const promptPath = () => cwd === identity.home ? '~' : cwd.startsWith(identity.home + '/') ? '~' + cwd.slice(identity.home.length) : cwd;
+    const sorted = node => filesystem.list(node);
+    function enterRoot(login) {
+      sessions.push({identity, cwd});
+      identity = {username:'root', home:'/root', isRoot:true};
+      if (login) cwd = identity.home;
     }
-    const promptPath = () => cwd === home ? '~' : cwd.startsWith(home + '/') ? '~' + cwd.slice(home.length) : cwd;
-    const sorted = node => [...node.children.values()].sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'));
+    function finishAuthentication(accepted) {
+      const request = pendingAuthentication;
+      pendingAuthentication = null;
+      if (!request) return {lines:[], cwd};
+      if (accepted === true) {
+        enterRoot(request.login);
+        return {lines:[], cwd};
+      }
+      return {lines:[presentation.message('su_auth_failed', request.context)], failed:true, cwd};
+    }
     function execute(line) {
+      // Password input is handled separately: never parse, echo or retain it as a command.
+      if (pendingAuthentication) return {lines:[], failed:true, cwd};
       const lines = [];
       let action, command = '', commandId, failed = false;
       line = String(line || '');
@@ -277,15 +224,24 @@
         };
         if (!command) return {lines, cwd};
         if (commandId === 'help') {
-          requireCount(0, 0);
-          const visibleCommands = presentation.commands.filter(item => item.show_in_help);
-          const width = Math.max(0, ...visibleCommands.map(item => item.usage.length)) + 2;
-          visibleCommands.forEach(item => out(item.usage.padEnd(width) + item.description));
+          requireCount(0, 1);
+          if (args.length) {
+            const item = commandDetails.get(presentation.resolveCommand(args[0]));
+            if (!item) throw failure('help_not_found', {target:args[0]});
+            out(item.usage);
+            if (item.description) out(item.description);
+          } else {
+            const intro = message('help_intro');
+            if (intro.text) lines.push(intro);
+            const visibleCommands = presentation.commands.filter(item => item.show_in_help);
+            const width = Math.max(0, ...visibleCommands.map(item => item.usage.length)) + 2;
+            visibleCommands.forEach(item => out(item.usage.padEnd(width) + item.description));
+          }
         } else if (commandId === 'pwd') {
           requireCount(0, 0); out(cwd);
         } else if (commandId === 'cd') {
           requireCount(0, 1);
-          const node = lookup(args.length ? args[0] : home);
+          const node = lookup(args.length ? args[0] : identity.home);
           if (node.type !== 'directory') throw failure('not_directory', {path:args[0]});
           cwd = pathOf(node);
         } else if (commandId === 'ls' || commandId === 'll') {
@@ -313,11 +269,12 @@
             const name = entry.name + (directory ? '/' : '');
             if (empty || long) {
               const size = sizeLabel(entry.size, human), date = dateLabel(entry.date);
-              const nameRole = directory ? 'directory' : entry.type === 'image' ? 'image' : entry.type === 'article' ? 'document' : 'name';
-              const parts = [{text:directory ? 'drwxr-xr-x' : '-r--r--r--', role:'permission'}, {text:'  '}];
+              const nameRole = directory ? 'directory' : entry.type === 'image' ? 'image' : entry.type === 'article' ? 'document' : entry.type === 'music' ? 'music' : 'name';
+              const owner = directory ? entry.owner : username;
+              const parts = [{text:directory ? entry.mode : '-r--r--r--', role:'permission'}, {text:'  '}];
               // Empty directories retain their original size-before-owner column order.
               if (empty) parts.push({text:size, role:'size'}, {text:'  '});
-              parts.push({text:username, role:'owner'}, {text:' '}, {text:username, role:'owner'});
+              parts.push({text:owner, role:'owner'}, {text:' '}, {text:owner, role:'owner'});
               if (!empty) parts.push({text:'  ' + ' '.repeat(Math.max(0, 6 - size.length))}, {text:size, role:'size'});
               parts.push({text:'  '}, {text:date, role:'date'},
                 {text:(empty ? '' : ' '.repeat(Math.max(0, 16 - date.length))) + '  '}, {text:name, role:nameRole});
@@ -327,29 +284,78 @@
         } else if (commandId === 'open') {
           requireCount(1, 1);
           const node = lookup(args[0]);
-          if (node.type === 'directory') {
-            const path = pathOf(node);
-            if (node === postsRoot) action = {type:'folder', path, appId:'files'};
-            else if (node === albumsRoot || node.folderId !== undefined) action = {type:'folder', path, appId:'album', ...(node.folderId !== undefined ? {folderId:node.folderId} : {})};
-            else if (path === home + '/Music' && [...desktop.children.values()].some(app => app.appId === 'music')) action = {type:'app', id:'music'};
-            else cwd = path;
-          }
+          if (node.type === 'directory') action = {type:'folder', path:pathOf(node), appId:'files'};
           else if (node.type === 'article') action = {type:'article', url:node.url};
           else if (node.type === 'app') action = {type:'app', id:node.appId};
-          else action = {type:'image', items:node.parent.images.map(item => ({...item})), index:node.imageIndex, source:node.parent.name};
+          else if (node.type === 'music') action = {type:'music', trackKey:node.trackKey};
+          else if (node.type === 'image') action = {type:'image', items:node.parent.images.map(item => ({...item})), index:node.imageIndex, source:node.parent.name};
+          else throw failure('operation_failed');
           report('opening', {name:node.name, path:args[0]});
         } else if (commandId === 'search') {
           if (!args.length || !args.join(' ').trim()) throw failure('search_usage');
           const query = args.join(' ').toLocaleLowerCase();
           let count = 0;
           for (const [path, node] of nodes) {
-            if (!['article', 'image'].includes(node.type)) continue;
+            if (!['article', 'image', 'music'].includes(node.type)) continue;
             if (!(path + ' ' + (node.search || '')).toLocaleLowerCase().includes(query)) continue;
             out(path); count++;
           }
           if (!count) report('search_empty');
+        } else if (commandId === 'su') {
+          let login = false, flags = true;
+          const users = [];
+          args.forEach(argument => {
+            if (flags && argument === '--') { flags = false; return; }
+            if (flags && ['-', '-l', '--login'].includes(argument)) { login = true; return; }
+            if (flags && argument.startsWith('-')) throw failure('invalid_option', {option:argument});
+            users.push(argument);
+          });
+          if (users.length > 1) throw failure('invalid_arguments');
+          const target = users.length ? users[0] : 'root';
+          if (target !== 'root') throw failure('su_unknown_user', {name:target});
+          if (!rootConfigured) throw failure('su_locked');
+          if (sessions.length >= 64) throw failure('operation_failed');
+          if (identity.isRoot) enterRoot(login);
+          else {
+            pendingAuthentication = {login, context:context()};
+            action = {type:'authenticate'};
+          }
+        } else if (commandId === 'rm') {
+          let recursive = false, force = false, flags = true;
+          const paths = [];
+          args.forEach(argument => {
+            if (flags && argument === '--') { flags = false; return; }
+            if (flags && argument.startsWith('-') && argument !== '-') {
+              for (const flag of argument.slice(1)) {
+                if (flag === 'r' || flag === 'R') recursive = true;
+                else if (flag === 'f') force = true;
+                else throw failure('invalid_option', {option:'-' + flag});
+              }
+            } else paths.push(argument);
+          });
+          if (!paths.length && !force) throw failure('rm_missing_operand');
+          // The mapped filesystem remains immutable for every identity in this release.
+          for (const path of paths) {
+            let node;
+            try { node = lookup(path); }
+            catch (error) {
+              if (error.terminalKey === 'no_such_path' && force) continue;
+              failed = true;
+              const key = error.terminalKey === 'no_such_path' ? 'rm_missing' :
+                error.terminalKey === 'permission_denied' ? 'rm_permission_denied' : error.terminalKey;
+              report(key || 'operation_failed', {path});
+              continue;
+            }
+            failed = true;
+            report(node.type === 'directory' && !recursive ? 'rm_directory' :
+              identity.isRoot ? 'rm_read_only' : 'rm_permission_denied', {path});
+          }
         } else if (commandId === 'clear' || commandId === 'exit') {
-          requireCount(0, 0); action = {type:commandId};
+          requireCount(0, 0);
+          if (commandId === 'exit' && sessions.length) {
+            const previous = sessions.pop();
+            identity = previous.identity; cwd = previous.cwd;
+          } else action = {type:commandId};
         } else throw failure('unknown_command');
       } catch (error) {
         action = undefined;
@@ -366,6 +372,7 @@
     }
     function complete(line) {
       line = String(line || '');
+      if (pendingAuthentication) return {value:'', candidates:[]};
       if (line.length > MAX_INPUT) return {value:line, candidates:[]};
       const parsed = tokenize(line, true);
       const tokens = parsed.tokens;
@@ -373,19 +380,27 @@
       const active = endsInSpace || !tokens.length ? {value:'', start:line.length} : tokens[tokens.length - 1];
       const tokenCount = tokens.length + (endsInSpace ? 1 : 0);
       let matches, prefix = '';
-      if (tokenCount <= 1) matches = commandNames.filter(command => command.startsWith(active.value));
+      if (tokenCount <= 1 || (tokenCount === 2 && presentation.resolveCommand(tokens[0].value) === 'help')) {
+        matches = commandNames.filter(command => command.startsWith(active.value));
+      }
       else {
         const command = presentation.resolveCommand(tokens[0].value);
-        if (!['cd', 'open', 'ls', 'll'].includes(command)) return {value:line, candidates:[]};
-        if (active.value === '~') return {value:line.slice(0, active.start) + '~/', candidates:['~/']};
-        const slash = active.value.lastIndexOf('/');
-        prefix = slash >= 0 ? active.value.slice(0, slash + 1) : '';
-        const fragment = active.value.slice(slash + 1);
-        let parent;
-        try { parent = lookup(prefix || '.'); } catch { return {value:line, candidates:[]}; }
-        if (parent.type !== 'directory') return {value:line, candidates:[]};
-        matches = sorted(parent).filter(node => node.name.startsWith(fragment) && (command !== 'cd' || node.type === 'directory'))
-          .map(node => node.name + (node.type === 'directory' ? '/' : ''));
+        if (command === 'su') {
+          const argumentsBefore = tokens.slice(1, endsInSpace ? tokens.length : -1).map(token => token.value);
+          if (argumentsBefore.some(value => !['-', '-l', '--login', '--'].includes(value))) return {value:line, candidates:[]};
+          matches = 'root'.startsWith(active.value) ? ['root'] : [];
+        } else {
+          if (!['cd', 'open', 'ls', 'll', 'rm'].includes(command)) return {value:line, candidates:[]};
+          if (active.value === '~') return {value:line.slice(0, active.start) + '~/', candidates:['~/']};
+          const slash = active.value.lastIndexOf('/');
+          prefix = slash >= 0 ? active.value.slice(0, slash + 1) : '';
+          const fragment = active.value.slice(slash + 1);
+          let parent;
+          try { parent = lookup(prefix || '.'); } catch { return {value:line, candidates:[]}; }
+          if (parent.type !== 'directory') return {value:line, candidates:[]};
+          matches = sorted(parent).filter(node => node.name.startsWith(fragment) && (command !== 'cd' || node.type === 'directory'))
+            .map(node => node.name + (node.type === 'directory' ? '/' : ''));
+        }
       }
       if (!matches.length) return {value:line, candidates:[]};
       let common = matches[0];
@@ -396,7 +411,8 @@
       const suffix = matches.length === 1 && !common.endsWith('/') ? ' ' : '';
       return {value:line.slice(0, active.start) + shellWord(completed) + suffix, candidates:matches};
     }
-    return {execute, complete, getCwd:() => cwd, getPromptPath:promptPath, home, username, hostname};
+    return {execute, complete, finishAuthentication, cancelAuthentication:() => { pendingAuthentication = null; },
+      getIdentity:() => ({...identity}), getCwd:() => cwd, getPromptPath:promptPath, home, username, hostname};
   }
   return {create, configure};
 });

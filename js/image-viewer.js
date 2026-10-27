@@ -167,6 +167,15 @@
   }));
   new ResizeObserver(() => { endGesture(); draw(); }).observe(stage);
   let albumMode = false, metadataRequest, metadataTimer, fullscreenPending = false;
+  const metadataCache = new Map();
+  function rememberMetadata(url, values) {
+    const key = safeURL(url);
+    if (!key) return;
+    const previous = metadataCache.get(key) || {};
+    metadataCache.delete(key); metadataCache.set(key,{...previous,...values});
+    if (metadataCache.size > 100) metadataCache.delete(metadataCache.keys().next().value);
+    window.dispatchEvent(new CustomEvent('blanktime:image-metadata',{detail:{url:key}}));
+  }
   function stopMetadata() {
     metadataRequest?.abort(); metadataRequest = null;
     clearTimeout(metadataTimer);
@@ -191,7 +200,7 @@
     const ext = new URL(item.url).pathname.match(/\.(jpe?g|png|webp|gif|avif|bmp|svg)$/i)?.[1];
     setMetadata('format',ext ? `${ext.toUpperCase()}（扩展名）` : '');
     setMetadata('size',item.size !== null ? sizeLabel(item.size) : '');
-    if (item.size !== null) return;
+    if (item.size !== null) { rememberMetadata(item.url,{size:item.size}); return; }
     if (!/^https?:/.test(item.url)) return;
     const controller = new AbortController(); metadataRequest = controller;
     const timer = setTimeout(() => controller.abort(),5000); metadataTimer = timer;
@@ -206,6 +215,10 @@
       const length = response.headers.get('Content-Length');
       const bytes = length === null || length.trim() === '' ? NaN : Number(length);
       setMetadata('size',type.startsWith('image/') && Number.isSafeInteger(bytes) && bytes >= 0 ? sizeLabel(bytes) : '');
+      if (type.startsWith('image/')) rememberMetadata(item.url,{
+        ...(formats[type] ? {format:formats[type]} : {}),
+        ...(Number.isSafeInteger(bytes) && bytes >= 0 ? {size:bytes} : {})
+      });
     } catch {
       if (current === version) setMetadata('size');
     } finally {
@@ -278,6 +291,7 @@
       stage.setAttribute('aria-busy','false'); message.hidden = true; img.hidden = false;
       apply.disabled = !item.wallpaper;
       naturalWidth = img.naturalWidth; naturalHeight = img.naturalHeight; draw();
+      if (ready()) rememberMetadata(item.url,{width:naturalWidth,height:naturalHeight});
       if (albumMode) setMetadata('resolution',ready() ? `${naturalWidth} × ${naturalHeight} px` : '');
     });
     const fail = (timedOut = false) => {
@@ -398,5 +412,8 @@
       if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('img.image-viewer-trigger')) launch(event.target,event);
     });
   }
-  window.blanktimeImages = {open, prepareArticle};
+  window.blanktimeImages = {open, prepareArticle, getMetadata(url) {
+    const value = metadataCache.get(safeURL(url));
+    return value ? {...value} : null;
+  }};
 })();
