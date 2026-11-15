@@ -80,14 +80,15 @@
 .file-node-icon svg {width:22px;height:22px;}
 .file-app-icon {width:26px;height:29px;}
 .file-app-icon img {display:block;width:26px;height:26px;object-fit:contain;}
-.file-music-cover {position:relative;width:28px;height:28px;border-radius:5px;overflow:hidden;background:#edf2fa;color:#7186ae;font-size:20px;}
-.file-music-cover img {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.file-music-cover,.file-image-thumb {position:relative;width:28px;height:28px;border-radius:5px;overflow:hidden;background:#edf2fa;color:#7186ae;font-size:20px;}
+.file-image-thumb svg {width:18px;height:18px;}
+.file-music-cover img,.file-image-thumb img {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:inherit;}
 .files-music-state {display:flex;align-items:center;gap:12px;margin:0 18px 10px;color:#66717e;font-size:12px;line-height:1.6;}
 .files-music-state span {min-width:0;overflow-wrap:anywhere;}
 .files-music-state button {flex-shrink:0;padding:4px 9px;border:1px solid #dce4ee;border-radius:4px;color:#2877da;}
 .files-music-state button:enabled:hover {background:#edf3fa;}
 .files-music-state button:disabled {opacity:.5;}
-html[data-system-theme="dark"] .file-music-cover {background:#303c4d;color:#a8bce1;}
+html[data-system-theme="dark"] :is(.file-music-cover,.file-image-thumb) {background:#303c4d;color:#a8bce1;}
 html[data-system-theme="dark"] .files-music-state {color:#aab8c6;}
 html[data-system-theme="dark"] .files-music-state button {border-color:#425469;color:#8dbdff;}
 html[data-system-theme="dark"] .files-music-state button:enabled:hover {background:#324357;}

@@ -42,9 +42,10 @@ html[data-system-theme="dark"] .files-error {background:#493824;color:#efbd7d;}
 html[data-system-theme="dark"] .file-icon {background:linear-gradient(145deg,#3c4958,#2b3540);border-color:#566374;color:#c4d6e3;}
 /* Album. */
 html[data-system-theme="dark"] .album-content {background:var(--sys-base);border-color:var(--sys-border);}
-html[data-system-theme="dark"] :is(.album-toolbar p,.album-empty) {color:var(--sys-muted);}
-html[data-system-theme="dark"] :is(.album-card,.album-toolbar button) {background:var(--sys-raised);border-color:var(--sys-border);color:var(--sys-text);}
-html[data-system-theme="dark"] :is(.album-card:hover,.album-toolbar button:hover) {background:var(--sys-hover);}
+html[data-system-theme="dark"] :is(.album-toolbar p,.album-empty,.album-readme blockquote) {color:var(--sys-muted);}
+html[data-system-theme="dark"] :is(.album-card,.album-toolbar button:not(#album-folders-back)) {background:var(--sys-raised);border-color:var(--sys-border);color:var(--sys-text);}
+html[data-system-theme="dark"] .album-readme code {background:var(--sys-base);}
+html[data-system-theme="dark"] :is(.album-card:hover,.album-toolbar button:not(#album-folders-back):hover) {background:var(--sys-hover);}
 /* Music keeps its user-selected accent, while all neutral surfaces follow the system. */
 html[data-system-theme="dark"] #music {--text:var(--sys-text);--text-2:var(--sys-muted);--line:var(--sys-border);--window-bg:var(--sys-base);--panel-bg:var(--sys-raised);background:var(--sys-base);}
 html[data-system-theme="dark"] #music :is(.theme-pop,.list-state) {background:var(--sys-raised);color:var(--sys-text);}

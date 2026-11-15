@@ -12,7 +12,7 @@
   const places = $('#files-places'), listExpanded = new Set(), sidebarExpanded = new Set();
   const settings = window.blanktimeFileConfig || {};
   const mobile = matchMedia('(max-width:760px)');
-  const appIds = new Set(['files', 'browser', 'album', 'music', 'system-info', 'terminal', 'thoughts']);
+  const appIds = new Set(['files', 'browser', 'album', 'music', 'system-info', 'terminal', 'thoughts', 'jiangshan', 'minesweeper']);
   const types = {directory:'文件夹', article:'Markdown', image:'图片', music:'在线音频', app:'应用快捷方式', text:'文本文件'};
   let boundary, cwd = '', entries = [], rows = [], selected = null, history = [], historyIndex = -1, matchedCount = 0;
   let musicVersion = '', retryingMusic = false;
@@ -98,6 +98,18 @@
       const symbol = node.type === 'app' && /^#i-[a-z-]+$/.test(node.icon || '') ? node.icon : null;
       use.setAttribute('href', symbol || (node.type === 'image' ? '#i-album' : node.type === 'app' ? '#i-grid' : '#i-book'));
       svg.append(use); icon.append(svg);
+      if (node.type === 'image') {
+        icon.classList.add('file-image-thumb');
+        try {
+          const url = node.thumbnail && new URL(node.thumbnail, location.href);
+          if (url && ['http:', 'https:'].includes(url.protocol)) {
+            const image = document.createElement('img'); image.alt = ''; image.draggable = false;
+            image.loading = 'lazy'; image.decoding = 'async';
+            image.addEventListener('error', () => image.remove(), {once:true});
+            image.src = url.href; icon.append(image);
+          }
+        } catch {}
+      }
     }
     return icon;
   }

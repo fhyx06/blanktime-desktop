@@ -1,0 +1,408 @@
+.desktop-jiangshan-icon {
+  top: 467px;
+}
+
+.desktop-thoughts-icon ~ .desktop-jiangshan-icon {
+  top: 571px;
+}
+
+.desktop-jiangshan-icon .jiangshan-icon-art,
+.dock-button[data-open="jiangshan"] .jiangshan-icon-art {
+  width: 46px;
+  height: 46px;
+  display: block;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 5px 10px rgba(34, 48, 62, .16));
+  transition: transform .18s ease;
+}
+
+.dock-button[data-open="jiangshan"] .jiangshan-icon-art {
+  width: 28px;
+  height: 28px;
+}
+
+.desktop-jiangshan-icon:hover .jiangshan-icon-art,
+.dock-button[data-open="jiangshan"]:hover .jiangshan-icon-art {
+  transform: translateY(-1px) scale(1.04);
+}
+
+.jiangshan-window {
+  left: calc((100vw - min(1240px, calc(100vw - 108px))) / 2);
+  top: max(18px, calc((100vh - min(820px, calc(100vh - 36px))) / 2));
+  width: min(1240px, calc(100vw - 108px));
+  height: min(820px, calc(100vh - 36px));
+  min-width: min(560px, calc(100vw - 96px));
+  min-height: 400px;
+}
+
+.jiangshan-window .titlebar {
+  gap: 10px;
+}
+
+.jiangshan-window .titlebar .jiangshan-icon-art {
+  width: 21px;
+  height: 21px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.jiangshan-titlebar-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  margin-right: 4px;
+}
+
+.jiangshan-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid rgba(25, 35, 48, .1);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, .72);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.jiangshan-tool-btn.jiangshan-tool-icon {
+  width: 28px;
+  padding: 0;
+}
+
+.jiangshan-tool-btn svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.jiangshan-tool-btn:hover {
+  background: rgba(18, 112, 254, .1);
+  border-color: rgba(18, 112, 254, .24);
+  color: var(--accent);
+}
+
+.jiangshan-tool-btn[aria-pressed="true"] {
+  background: rgba(18, 112, 254, .14);
+  border-color: rgba(18, 112, 254, .34);
+  color: var(--accent);
+}
+
+.jiangshan-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  background: #141920;
+  overflow: hidden;
+}
+
+.jiangshan-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #141920;
+}
+
+.jiangshan-frame[hidden] {
+  display: none;
+}
+
+.is-window-dragging iframe {
+  pointer-events: none !important;
+}
+
+.jiangshan-feedback {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 50% 32%, rgba(72, 152, 108, .18), transparent 56%),
+    linear-gradient(180deg, #1b222c 0%, #12171e 100%);
+  color: #eef3f8;
+  text-align: center;
+}
+
+.jiangshan-feedback[hidden] {
+  display: none;
+}
+
+.jiangshan-feedback-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: 380px;
+  padding: 26px 28px;
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 14px;
+  background: rgba(24, 31, 41, .78);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, .32);
+  backdrop-filter: blur(12px);
+}
+
+.jiangshan-feedback-icon {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 2px;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .28));
+}
+
+.jiangshan-feedback-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: #f5f7fa;
+}
+
+.jiangshan-feedback-message {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(226, 234, 243, .78);
+}
+
+.jiangshan-feedback-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.jiangshan-action-btn,
+.jiangshan-action-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.jiangshan-action-btn {
+  border: 1px solid rgba(118, 184, 148, .45);
+  background: rgba(46, 125, 103, .35);
+  color: #e9f7f0;
+}
+
+.jiangshan-action-btn:hover {
+  background: rgba(46, 125, 103, .52);
+}
+
+.jiangshan-action-link {
+  border: 1px solid rgba(255, 255, 255, .16);
+  background: rgba(255, 255, 255, .06);
+  color: rgba(238, 243, 248, .88);
+}
+
+.jiangshan-action-link:hover {
+  background: rgba(255, 255, 255, .12);
+  color: #fff;
+}
+
+#jiangshan:fullscreen {
+  left: 0 !important;
+  top: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  max-height: none !important;
+  border-radius: 0 !important;
+}
+
+html[data-system-theme="dark"] .jiangshan-tool-btn {
+  border-color: rgba(255, 255, 255, .12);
+  background: rgba(255, 255, 255, .06);
+  color: rgba(235, 241, 248, .9);
+}
+
+html[data-system-theme="dark"] .jiangshan-tool-btn:hover,
+html[data-system-theme="dark"] .jiangshan-tool-btn[aria-pressed="true"] {
+  background: rgba(76, 152, 255, .2);
+  border-color: rgba(76, 152, 255, .42);
+  color: #8cc0ff;
+}
+
+@media (max-width: 760px) {
+  body .desktop-jiangshan-icon {
+    left: 20px;
+    top: 280px;
+  }
+
+  body .desktop-thoughts-icon ~ .desktop-jiangshan-icon {
+    left: 120px;
+    top: 280px;
+  }
+
+  .jiangshan-tool-btn span {
+    font-size: 11.5px;
+  }
+}
+
+/* Antique blue-green landscape scroll unfolds and rolls up on launch/close. */
+.jiangshan-launch {
+  position: fixed;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.jiangshan-launch-scroll {
+  position: absolute;
+  inset: 0;
+  display: block;
+  will-change: transform, opacity;
+}
+
+.jiangshan-launch-canvas {
+  position: absolute;
+  inset: 8px 10px;
+  overflow: hidden;
+  border: 2px solid #c69d59;
+  border-radius: 6px;
+  background:
+    radial-gradient(circle at 24% 28%, rgba(223, 155, 82, .26), transparent 36%),
+    linear-gradient(180deg, #f8f1e2 0%, #efe2c8 62%, #e3d1af 100%);
+  box-shadow: 0 16px 36px rgba(24, 18, 10, .32), inset 0 0 0 1px rgba(255, 250, 240, .65);
+  will-change: clip-path;
+}
+
+.jiangshan-launch-canvas::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(166, 131, 78, .16) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(166, 131, 78, .16) 1px, transparent 1px);
+  background-size: 28px 24px;
+  pointer-events: none;
+}
+
+.jiangshan-launch-peaks {
+  position: absolute;
+  inset: 24% 0 0;
+  background:
+    linear-gradient(172deg, transparent 34%, rgba(44, 105, 125, .42) 35%, rgba(92, 156, 166, .72) 100%),
+    linear-gradient(164deg, transparent 46%, rgba(46, 125, 103, .65) 47%, rgba(118, 184, 148, .88) 100%);
+  clip-path: polygon(0% 72%, 16% 32%, 31% 54%, 49% 18%, 68% 48%, 84% 26%, 100% 44%, 100% 100%, 0% 100%);
+}
+
+.jiangshan-launch-river {
+  position: absolute;
+  left: -4%;
+  right: -4%;
+  bottom: 0;
+  height: 32%;
+  background: linear-gradient(90deg, rgba(67, 137, 162, .75), rgba(37, 94, 121, .88));
+  clip-path: polygon(0% 58%, 24% 38%, 48% 52%, 74% 26%, 100% 40%, 100% 100%, 0% 100%);
+}
+
+.jiangshan-launch-seal {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 28px;
+  border-radius: 3px;
+  background: #c53d34;
+  color: #f9efe2;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: .04em;
+  writing-mode: vertical-rl;
+  box-shadow: 0 2px 6px rgba(197, 61, 52, .35);
+  will-change: transform, opacity;
+}
+
+.jiangshan-launch-caption {
+  position: absolute;
+  left: 16px;
+  top: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  color: #5b4425;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .6);
+  white-space: nowrap;
+}
+
+.jiangshan-close .jiangshan-launch-caption {
+  visibility: hidden;
+}
+
+.jiangshan-launch-rod {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 11px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #8b5e35 0%, #5d3b1e 52%, #3f2611 100%);
+  box-shadow: 0 6px 16px rgba(24, 15, 6, .36);
+  will-change: transform;
+}
+
+.jiangshan-launch-rod::before,
+.jiangshan-launch-rod::after {
+  content: "";
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  height: 8px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #ebd197, #b98e46);
+}
+
+.jiangshan-launch-rod::before {
+  top: 6px;
+}
+
+.jiangshan-launch-rod::after {
+  bottom: 6px;
+}
+
+.jiangshan-launch-rod-left {
+  left: 2px;
+}
+
+.jiangshan-launch-rod-right {
+  right: 2px;
+}
+
+#jiangshan.jiangshan-is-starting,
+#jiangshan.jiangshan-is-closing {
+  will-change: clip-path, transform, opacity;
+  transition: none;
+}
+
+#jiangshan.jiangshan-is-closing .jiangshan-feedback {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jiangshan-launch {
+    display: none;
+  }
+}

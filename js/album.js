@@ -5,6 +5,8 @@
   const status = $('status');
   const cards = [...grid.querySelectorAll('.album-card')];
   const folderButtons = [...folders.querySelectorAll('[data-folder]')];
+  const readmeWrap = $('folder-readmes');
+  const readmeItems = readmeWrap ? [...readmeWrap.querySelectorAll('[data-folder-readme]')] : [];
   folderButtons.forEach(button => {
     const cover = button.querySelector('.album-folder-cover img');
     if (!cover) return;
@@ -14,6 +16,12 @@
   });
   let currentFolder;
   const retry = $('retry');
+  function updateBreadcrumb(inFolder, count = 0) {
+    for (const id of ['root-title', 'subtitle']) if ($(id)) $(id).hidden = inFolder;
+    for (const id of ['folders-back', 'current-crumb', 'count']) if ($(id)) $(id).hidden = !inFolder;
+    if ($('count')) $('count').textContent = inFolder ? `${count} 张` : '';
+    if (!inFolder) $('folder-name').textContent = '';
+  }
   function updateFailures() {
     const failed = cards.filter(card => !card.hidden && card.dataset.loadState === 'error').length;
     if (retry) { retry.hidden = !failed || view.hidden; retry.textContent = `重试失败图片（${failed}）`; }
@@ -66,6 +74,13 @@
     currentFolder = button;
     folders.hidden = true; view.hidden = false;
     $('folder-name').textContent = button.querySelector('strong').textContent;
+    let hasReadme = false;
+    readmeItems.forEach(item => {
+      const match = item.dataset.folderReadme === id;
+      item.hidden = !match;
+      if (match) hasReadme = true;
+    });
+    if (readmeWrap) readmeWrap.hidden = !hasReadme;
     let count = 0;
     cards.forEach(card => {
       card.hidden = card.dataset.folder !== id;
@@ -75,11 +90,14 @@
       }
     });
     $('empty').hidden = count > 0; updateFailures();
+    updateBreadcrumb(true, count);
     status.textContent = id === 'wallpapers' ? '选择图片预览，可设为桌面壁纸' : '此文件夹仅用于浏览图片';
     $('folders-back').focus();
   }
   function showFolders() {
     view.hidden = true; folders.hidden = false;
+    updateBreadcrumb(false);
+    if (readmeWrap) readmeWrap.hidden = true;
     status.textContent = '选择文件夹浏览图片';
     updateFailures(); currentFolder?.focus();
   }

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbf7ee"/>
+      <stop offset="1" stop-color="#e7dec9"/>
+    </linearGradient>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6efe0"/>
+      <stop offset=".55" stop-color="#efe3ca"/>
+      <stop offset="1" stop-color="#e4d3b3"/>
+    </linearGradient>
+    <linearGradient id="rod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8b5e35"/>
+      <stop offset=".5" stop-color="#5d3b1e"/>
+      <stop offset="1" stop-color="#3f2611"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ebd197"/>
+      <stop offset="1" stop-color="#b98e46"/>
+    </linearGradient>
+    <linearGradient id="peakFar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2c697d"/>
+      <stop offset="1" stop-color="#5c9ca6" stop-opacity=".75"/>
+    </linearGradient>
+    <linearGradient id="peakMid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2e7d67"/>
+      <stop offset="1" stop-color="#76b894" stop-opacity=".88"/>
+    </linearGradient>
+    <linearGradient id="peakNear" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#48986c"/>
+      <stop offset="1" stop-color="#b9d59c" stop-opacity=".92"/>
+    </linearGradient>
+    <linearGradient id="river" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4389a2"/>
+      <stop offset="1" stop-color="#255e79"/>
+    </linearGradient>
+    <clipPath id="mapClip">
+      <rect x="19" y="21" width="58" height="54" rx="4"/>
+    </clipPath>
+    <filter id="shadow" x="-.2" y="-.2" width="1.4" height="1.5">
+      <feDropShadow dx="0" dy="3" stdDeviation="2.2" flood-color="#4b3a26" flood-opacity=".2"/>
+    </filter>
+  </defs>
+  <rect x="1" y="1" width="94" height="94" rx="23" fill="url(#tile)" stroke="#fff" stroke-opacity=".75"/>
+  <g filter="url(#shadow)">
+    <rect x="15" y="18" width="66" height="60" rx="6" fill="url(#gold)"/>
+    <rect x="19" y="21" width="58" height="54" rx="4" fill="url(#paper)"/>
+    <g clip-path="url(#mapClip)">
+      <path d="M19 35h58M19 49h58M19 63h58M34 21v54M48 21v54M62 21v54" stroke="#b99e73" stroke-opacity=".24" stroke-width="1"/>
+      <circle cx="31" cy="31" r="6" fill="#df9b52" opacity=".32"/>
+      <path d="M17 58 L30 36 L41 49 L55 29 L69 47 L79 39 L79 76 L17 76 Z" fill="url(#peakFar)"/>
+      <path d="M17 64 L27 48 L39 58 L49 40 L63 56 L74 46 L79 53 L79 76 L17 76 Z" fill="url(#peakMid)"/>
+      <path d="M17 70 L25 57 L36 65 L46 53 L59 64 L79 56 L79 76 L17 76 Z" fill="url(#peakNear)"/>
+      <path d="M20 72 C32 65, 38 69, 47 62 C55 56, 62 60, 77 50 L77 57 C64 65, 56 62, 47 68 C38 74, 30 71, 20 76 Z" fill="url(#river)" opacity=".92"/>
+      <rect x="61" y="26" width="10" height="12" rx="1.8" fill="#c53d34"/>
+      <path d="M64 29h4M64 32h4M64 35h2.5" stroke="#f9efe2" stroke-width="1.2" stroke-linecap="round"/>
+    </g>
+    <rect x="19" y="21" width="58" height="54" rx="4" fill="none" stroke="#a6834e" stroke-opacity=".55" stroke-width="1"/>
+    <rect x="12" y="14" width="6" height="68" rx="3" fill="url(#rod)"/>
+    <rect x="78" y="14" width="6" height="68" rx="3" fill="url(#rod)"/>
+    <rect x="13" y="20" width="4" height="5" rx="1" fill="url(#gold)"/>
+    <rect x="13" y="71" width="4" height="5" rx="1" fill="url(#gold)"/>
+    <rect x="79" y="20" width="4" height="5" rx="1" fill="url(#gold)"/>
+    <rect x="79" y="71" width="4" height="5" rx="1" fill="url(#gold)"/>
+  </g>
+</svg>

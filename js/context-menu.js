@@ -48,8 +48,9 @@
     try { if (value) { const parsed = new URL(value, location.href); if (/^https?:$/.test(parsed.protocol)) url = parsed.href; } } catch {}
     return item('copy-link', label, () => copy(url), !url);
   }
+  const usableControl = element => element?.isConnected && !element.disabled && !element.closest('[hidden], [inert]:not([data-image-viewer-chrome])');
   function buttonItem(id, label, button) {
-    return item(id, label, () => { if (visible(button) && !button.disabled) button.click(); }, !visible(button) || button.disabled);
+    return item(id, label, () => { if (usableControl(button)) button.click(); }, !usableControl(button));
   }
   function openApp(id) { const win = document.getElementById(id); if (win) window.blanktimeDesktop.openWindow(win); }
   function systemThemeLabel() { return window.blanktimeAppearance.getTheme() === 'dark' ? '切换到浅色模式' : '切换到深色模式'; }

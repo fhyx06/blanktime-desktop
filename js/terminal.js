@@ -266,7 +266,7 @@
   }
   function openApp(id,context) {
     // Only known windows can be launched; paths and command strings never execute JavaScript.
-    if (!['files','browser','album','music','system-info','terminal'].includes(id)) throw actionError('app_unavailable',{...context,name:id});
+    if (!['files','browser','album','music','system-info','terminal','thoughts','jiangshan','minesweeper'].includes(id)) throw actionError('app_unavailable',{...context,name:id});
     const target = document.getElementById(id);
     if (!target || !window.blanktimeDesktop) throw actionError('app_unavailable',{...context,name:id});
     window.blanktimeDesktop.openWindow(target);

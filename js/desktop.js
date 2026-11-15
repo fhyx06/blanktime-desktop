@@ -71,6 +71,8 @@
   const albumLaunched = new WeakSet();
   const filesLaunched = new WeakSet();
   const browserLaunched = new WeakSet();
+  const thoughtsLaunched = new WeakSet();
+  const jiangshanLaunched = new WeakSet();
   const windowClose = new WeakMap();
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   function settleLaunch(win, finished = false) {
@@ -84,7 +86,7 @@
     });
     launch.scene.remove();
     launch.cleanup?.();
-    win.classList.remove('music-is-starting', 'album-is-starting', 'files-is-starting', 'browser-is-starting');
+    win.classList.remove('music-is-starting', 'album-is-starting', 'files-is-starting', 'browser-is-starting', 'thoughts-is-starting', 'jiangshan-is-starting');
     win.style.removeProperty('--music-launch-duration');
     if (win.id === 'files' || win.id === 'browser') {
       if (finished && win.dataset.state === 'open') {
@@ -132,7 +134,7 @@
     });
     closing.scene.remove();
     closing.cleanup?.();
-    win.classList.remove('album-is-starting', 'album-is-closing', 'files-is-starting', 'files-is-closing', 'browser-is-starting', 'browser-is-closing');
+    win.classList.remove('album-is-starting', 'album-is-closing', 'files-is-starting', 'files-is-closing', 'browser-is-starting', 'browser-is-closing', 'thoughts-is-starting', 'thoughts-is-closing', 'jiangshan-is-starting', 'jiangshan-is-closing');
     win.inert = false;
     win.hidden = win.dataset.state !== 'open';
     if (win.id === 'files' || win.id === 'browser') {
@@ -154,6 +156,14 @@
       if (motion.closingRate === -1) motion.scene.classList.toggle('files-close', closing);
     }
     if (win.id === 'browser') win.classList.toggle('browser-is-closing', closing);
+    if (win.id === 'thoughts') {
+      win.classList.toggle('thoughts-is-closing', closing);
+      if (motion.closingRate === -1) motion.scene.classList.toggle('thoughts-close', closing);
+    }
+    if (win.id === 'jiangshan') {
+      win.classList.toggle('jiangshan-is-closing', closing);
+      if (motion.closingRate === -1) motion.scene.classList.toggle('jiangshan-close', closing);
+    }
     return true;
   }
   function launchBrowser(win) {
@@ -594,6 +604,311 @@
     };
     return true;
   }
+  function thoughtsScene(win, rect) {
+    const compact = mobile();
+    const size = Math.min(compact ? 124 : 160, rect.width * .34, rect.height * .28);
+    const scene = document.createElement('div');
+    scene.className = 'thoughts-launch';
+    scene.setAttribute('aria-hidden', 'true');
+    Object.assign(scene.style, {
+      left:`${rect.left + rect.width / 2 - size / 2}px`,
+      top:`${rect.top + rect.height / 2 - size * .52}px`,
+      width:`${size}px`, height:`${size * 1.04}px`, zIndex:win.style.zIndex
+    });
+    const activeTab = $('.thoughts-tab[aria-selected="true"]', win)?.dataset.thoughtsTab;
+    const labelText = activeTab === 'guestbook' ? '留言板…' : '碎碎念…';
+    function bubble(variant) {
+      const card = document.createElement('span');
+      card.className = `thoughts-launch-bubble thoughts-launch-bubble-${variant}`;
+      if (variant === 'front') {
+        card.innerHTML = '<span class="thoughts-launch-head"><i class="thoughts-launch-avatar"></i><span class="thoughts-launch-caption"></span></span><i class="thoughts-launch-line"></i><i class="thoughts-launch-line"></i><i class="thoughts-launch-line"></i><span class="thoughts-launch-tag">#日常</span>';
+        $('.thoughts-launch-caption', card).textContent = labelText;
+      } else {
+        card.innerHTML = '<i class="thoughts-launch-line"></i><i class="thoughts-launch-line"></i>';
+      }
+      scene.append(card);
+      return card;
+    }
+    const spread = compact ? 24 : 42, tilt = compact ? 7 : 12;
+    const bubbles = [['left',-spread,-tilt,2],['right',spread,tilt,-2],['front',0,0,-10]].map(([variant,x,angle,y]) => ({element:bubble(variant),x,angle,y}));
+    win.after(scene);
+    return {scene, bubbles};
+  }
+  function launchThoughts(win) {
+    if (win.id !== 'thoughts' || reducedMotion.matches || typeof win.animate !== 'function') return;
+    const rect = win.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const compact = mobile(), repeated = thoughtsLaunched.has(win);
+    const duration = compact ? (repeated ? 280 : 440) : (repeated ? 380 : 580);
+    thoughtsLaunched.add(win);
+    const {scene, bubbles} = thoughtsScene(win, rect);
+    const options = {duration, easing:'linear', fill:'both'};
+    const animations = [];
+    const add = (element, frames, extra = {}) => {
+      if (!element) return null;
+      const animation = element.animate(frames, {...options, ...extra});
+      animations.push(animation); return animation;
+    };
+    for (const {element, x, angle, y} of bubbles) {
+      add(element, [
+        {opacity:0, transform:`translateY(18px) rotate(${angle/3}deg) scale(.76)`, offset:0, easing:'cubic-bezier(.2, .7, .3, 1)'},
+        {opacity:1, transform:`translateY(0) rotate(${angle/3}deg) scale(.98)`, offset:.2, easing:'cubic-bezier(.22, .8, .3, 1)'},
+        {opacity:1, transform:`translate(${x}px, ${y}px) rotate(${angle}deg) scale(1)`, offset:.46},
+        {opacity:1, transform:`translate(${x}px, ${y-3}px) rotate(${angle}deg) scale(1.02)`, offset:.57, easing:'ease-out'},
+        {opacity:0, transform:`translate(${x*1.12}px, ${y-10}px) rotate(${angle}deg) scale(1.08)`, offset:.84},
+        {opacity:0, transform:`translate(${x*1.12}px, ${y-10}px) rotate(${angle}deg) scale(1.08)`, offset:1}
+      ]);
+    }
+    scene.querySelectorAll('.thoughts-launch-bubble-front .thoughts-launch-line').forEach((line, index) => add(line, [
+      {opacity:0, transform:'scaleX(.2)', offset:0},
+      {opacity:0, transform:'scaleX(.2)', offset:.18 + index * .06, easing:'ease-out'},
+      {opacity:1, transform:'scaleX(1)', offset:.36 + index * .06},
+      {opacity:1, transform:'scaleX(1)', offset:1}
+    ]));
+    win.classList.add('thoughts-is-starting');
+    const animation = add(win, [
+      {opacity:0, transform:'scale(.91)', offset:0},
+      {opacity:0, transform:'scale(.91)', offset:.28, easing:'cubic-bezier(.22, 1, .36, 1)'},
+      {opacity:1, transform:'scale(1)', offset:1}
+    ], {id:'thoughts-launch'});
+    add($('.thoughts-workspace', win), [
+      {opacity:0, transform:'translateY(8px)', offset:0},
+      {opacity:0, transform:'translateY(8px)', offset:.4, easing:'ease-out'},
+      {opacity:1, transform:'translateY(0)', offset:1}
+    ]);
+    let order = 0;
+    for (const card of win.querySelectorAll('#thoughts-feed > .thought-card:not([hidden])')) {
+      const bounds = card.getBoundingClientRect();
+      if (!bounds.width || bounds.top >= rect.bottom || bounds.bottom <= rect.top) continue;
+      add(card, [
+        {opacity:0, transform:'translateY(12px)', offset:0},
+        {opacity:0, transform:'translateY(12px)', offset:.48 + order * .04, easing:'ease-out'},
+        {opacity:1, transform:'translateY(0)', offset:1}
+      ]);
+      if (++order === 5) break;
+    }
+    windowLaunch.set(win, {animation, animations, scene});
+    animation.onfinish = animation.oncancel = () => {
+      if (windowLaunch.get(win)?.animation === animation) settleLaunch(win);
+    };
+  }
+  function closeThoughts(win) {
+    if (win.id !== 'thoughts') return false;
+    if (reducedMotion.matches || typeof win.animate !== 'function') {
+      settleMotion(win);
+      return false;
+    }
+    if (directClose(win, true)) return true;
+    const launch = windowLaunch.get(win);
+    if (launch) {
+      if (!(launch.animation.currentTime > 0)) { settleLaunch(win); return false; }
+      windowLaunch.delete(win);
+      windowClose.set(win, {...launch, closingRate:-1});
+      launch.animation.onfinish = launch.animation.oncancel = () => {
+        if (windowClose.get(win)?.animation === launch.animation) settleClose(win);
+      };
+      directClose(win, true);
+      return true;
+    }
+    const style = getComputedStyle(win), content = $('.thoughts-workspace', win);
+    const from = {transform:style.transform, opacity:style.opacity, contentOpacity:content ? getComputedStyle(content).opacity : 1};
+    settleMotion(win);
+    win.hidden = false;
+    const rect = win.getBoundingClientRect();
+    if (!rect.width || !rect.height) return false;
+    const {scene, bubbles} = thoughtsScene(win, rect);
+    scene.classList.add('thoughts-close');
+    win.classList.add('thoughts-is-closing');
+    const options = {duration:mobile() ? 320 : 380, easing:'linear', fill:'both'};
+    const animation = win.animate([
+      {opacity:from.opacity || 1, transform:from.transform || 'none', offset:0, easing:'cubic-bezier(.4, 0, .6, 1)'},
+      {opacity:0, transform:'scale(.91)', offset:.58},
+      {opacity:0, transform:'scale(.91)', offset:1}
+    ], {...options, id:'thoughts-close'});
+    const animations = [animation];
+    if (content) {
+      animations.push(content.animate([
+        {opacity:from.contentOpacity || 1, offset:0}, {opacity:0, offset:.35}, {opacity:0, offset:1}
+      ], options));
+    }
+    for (const {element, x, angle, y} of bubbles) {
+      animations.push(element.animate([
+        {opacity:0, transform:`translate(${x}px, ${y-10}px) rotate(${angle}deg) scale(1.08)`, offset:0},
+        {opacity:0, transform:`translate(${x}px, ${y-10}px) rotate(${angle}deg) scale(1.08)`, offset:.14, easing:'ease-out'},
+        {opacity:1, transform:`translate(${x}px, ${y}px) rotate(${angle}deg) scale(1)`, offset:.4, easing:'cubic-bezier(.4, 0, .2, 1)'},
+        {opacity:1, transform:`translateY(4px) rotate(${angle/4}deg) scale(.94)`, offset:.7, easing:'ease-in'},
+        {opacity:0, transform:`translateY(24px) rotate(${angle/5}deg) scale(.72)`, offset:1}
+      ], options));
+    }
+    windowClose.set(win, {animation, animations, scene});
+    win.inert = true;
+    animation.onfinish = animation.oncancel = () => {
+      if (windowClose.get(win)?.animation === animation) settleClose(win);
+    };
+    return true;
+  }
+  function jiangshanScene(win, rect) {
+    const compact = mobile();
+    const width = Math.min(compact ? 216 : 312, rect.width * .52);
+    const height = Math.min(compact ? 116 : 154, rect.height * .32, width * .5);
+    const travel = Math.max(18, Math.round((width - 28) / 2));
+    const scene = document.createElement('div');
+    scene.className = 'jiangshan-launch';
+    scene.setAttribute('aria-hidden', 'true');
+    Object.assign(scene.style, {
+      left:`${rect.left + rect.width / 2 - width / 2}px`,
+      top:`${rect.top + rect.height / 2 - height / 2}px`,
+      width:`${width}px`, height:`${height}px`, zIndex:win.style.zIndex
+    });
+    scene.innerHTML = '<span class="jiangshan-launch-scroll"><span class="jiangshan-launch-canvas"><span class="jiangshan-launch-peaks"></span><span class="jiangshan-launch-river"></span><span class="jiangshan-launch-seal">江山</span><span class="jiangshan-launch-caption">展卷 · 江山时序</span></span><span class="jiangshan-launch-rod jiangshan-launch-rod-left"></span><span class="jiangshan-launch-rod jiangshan-launch-rod-right"></span></span>';
+    win.after(scene);
+    return {
+      scene, travel,
+      scroll:$('.jiangshan-launch-scroll', scene),
+      canvas:$('.jiangshan-launch-canvas', scene),
+      rodLeft:$('.jiangshan-launch-rod-left', scene),
+      rodRight:$('.jiangshan-launch-rod-right', scene),
+      seal:$('.jiangshan-launch-seal', scene),
+      radius:getComputedStyle(win).borderRadius || '13px'
+    };
+  }
+  function launchJiangshan(win) {
+    if (win.id !== 'jiangshan' || reducedMotion.matches || typeof win.animate !== 'function') return;
+    const rect = win.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const compact = mobile(), repeated = jiangshanLaunched.has(win);
+    const duration = compact ? (repeated ? 320 : 480) : (repeated ? 420 : 640);
+    jiangshanLaunched.add(win);
+    const {scene, travel, scroll, canvas, rodLeft, rodRight, seal, radius} = jiangshanScene(win, rect);
+    const options = {duration, easing:'linear', fill:'both'};
+    const animations = [];
+    const add = (element, frames, extra = {}) => {
+      if (!element) return null;
+      const animation = element.animate(frames, {...options, ...extra});
+      animations.push(animation); return animation;
+    };
+    const unrollEase = 'cubic-bezier(.22, .8, .25, 1)';
+    add(scroll, [
+      {opacity:0, transform:'translateY(14px) scale(.86)', offset:0, easing:'cubic-bezier(.2, .7, .3, 1)'},
+      {opacity:1, transform:'translateY(0) scale(1)', offset:.16},
+      {opacity:1, transform:'translateY(0) scale(1)', offset:.56, easing:'ease-out'},
+      {opacity:0, transform:'translateY(-6px) scale(1.08)', offset:.86},
+      {opacity:0, transform:'translateY(-6px) scale(1.08)', offset:1}
+    ]);
+    add(canvas, [
+      {clipPath:`inset(0px ${travel}px round 4px)`, offset:0},
+      {clipPath:`inset(0px ${travel}px round 4px)`, offset:.14, easing:unrollEase},
+      {clipPath:'inset(0px 0px round 6px)', offset:.54},
+      {clipPath:'inset(0px 0px round 6px)', offset:1}
+    ]);
+    add(rodLeft, [
+      {transform:`translateX(${travel}px)`, offset:0},
+      {transform:`translateX(${travel}px)`, offset:.14, easing:unrollEase},
+      {transform:'translateX(0px)', offset:.54},
+      {transform:'translateX(0px)', offset:1}
+    ]);
+    add(rodRight, [
+      {transform:`translateX(-${travel}px)`, offset:0},
+      {transform:`translateX(-${travel}px)`, offset:.14, easing:unrollEase},
+      {transform:'translateX(0px)', offset:.54},
+      {transform:'translateX(0px)', offset:1}
+    ]);
+    add(seal, [
+      {opacity:0, transform:'scale(1.38)', offset:0},
+      {opacity:0, transform:'scale(1.38)', offset:.36, easing:'cubic-bezier(.2, .8, .3, 1)'},
+      {opacity:1, transform:'scale(1)', offset:.54},
+      {opacity:1, transform:'scale(1)', offset:1}
+    ]);
+    win.classList.add('jiangshan-is-starting');
+    const animation = add(win, [
+      {clipPath:`inset(6% 38% round ${radius})`, transform:'scale(.92)', opacity:0, offset:0},
+      {clipPath:`inset(6% 38% round ${radius})`, transform:'scale(.92)', opacity:0, offset:.3, easing:'cubic-bezier(.22, 1, .36, 1)'},
+      {clipPath:`inset(0% 0% round ${radius})`, transform:'scale(1)', opacity:1, offset:1}
+    ], {id:'jiangshan-launch'});
+    add($('.jiangshan-stage', win), [
+      {opacity:0, offset:0},
+      {opacity:0, offset:.42, easing:'ease-out'},
+      {opacity:1, offset:1}
+    ]);
+    windowLaunch.set(win, {animation, animations, scene});
+    animation.onfinish = animation.oncancel = () => {
+      if (windowLaunch.get(win)?.animation === animation) settleLaunch(win);
+    };
+  }
+  function closeJiangshan(win) {
+    if (win.id !== 'jiangshan') return false;
+    if (reducedMotion.matches || typeof win.animate !== 'function') {
+      settleMotion(win);
+      return false;
+    }
+    if (directClose(win, true)) return true;
+    const launch = windowLaunch.get(win);
+    if (launch) {
+      if (!(launch.animation.currentTime > 0)) { settleLaunch(win); return false; }
+      windowLaunch.delete(win);
+      windowClose.set(win, {...launch, closingRate:-1});
+      launch.animation.onfinish = launch.animation.oncancel = () => {
+        if (windowClose.get(win)?.animation === launch.animation) settleClose(win);
+      };
+      directClose(win, true);
+      return true;
+    }
+    const style = getComputedStyle(win), stage = $('.jiangshan-stage', win);
+    const from = {clipPath:style.clipPath, transform:style.transform, opacity:style.opacity, stageOpacity:stage ? getComputedStyle(stage).opacity : 1};
+    settleMotion(win);
+    win.hidden = false;
+    const rect = win.getBoundingClientRect();
+    if (!rect.width || !rect.height) return false;
+    const {scene, travel, scroll, canvas, rodLeft, rodRight, radius} = jiangshanScene(win, rect);
+    scene.classList.add('jiangshan-close');
+    win.classList.add('jiangshan-is-closing');
+    const options = {duration:mobile() ? 340 : 420, easing:'linear', fill:'both'};
+    const rollEase = 'cubic-bezier(.4, 0, .2, 1)';
+    const animation = win.animate([
+      {clipPath:from.clipPath && from.clipPath !== 'none' ? from.clipPath : `inset(0% 0% round ${radius})`,
+        transform:from.transform || 'none', opacity:from.opacity || 1, offset:0, easing:rollEase},
+      {clipPath:`inset(6% 38% round ${radius})`, transform:'scale(.92)', opacity:0, offset:.58},
+      {clipPath:`inset(6% 38% round ${radius})`, transform:'scale(.92)', opacity:0, offset:1}
+    ], {...options, id:'jiangshan-close'});
+    const animations = [animation];
+    const add = (element, frames) => {
+      if (element) animations.push(element.animate(frames, options));
+    };
+    add(stage, [
+      {opacity:from.stageOpacity || 1, offset:0}, {opacity:0, offset:.32}, {opacity:0, offset:1}
+    ]);
+    add(scroll, [
+      {opacity:0, transform:'translateY(-4px) scale(1.06)', offset:0},
+      {opacity:0, transform:'translateY(-4px) scale(1.06)', offset:.12, easing:'ease-out'},
+      {opacity:1, transform:'translateY(0) scale(1)', offset:.36},
+      {opacity:1, transform:'translateY(0) scale(1)', offset:.76, easing:'ease-in'},
+      {opacity:0, transform:'translateY(14px) scale(.84)', offset:1}
+    ]);
+    add(canvas, [
+      {clipPath:'inset(0px 0px round 6px)', offset:0},
+      {clipPath:'inset(0px 0px round 6px)', offset:.32, easing:rollEase},
+      {clipPath:`inset(0px ${travel}px round 4px)`, offset:.76},
+      {clipPath:`inset(0px ${travel}px round 4px)`, offset:1}
+    ]);
+    add(rodLeft, [
+      {transform:'translateX(0px)', offset:0},
+      {transform:'translateX(0px)', offset:.32, easing:rollEase},
+      {transform:`translateX(${travel}px)`, offset:.76},
+      {transform:`translateX(${travel}px)`, offset:1}
+    ]);
+    add(rodRight, [
+      {transform:'translateX(0px)', offset:0},
+      {transform:'translateX(0px)', offset:.32, easing:rollEase},
+      {transform:`translateX(-${travel}px)`, offset:.76},
+      {transform:`translateX(-${travel}px)`, offset:1}
+    ]);
+    windowClose.set(win, {animation, animations, scene});
+    win.inert = true;
+    animation.onfinish = animation.oncancel = () => {
+      if (windowClose.get(win)?.animation === animation) settleClose(win);
+    };
+    return true;
+  }
   function scheduleWindowLayerRelease(win) {
     clearTimeout(windowLayerCleanup.get(win));
     const timer = setTimeout(() => {
@@ -704,7 +1019,7 @@
     focusWindow(win);
     if (focus) revealDockButton($(`.dock [data-open="${win.id}"]`));
     if (animate && restoring) animateWindow(win, false);
-    if (animate && starting && !directClose(win, false)) { launchMusic(win); launchAlbum(win); launchFiles(win); launchBrowser(win); }
+    if (animate && starting && !directClose(win, false)) { launchMusic(win); launchAlbum(win); launchFiles(win); launchBrowser(win); launchThoughts(win); launchJiangshan(win); }
     if (focus) win.focus({preventScroll: true});
     win.dispatchEvent(new CustomEvent('blanktime:window-opened'));
   }
@@ -712,7 +1027,7 @@
     if (win.dataset.state === state) return;
     const wasOpen = win.dataset.state === 'open';
     win.dataset.state = state;
-    const animating = wasOpen && (state === 'closed' ? closeMusic(win) || closeAlbum(win) || closeFiles(win) || closeBrowser(win) : animateWindow(win, true));
+    const animating = wasOpen && (state === 'closed' ? closeMusic(win) || closeAlbum(win) || closeFiles(win) || closeBrowser(win) || closeThoughts(win) || closeJiangshan(win) : animateWindow(win, true));
     if (!animating && state === 'closed') settleMotion(win);
     if (!animating) win.hidden = true;
     if (win === welcome) dismissWelcome();
@@ -767,6 +1082,7 @@
       const x = event.clientX, y = event.clientY, dir = resize?.dataset.resize;
       const target = resize || title;
       target.setPointerCapture(event.pointerId);
+      document.body.classList.add('is-window-dragging');
       const move = e => {
         const dx = e.clientX - x, dy = e.clientY - y;
         const maxRight = innerWidth - 8, maxBottom = innerHeight - 8;
@@ -782,7 +1098,9 @@
         }
         Object.assign(win.style, {left: `${left}px`, top: `${top}px`, width: `${width}px`, height: `${height}px`});
       };
-      const end = () => { target.removeEventListener('pointermove', move); target.removeEventListener('lostpointercapture', end); };
+      const end = () => { document.body.classList.remove('is-window-dragging'); target.removeEventListener('pointermove', move); target.removeEventListener('lostpointercapture', end); target.removeEventListener('pointerup', end); target.removeEventListener('pointercancel', end); };
+      target.addEventListener('pointerup', end);
+      target.addEventListener('pointercancel', end);
       target.addEventListener('pointermove', move);
       target.addEventListener('lostpointercapture', end);
     });
@@ -795,9 +1113,9 @@
   const filesWindow = $('#files'), desktopFiles = $('#desktop-files');
   desktopFiles.addEventListener('click', () => openWindow(filesWindow));
   $('#welcome-start-reading').addEventListener('click', () => {
-    if (window.blanktimeFiles?.openPath(window.blanktimeFS.home + '/Documents/Posts')) {
-      const sort = $('#files-sort'); sort.value = 'newest'; sort.dispatchEvent(new Event('change'));
-    } else openWindow($('#browser'));
+    openWindow($('#browser'));
+
+
   });
   $('.desktop-toggle').addEventListener('click', () => {
     const visible = windows.filter(win => win.dataset.state === 'open');

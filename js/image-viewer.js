@@ -2,7 +2,7 @@
   'use strict';
   const win = document.getElementById('image-viewer');
   const $ = name => document.getElementById('image-viewer-' + name);
-  const stage = $('stage'), message = $('message'), status = $('status'), apply = $('wallpaper');
+  const stage = $('stage'), canvas = stage.parentElement, prev = $('prev'), next = $('next'), message = $('message'), status = $('status'), apply = $('wallpaper');
   let imageTimer;
   let items = [], index = 0, trigger, source = '', photo, version = 0, awaitingWallpaper = false;
   const controls = ['zoom-out','zoom-in','actual','fit','rotate-left','rotate-right'].map($);
@@ -14,12 +14,14 @@
   let controlsVisible = false, tap;
   function setControlsVisible(visible) {
     controlsVisible = visible;
-    const hidden = !!mobile?.matches && !visible;
+    const hidden = !visible;
     win.classList.toggle('is-controls-hidden',hidden);
     if (hidden && chrome.some(element => element.contains(document.activeElement))) $('toggle').focus({preventScroll:true});
     chrome.forEach(element => {
-      element.inert = hidden;
-      if (hidden) element.setAttribute('aria-hidden','true');
+      const side = element === prev || element === next;
+      const elementHidden = hidden && (!side || !!mobile?.matches);
+      element.inert = elementHidden;
+      if (elementHidden) element.setAttribute('aria-hidden','true');
       else element.removeAttribute('aria-hidden');
     });
     const label = hidden ? '显示图片操作' : '隐藏图片操作';
@@ -43,9 +45,28 @@
     return [Math.max(0,(width * scale - Math.max(1,stage.clientWidth - PADDING)) / 2),
       Math.max(0,(height * scale - Math.max(1,stage.clientHeight - PADDING)) / 2)];
   }
+  function syncSideHover(event) {
+    if (!event || event.pointerType === 'touch' || mobile?.matches || win.hidden || drag || pinch) {
+      prev.classList.remove('is-near');
+      next.classList.remove('is-near');
+      return;
+    }
+    const rect = canvas.getBoundingClientRect();
+    const width = rect.width || stage.clientWidth;
+    const height = rect.height || stage.clientHeight;
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const inVerticalBand = !height || Math.abs(y - height / 2) <= Math.max(120, height * .28);
+    const zone = Math.min(120, Math.max(72, (width || 0) * .14 || 96));
+    prev.classList.toggle('is-near', event.target === prev || prev.contains(event.target) || (inVerticalBand && x >= 0 && x <= zone));
+    next.classList.toggle('is-near', event.target === next || next.contains(event.target) || (inVerticalBand && width > 0 && x >= width - zone && x <= width));
+  }
+  canvas.addEventListener('pointermove', syncSideHover);
+  canvas.addEventListener('pointerleave', () => syncSideHover(null));
   function endGesture() {
     const ids = [...pointers.keys()];
     pointers.clear(); drag = null; pinch = null; tap = null;
+    prev.classList.remove('is-near'); next.classList.remove('is-near');
     stage.classList.remove('is-panning');
     ids.forEach(id => { if (stage.hasPointerCapture?.(id)) stage.releasePointerCapture(id); });
   }
@@ -121,15 +142,15 @@
     // A second finger invalidates the whole tap, even after one finger lifts.
     if (pointers.size) tap = null;
     const surface = event.target === photo || event.target === stage || event.target === $('feedback') || event.target === message;
-    if ((!ready() && !mobile?.matches) || win.hidden || !surface || event.button !== 0 || pointers.size >= 2) return;
+    if (stage.getAttribute('aria-busy') === 'true' || win.hidden || !surface || event.button !== 0 || pointers.size >= 2) return;
     const touch = event.pointerType === 'touch';
-    // Track the first finger even while the whole image fits, so the second
-    // finger can start a pinch. Desktop mouse dragging requires an enlarged image.
-    if (!touch && (event.isPrimary === false || pointers.size || (!mobile?.matches && (event.target !== photo || !stage.classList.contains('can-pan'))))) return;
+    // Track the first pointer even while the whole image fits, so taps/clicks can
+    // toggle controls and a second touch finger can start a pinch.
+    if (!touch && (event.isPrimary === false || pointers.size)) return;
     if (touch && [...pointers.values()].some(point => point.type !== 'touch')) return;
     event.preventDefault();
     pointers.set(event.pointerId,{x:event.clientX,y:event.clientY,type:event.pointerType});
-    if (mobile?.matches && pointers.size === 1) tap = {id:event.pointerId,x:event.clientX,y:event.clientY,time:performance.now()};
+    if (pointers.size === 1) tap = {id:event.pointerId,x:event.clientX,y:event.clientY,time:performance.now()};
     stage.setPointerCapture(event.pointerId);
     startGesture();
   });
@@ -160,7 +181,7 @@
     if (stage.hasPointerCapture?.(event.pointerId)) stage.releasePointerCapture(event.pointerId);
     // Lifting either finger continues as a one-finger pan without a jump.
     startGesture();
-    if (tapped && mobile?.matches) setControlsVisible(!controlsVisible);
+    if (tapped) setControlsVisible(!controlsVisible);
   });
   ['pointercancel','lostpointercapture'].forEach(type => stage.addEventListener(type, event => {
     if (pointers.has(event.pointerId)) endGesture();
@@ -327,7 +348,7 @@
   $('prev').addEventListener('click', () => show(index - 1));
   $('next').addEventListener('click', () => show(index + 1));
   win.addEventListener('keydown', event => {
-    if (event.key === 'Tab' && mobile?.matches) setControlsVisible(true);
+    if (event.key === 'Tab') setControlsVisible(true);
     if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
     if (event.target.closest('input,textarea,select,[contenteditable=true]')) return;
     if (event.key === 'Escape') {

@@ -1,0 +1,12 @@
+/* Keep visual placement and keyboard order aligned with the rendered shortcut list. */
+.desktop { --shortcut-top: 51px; --shortcut-step: 104px; --shortcut-bottom: 24px; }
+.desktop > .desktop-file-icon[data-shortcut] {
+  left: calc(80px + var(--shortcut-col) * 104px);
+  top: calc(var(--shortcut-top) + var(--shortcut-row) * var(--shortcut-step));
+}
+@media (max-width: 760px) {
+  .desktop > .desktop-file-icon[data-shortcut] {
+    left: calc(20px + var(--shortcut-mobile-col) * 100px);
+    top: calc(64px + var(--shortcut-mobile-row) * 108px);
+  }
+}
