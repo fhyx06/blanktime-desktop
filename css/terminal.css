@@ -3,9 +3,43 @@
   left:max(84px,calc(50vw - 440px));top:max(32px,calc(50dvh - 320px));
   border-radius:14px;
 }
+#terminal.terminal-window {
+  background:var(--terminal-color-background,#151c24);
+  color:var(--terminal-color-text,#d6e1ed);
+  border:1px solid color-mix(in srgb,var(--terminal-color-text,#d6e1ed) 12%,var(--terminal-color-background,#151c24));
+  box-shadow:0 22px 70px #050a1080,0 3px 12px #00000038;
+  color-scheme:dark;
+}
+#terminal.terminal-window.is-focused {
+  border-color:color-mix(in srgb,var(--terminal-color-directory,#83bcf3) 22%,var(--terminal-color-background,#151c24));
+  box-shadow:0 26px 82px #050a109e,0 4px 16px #0000004d;
+}
 .terminal-window.terminal-entering {animation:terminal-enter .24s cubic-bezier(.2,.8,.2,1);}
 @keyframes terminal-enter {from {opacity:0;scale:.97;} to {opacity:1;scale:1;}}
-.terminal-window .titlebar {border-bottom:1px solid var(--line);}
+#terminal.terminal-window .titlebar {
+  background:linear-gradient(180deg,color-mix(in srgb,var(--terminal-color-background_glow,#1d2a38) 88%,#fff 3%),color-mix(in srgb,var(--terminal-color-background,#151c24) 65%,var(--terminal-color-background_glow,#1d2a38)));
+  border-bottom:1px solid color-mix(in srgb,var(--terminal-color-text,#d6e1ed) 8%,transparent);
+  color:var(--terminal-color-text,#d6e1ed);
+}
+#terminal.terminal-window .window-caption {
+  color:var(--terminal-color-text,#d6e1ed);
+  letter-spacing:.2px;
+}
+#terminal.terminal-window .window-caption svg {
+  color:var(--terminal-color-prompt,#86d6af);
+}
+#terminal.terminal-window .window-controls button {
+  color:var(--terminal-color-muted,#97a8ba);
+  transition:background .15s,color .15s;
+}
+#terminal.terminal-window .window-controls button:hover {
+  background:color-mix(in srgb,var(--terminal-color-text,#d6e1ed) 10%,transparent);
+  color:var(--terminal-color-welcome,#f0f5fa);
+}
+#terminal.terminal-window .window-controls button[data-action="close"]:hover {
+  background:#ce505b;
+  color:#fff;
+}
 .terminal-screen {
   container-type:inline-size;
   flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:22px 24px;

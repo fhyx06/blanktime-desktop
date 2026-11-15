@@ -6,6 +6,9 @@
   const COMMANDS = ['help', 'pwd', 'ls', 'll', 'cd', 'open', 'search', 'clear', 'exit', 'su', 'rm'];
   const MAX_INPUT = 4096;
   const MAX_LINES = 1000;
+  const MAX_GLOB = 1000;
+  // Path commands expand bare `*`; search/help/su keep their arguments literal.
+  const GLOB_COMMANDS = new Set(['ls', 'll', 'cd', 'open', 'rm']);
   const DEFAULT_FONT_SIZE = 14.5;
   const cleanText = value => String(value ?? '').replace(/[\u0000-\u001f\u007f-\u009f]/g, ' ');
   const KINDS = ['text', 'muted', 'directory', 'error', 'success', 'welcome', 'warning', 'info'];
@@ -37,6 +40,7 @@
     invalid_arguments:['{command}: invalid number of arguments\nusage: {usage}', 'error'],
     invalid_option:['{command}: invalid option: {option}', 'error'],
     too_many_paths:['{command}: too many operands', 'error'],
+    glob_too_many:['{shell}: {command}: argument list too long (max {limit} matches)', 'error'],
     unclosed_quote:['{shell}: syntax error: unterminated quote', 'error'],
     incomplete_escape:['{shell}: syntax error: incomplete escape sequence', 'error'],
     input_too_long:['{shell}: command line too long (max {limit} characters)', 'error'],
@@ -137,7 +141,7 @@
     let quote = '', escaped = false, token = null;
     for (let index = 0; index < line.length; index++) {
       const character = line[index];
-      if (!token && !/\s/.test(character)) token = {value:'', start:index};
+      if (!token && !/\s/.test(character)) token = {value:'', start:index, stars:[]};
       if (escaped) { token.value += character; escaped = false; }
       else if (character === '\\' && quote !== "'") escaped = true;
       else if (quote) {
@@ -146,14 +150,31 @@
       } else if (character === '"' || character === "'") quote = character;
       else if (/\s/.test(character)) {
         if (token) { tokens.push(token); token = null; }
-      } else token.value += character;
+      } else {
+        // Only bare stars are wildcards; quoted or escaped stars stay literal characters.
+        if (character === '*') token.stars.push(token.value.length);
+        token.value += character;
+      }
     }
     if (!partial && (quote || escaped)) throw failure(quote ? 'unclosed_quote' : 'incomplete_escape');
+    const endsInSpace = !token;
     if (token) tokens.push(token);
-    return {tokens, quote, escaped};
+    return {tokens, quote, escaped, endsInSpace};
   }
   function shellWord(value) {
-    return value.replace(/[\\\s'"$`]/g, '\\$&');
+    return value.replace(/[\\\s'"$`*]/g, '\\$&');
+  }
+  // Linear wildcard match (no regex backtracking); pattern items are {star} or literal code units.
+  function wildcardMatch(name, pattern) {
+    let n = 0, p = 0, starAt = -1, resume = 0;
+    while (n < name.length) {
+      if (p < pattern.length && !pattern[p].star && pattern[p].text === name[n]) { n++; p++; }
+      else if (p < pattern.length && pattern[p].star) { starAt = p++; resume = n; }
+      else if (starAt >= 0) { p = starAt + 1; n = ++resume; }
+      else return false;
+    }
+    while (p < pattern.length && pattern[p].star) p++;
+    return p === pattern.length;
   }
   function dateLabel(value) {
     if (!value) return '—';
@@ -188,6 +209,49 @@
     const lookup = value => filesystem.resolve(value, {cwd, home:identity.home, isRoot:identity.isRoot});
     const promptPath = () => cwd === identity.home ? '~' : cwd.startsWith(identity.home + '/') ? '~' + cwd.slice(identity.home.length) : cwd;
     const sorted = node => filesystem.list(node);
+    const globEnabled = options.glob !== false && record(options.glob).enable !== false;
+    // Expand one token against the virtual tree, segment by segment, like bash without
+    // dotglob/globstar/nullglob. Unreadable or missing directories are skipped silently;
+    // no match keeps the literal word so the command reports it.
+    function expand(token) {
+      const value = token.value;
+      if (!globEnabled || !token.stars || !token.stars.length) return [value];
+      const stars = new Set(token.stars);
+      const segments = [];
+      let offset = 0;
+      for (const text of value.split('/')) {
+        const pattern = [];
+        for (let index = 0; index < text.length; index++) {
+          const star = stars.has(offset + index);
+          if (star && pattern.at(-1)?.star) continue;
+          pattern.push(star ? {star:true} : {text:text[index]});
+        }
+        segments.push({text, pattern, wild:pattern.some(item => item.star)});
+        offset += text.length + 1;
+      }
+      let results = [''];
+      segments.forEach((segment, index) => {
+        const join = base => index === 0 ? '' : base + '/';
+        if (!segment.wild) { results = results.map(base => join(base) + segment.text); return; }
+        const next = [];
+        const hiddenAllowed = !segment.pattern[0].star && segment.pattern[0].text === '.';
+        for (const base of results) {
+          let directory;
+          try { directory = lookup(index === 0 ? '.' : base || '/'); } catch { continue; }
+          if (directory.type !== 'directory') continue;
+          for (const child of sorted(directory)) {
+            if (child.name.startsWith('.') && !hiddenAllowed) continue;
+            if (!wildcardMatch(child.name, segment.pattern)) continue;
+            next.push(join(base) + child.name);
+            if (next.length > MAX_GLOB) throw failure('glob_too_many', {limit:MAX_GLOB});
+          }
+        }
+        results = next;
+      });
+      // Trailing literal segments (and `*/`) must name an existing path to count as a match.
+      results = results.filter(path => { try { lookup(path); return true; } catch { return false; } });
+      return results.length ? results : [value];
+    }
     function enterRoot(login) {
       sessions.push({identity, cwd});
       identity = {username:'root', home:'/root', isRoot:true};
@@ -216,10 +280,14 @@
       const report = (key, values) => lines.push(message(key, values));
       try {
         if (line.length > MAX_INPUT) throw failure('input_too_long', {limit:MAX_INPUT});
-        const args = tokenize(line).tokens.map(token => token.value);
-        command = args.shift() || '';
+        const tokens = tokenize(line).tokens;
+        command = tokens.length ? tokens[0].value : '';
         commandId = presentation.resolveCommand(command);
+        const typedCount = Math.max(0, tokens.length - 1);
+        const args = tokens.slice(1).flatMap(token => GLOB_COMMANDS.has(commandId) ? expand(token) : [token.value]);
         const requireCount = (minimum, maximum) => {
+          // A wildcard that matched several paths is an ambiguity, not a usage mistake.
+          if (args.length > maximum && typedCount <= maximum) throw failure('too_many_paths');
           if (args.length < minimum || args.length > maximum) throw failure('invalid_arguments');
         };
         if (!command) return {lines, cwd};
@@ -258,13 +326,20 @@
               }
             } else paths.push(argument);
           });
-          if (paths.length > 1) throw failure('too_many_paths');
-          const node = lookup(paths.length ? paths[0] : '.');
-          const empty = node.type === 'directory' && node.children.size === 0;
-          let entries = node.type === 'directory' ? sorted(node).filter(child => all || !child.name.startsWith('.')) : [node];
-          if ((all || empty) && node.type === 'directory') entries = [{...node, name:'.'}, {...(node.parent || node), name:'..'}, ...entries];
-          if (empty) report('total', {total:0});
-          entries.forEach(entry => {
+          if (!paths.length) paths.push('.');
+          const multiple = paths.length > 1, files = [], directories = [];
+          for (const path of paths) {
+            try {
+              const node = lookup(path);
+              (node.type === 'directory' ? directories : files).push({path, node});
+            } catch (error) {
+              if (!multiple) throw error;
+              // Like bash: report each bad operand, keep listing the rest, and fail overall.
+              failed = true;
+              report(error.terminalKey || 'operation_failed', error.terminalValues);
+            }
+          }
+          const print = (entries, empty) => entries.forEach(entry => {
             const directory = entry.type === 'directory';
             const name = entry.name + (directory ? '/' : '');
             if (empty || long) {
@@ -280,6 +355,17 @@
                 {text:(empty ? '' : ' '.repeat(Math.max(0, 16 - date.length))) + '  '}, {text:name, role:nameRole});
               out(parts.map(part => part.text).join(''), directory ? 'directory' : undefined, parts);
             } else out(name, directory ? 'directory' : undefined);
+          });
+          // File operands come first and keep the path as typed when several were listed.
+          print(files.map(({path, node}) => multiple ? {...node, name:path} : node), false);
+          directories.forEach(({path, node}, index) => {
+            if (files.length || index) out('');
+            if (multiple) out(path.replace(/(.)\/+$/, '$1') + ':');
+            const empty = node.children.size === 0;
+            let entries = sorted(node).filter(child => all || !child.name.startsWith('.'));
+            if (all || empty) entries = [{...node, name:'.'}, {...(node.parent || node), name:'..'}, ...entries];
+            if (empty) report('total', {total:0});
+            print(entries, empty);
           });
         } else if (commandId === 'open') {
           requireCount(1, 1);
@@ -376,9 +462,9 @@
       if (line.length > MAX_INPUT) return {value:line, candidates:[]};
       const parsed = tokenize(line, true);
       const tokens = parsed.tokens;
-      const endsInSpace = !parsed.quote && !parsed.escaped && /\s$/.test(line);
+      const endsInSpace = parsed.endsInSpace;
       const active = endsInSpace || !tokens.length ? {value:'', start:line.length} : tokens[tokens.length - 1];
-      const tokenCount = tokens.length + (endsInSpace ? 1 : 0);
+      const tokenCount = tokens.length + (endsInSpace && tokens.length ? 1 : 0);
       let matches, prefix = '';
       if (tokenCount <= 1 || (tokenCount === 2 && presentation.resolveCommand(tokens[0].value) === 'help')) {
         matches = commandNames.filter(command => command.startsWith(active.value));
@@ -391,6 +477,17 @@
           matches = 'root'.startsWith(active.value) ? ['root'] : [];
         } else {
           if (!['cd', 'open', 'ls', 'll', 'rm'].includes(command)) return {value:line, candidates:[]};
+          if (globEnabled && active.stars?.length) {
+            // A wildcard word is previewed, never guessed: one match is inserted, several are listed.
+            let expanded;
+            try { expanded = expand(active); } catch { return {value:line, candidates:[]}; }
+            if (expanded.length === 1 && expanded[0] === active.value) return {value:line, candidates:[]};
+            if (expanded.length > 1) return {value:line, candidates:expanded};
+            let directory = false;
+            try { directory = lookup(expanded[0]).type === 'directory'; } catch {}
+            const word = expanded[0] + (directory && !expanded[0].endsWith('/') ? '/' : '');
+            return {value:line.slice(0, active.start) + shellWord(word) + (directory ? '' : ' '), candidates:[word]};
+          }
           if (active.value === '~') return {value:line.slice(0, active.start) + '~/', candidates:['~/']};
           const slash = active.value.lastIndexOf('/');
           prefix = slash >= 0 ? active.value.slice(0, slash + 1) : '';

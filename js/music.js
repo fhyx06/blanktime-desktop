@@ -116,9 +116,15 @@
     icon('btnPlay', playing ? 'pause' : 'play', playing ? '暂停' : '播放');
     dock?.classList.toggle('is-playing', playing);
     list.querySelectorAll('.row').forEach((row,i) => {
+      const rowPlaying = i === index && playing;
       row.classList.toggle('active',i === index);
-      row.classList.toggle('is-playing',i === index && playing && !buffering);
+      row.classList.toggle('is-playing',rowPlaying && !buffering);
       row.setAttribute('aria-current',i === index ? 'true' : 'false');
+      const stateIcon = row.querySelector('.row-icon'), nextIcon = rowPlaying ? 'pause' : 'play';
+      if (stateIcon && stateIcon.dataset.icon !== nextIcon) {
+        stateIcon.dataset.icon = nextIcon;
+        stateIcon.innerHTML = ICON[nextIcon];
+      }
     });
     publishState();
   }
@@ -154,7 +160,9 @@
           const number = document.createElement('span'); number.className = 'row-number'; number.textContent = span.textContent;
           const bars = document.createElement('span'); bars.className = 'rhythm-bars'; bars.setAttribute('aria-hidden', 'true');
           bars.innerHTML = '<i></i><i></i><i></i><i></i>';
-          span.replaceChildren(number, bars);
+          const stateIcon = document.createElement('span'); stateIcon.className = 'row-icon'; stateIcon.setAttribute('aria-hidden', 'true');
+          stateIcon.dataset.icon = 'play'; stateIcon.innerHTML = ICON.play;
+          span.replaceChildren(number, bars, stateIcon);
         }
         if (j === 0) {
           button.append(span);
@@ -549,7 +557,12 @@
   $('btnLink')?.addEventListener('click',() => { if(id) window.open('https://music.163.com/#/playlist?id='+id,'_blank','noopener,noreferrer'); });
   $('reload').addEventListener('click',loadPlaylist);
   list.addEventListener('click',event => {
-    const row=event.target.closest('.row'); if(row) selectSong(Number(row.dataset.index),true);
+    const row=event.target.closest('.row');
+    if(!row) return;
+    const i=Number(row.dataset.index);
+    if(i===index && audio.getAttribute('src') && !audio.error) {
+      if(audio.paused) playAudio(); else audio.pause();
+    } else selectSong(i,true);
   });
   lyricInner.addEventListener('click',event => {
     const line=event.target.closest('.lyric-line');

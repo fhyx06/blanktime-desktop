@@ -789,7 +789,8 @@
   });
   document.querySelectorAll('[data-open]').forEach(button => button.addEventListener('click', () => {
     const win = document.getElementById(button.dataset.open);
-    openWindow(win);
+    if (button.closest('.dock') && win.dataset.state === 'open') hideWindow(win, 'minimized');
+    else openWindow(win);
   }));
   const filesWindow = $('#files'), desktopFiles = $('#desktop-files');
   desktopFiles.addEventListener('click', () => openWindow(filesWindow));
