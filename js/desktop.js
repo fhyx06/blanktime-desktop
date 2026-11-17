@@ -73,6 +73,7 @@
   const browserLaunched = new WeakSet();
   const thoughtsLaunched = new WeakSet();
   const jiangshanLaunched = new WeakSet();
+  const welcomeLaunched = new WeakSet();
   const windowClose = new WeakMap();
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   function settleLaunch(win, finished = false) {
@@ -86,7 +87,7 @@
     });
     launch.scene.remove();
     launch.cleanup?.();
-    win.classList.remove('music-is-starting', 'album-is-starting', 'files-is-starting', 'browser-is-starting', 'thoughts-is-starting', 'jiangshan-is-starting');
+    win.classList.remove('music-is-starting', 'album-is-starting', 'files-is-starting', 'browser-is-starting', 'thoughts-is-starting', 'jiangshan-is-starting', 'welcome-is-starting');
     win.style.removeProperty('--music-launch-duration');
     if (win.id === 'files' || win.id === 'browser') {
       if (finished && win.dataset.state === 'open') {
@@ -134,7 +135,7 @@
     });
     closing.scene.remove();
     closing.cleanup?.();
-    win.classList.remove('album-is-starting', 'album-is-closing', 'files-is-starting', 'files-is-closing', 'browser-is-starting', 'browser-is-closing', 'thoughts-is-starting', 'thoughts-is-closing', 'jiangshan-is-starting', 'jiangshan-is-closing');
+    win.classList.remove('album-is-starting', 'album-is-closing', 'files-is-starting', 'files-is-closing', 'browser-is-starting', 'browser-is-closing', 'thoughts-is-starting', 'thoughts-is-closing', 'jiangshan-is-starting', 'jiangshan-is-closing', 'welcome-is-starting', 'welcome-is-closing');
     win.inert = false;
     win.hidden = win.dataset.state !== 'open';
     if (win.id === 'files' || win.id === 'browser') {
@@ -164,6 +165,7 @@
       win.classList.toggle('jiangshan-is-closing', closing);
       if (motion.closingRate === -1) motion.scene.classList.toggle('jiangshan-close', closing);
     }
+    if (win === welcome) win.classList.toggle('welcome-is-closing', closing);
     return true;
   }
   function launchBrowser(win) {
@@ -909,6 +911,218 @@
     };
     return true;
   }
+  let welcomeInkId = 0;
+  // 窗口本体用 clip-path 展开，与其他应用一致：给整窗加减 mask 会让部分 WebView（如 VIA）
+  // 在重建窗口图层时闪一帧。羽化 mask 只用在用完即弃的墨晕浮层上，且半径略大于窗口，
+  // 让墨色边缘盖住窗口的硬边，保留晕染感。
+  const welcomeMask = typeof CSS !== 'undefined' && CSS.supports?.('mask-size', '1px 1px') === true;
+  function welcomeReveal(radius, soft = false) {
+    if (!soft || !welcomeMask) return {clipPath:`circle(${(soft ? radius * 1.08 : radius).toFixed(1)}px at 50% 50%)`};
+    // 遮罩渐变在 82% 半径处才开始变淡，放大尺寸后实心部分恰好覆盖窗口边缘外一圈。
+    const size = (radius * 1.08 * 2 / .82).toFixed(1);
+    return {maskSize:`${size}px ${size}px`};
+  }
+  function welcomeScene(win, rect) {
+    // The blot is drawn once at its final size and only scaled, so the noise filter rasterizes a single time.
+    const reach = Math.hypot(rect.width, rect.height) / 2;
+    const size = Math.ceil(reach * 2.4);
+    const id = `welcome-ink-${++welcomeInkId}`;
+    const scene = document.createElement('div');
+    scene.className = 'welcome-launch';
+    scene.setAttribute('aria-hidden', 'true');
+    const radius = getComputedStyle(win).borderRadius || '13px';
+    Object.assign(scene.style, {
+      left:`${rect.left}px`, top:`${rect.top}px`,
+      width:`${rect.width}px`, height:`${rect.height}px`,
+      borderRadius:radius, zIndex:win.style.zIndex
+    });
+    scene.innerHTML = `<span class="welcome-launch-wash"><span class="welcome-launch-ink"><svg viewBox="-100 -100 200 200" preserveAspectRatio="none"><defs><filter id="${id}-edge" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="11"/><feDisplacementMap in="SourceGraphic" scale="14"/><feGaussianBlur stdDeviation=".7"/></filter><radialGradient id="${id}-fill"><stop offset="0" stop-color="#18231e" stop-opacity=".9"/><stop offset=".5" stop-color="#2a3d33" stop-opacity=".66"/><stop offset=".8" stop-color="#2f463a" stop-opacity=".5"/><stop offset=".92" stop-color="#1f3128" stop-opacity=".72"/><stop offset="1" stop-color="#4b6657" stop-opacity="0"/></radialGradient></defs><circle r="84" fill="url(#${id}-fill)" filter="url(#${id}-edge)"/></svg></span></span><span class="welcome-launch-drop"></span>`;
+    const ink = $('.welcome-launch-ink', scene);
+    Object.assign(ink.style, {
+      width:`${size}px`, height:`${size}px`,
+      left:`${rect.width / 2 - size / 2}px`, top:`${rect.height / 2 - size / 2}px`
+    });
+    win.after(scene);
+    // At scale 1 the blot's visible rim reaches 84% of half its box.
+    const inkScale = r => (r / (size / 2 * .84)).toFixed(4);
+    return {scene, ink, wash:$('.welcome-launch-wash', scene), drop:$('.welcome-launch-drop', scene), reach, inkScale};
+  }
+  // Content written onto the paper after the ink settles; only on a full first launch.
+  function welcomeBrushwork(win) {
+    const pick = selector => [...win.querySelectorAll(selector)].filter(element => !element.hidden);
+    const wipe = from => [
+      {clipPath:from, opacity:0, offset:0},
+      {clipPath:from, opacity:0, offset:.4, easing:'cubic-bezier(.3, .6, .25, 1)'},
+      {clipPath:'inset(-12% -6% -12% -6%)', opacity:1, offset:.82},
+      {clipPath:'inset(-12% -6% -12% -6%)', opacity:1, offset:1}
+    ];
+    const rise = (start, distance = 8) => [
+      {opacity:0, transform:`translateY(${distance}px)`, offset:0},
+      {opacity:0, transform:`translateY(${distance}px)`, offset:start, easing:'cubic-bezier(.2, .7, .3, 1)'},
+      {opacity:1, transform:'translateY(0)', offset:Math.min(1, start + .3)},
+      {opacity:1, transform:'translateY(0)', offset:1}
+    ];
+    return [
+      ...pick('.welcome-intro h1').map(element => [element, wipe('inset(-12% 106% -12% -6%)')]),
+      ...pick('.welcome-intro p').map(element => [element, rise(.56)]),
+      ...pick('#welcome-start-reading').map(element => [element, rise(.62)]),
+      ...pick('.profile-avatar').map(element => [element, [
+        {opacity:0, transform:'scale(1.32)', offset:0},
+        {opacity:0, transform:'scale(1.32)', offset:.46, easing:'cubic-bezier(.5, 0, .9, .4)'},
+        {opacity:1, transform:'scale(.95)', offset:.62, easing:'cubic-bezier(.2, .8, .3, 1)'},
+        {opacity:1, transform:'scale(1)', offset:.74},
+        {opacity:1, transform:'scale(1)', offset:1}
+      ]]),
+      ...pick('.profile-name').map(element => [element, rise(.6, 6)]),
+      ...pick('.profile-poem').map(element => [element, [
+        {clipPath:'inset(-10% 104% -10% -4%)', opacity:0, offset:0},
+        {clipPath:'inset(-10% 104% -10% -4%)', opacity:0, offset:.62, easing:'cubic-bezier(.35, .4, .3, 1)'},
+        {clipPath:'inset(-10% -4% -10% -4%)', opacity:1, offset:1}
+      ]]),
+      ...pick('.poem-refresh').map(element => [element, rise(.7, 4)]),
+      ...pick('.welcome-card').map((element, index) => [element, rise(.66 + index * .05, 12)])
+    ];
+  }
+  // 主线程卡顿时把整组动画回拨相同时长：相当于暂停，而不是在没有画面的情况下直接跳到结尾。
+  function steadyWelcome(win, launch) {
+    if (typeof requestAnimationFrame !== 'function') return;
+    let last = null;
+    const tick = now => {
+      if (windowLaunch.get(win) !== launch) return;
+      if (last !== null && now - last > 100) {
+        const lost = now - last - 16;
+        launch.animations.forEach(item => {
+          if (Number.isFinite(item.currentTime)) item.currentTime = Math.max(0, item.currentTime - lost);
+        });
+      }
+      last = now;
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+  function launchWelcome(win) {
+    if (win !== welcome || reducedMotion.matches || typeof win.animate !== 'function') return;
+    const rect = win.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const compact = mobile(), repeated = welcomeLaunched.has(win);
+    const duration = compact ? (repeated ? 340 : 640) : (repeated ? 460 : 920);
+    welcomeLaunched.add(win);
+    const {scene, ink, wash, drop, reach, inkScale} = welcomeScene(win, rect);
+    const start = repeated ? 0 : .17;
+    const options = {duration, easing:'linear', fill:'both'};
+    const animations = [];
+    const add = (element, frames, extra = {}) => {
+      if (!element) return null;
+      const animation = element.animate(frames, {...options, ...extra});
+      animations.push(animation); return animation;
+    };
+    if (repeated) drop.remove();
+    else add(drop, [
+      {opacity:0, transform:'translateY(-48px) scale(.5, .8)', offset:0, easing:'cubic-bezier(.55, 0, .9, .45)'},
+      {opacity:1, transform:'translateY(0) scale(.85, 1.12)', offset:.13, easing:'ease-out'},
+      {opacity:1, transform:'translateY(0) scale(1.4, .68)', offset:start},
+      {opacity:0, transform:'translateY(0) scale(1.8, .55)', offset:start + .06},
+      {opacity:0, transform:'translateY(0) scale(1.8, .55)', offset:1}
+    ]);
+    // Ink and paper share one radius curve: a quick bloom, then a long soft diffusion to the corners.
+    const steps = [[0, 0], [.03, 14], [.16, reach * .34], [.34, reach * .78], [.52, reach + 4]];
+    const bloom = 'cubic-bezier(.2, .7, .35, 1)';
+    const at = offset => Math.min(1, start + offset);
+    const radiusFrames = (extra = () => ({}), soft = false) => [
+      {...welcomeReveal(0, soft), ...extra(0), offset:0},
+      ...steps.map(([offset, radius], index) => ({...welcomeReveal(radius, soft), ...extra(index), offset:at(offset), easing:bloom})),
+      {...welcomeReveal(reach + 4, soft), ...extra(steps.length - 1), offset:1}
+    ];
+    win.classList.add('welcome-is-starting');
+    // The paper surfaces just behind the ink front, so the window seems to grow out of the wash.
+    const animation = add(win, radiusFrames(), {id:'welcome-launch'});
+    add(wash, radiusFrames(undefined, true));
+    const inkOpacity = [0, .95, .78, .4, 0];
+    add(ink, [
+      {opacity:0, transform:`scale(${inkScale(1)})`, offset:0},
+      ...steps.map(([offset, radius], index) => ({
+        opacity:inkOpacity[index], transform:`scale(${inkScale(Math.max(1, radius * 1.06))})`, offset:at(offset), easing:bloom
+      })),
+      {opacity:0, transform:`scale(${inkScale(reach * 1.06)})`, offset:1}
+    ]);
+    if (repeated) {
+      add($('.welcome-content', win), [
+        {opacity:0, offset:0}, {opacity:0, offset:.3, easing:'ease-out'}, {opacity:1, offset:.8}, {opacity:1, offset:1}
+      ]);
+    } else for (const [element, frames] of welcomeBrushwork(win)) add(element, frames);
+    const launch = {animation, animations, scene};
+    windowLaunch.set(win, launch);
+    steadyWelcome(win, launch);
+    animation.onfinish = animation.oncancel = () => {
+      if (windowLaunch.get(win)?.animation === animation) settleLaunch(win);
+    };
+  }
+  function closeWelcome(win) {
+    if (win !== welcome) return false;
+    if (reducedMotion.matches || typeof win.animate !== 'function') {
+      settleMotion(win);
+      return false;
+    }
+    if (directClose(win, true)) return true;
+    const launch = windowLaunch.get(win);
+    if (launch) {
+      // Draw an unfinished launch back into its drop instead of starting a new scene.
+      if (!(launch.animation.currentTime > 0)) { settleLaunch(win); return false; }
+      windowLaunch.delete(win);
+      windowClose.set(win, {...launch, closingRate:-1});
+      launch.animation.onfinish = launch.animation.oncancel = () => {
+        if (windowClose.get(win)?.animation === launch.animation) settleClose(win);
+      };
+      directClose(win, true);
+      return true;
+    }
+    const style = getComputedStyle(win), content = $('.welcome-content', win);
+    const from = {transform:style.transform, opacity:style.opacity, contentOpacity:content ? getComputedStyle(content).opacity : 1};
+    settleMotion(win);
+    win.hidden = false;
+    const rect = win.getBoundingClientRect();
+    if (!rect.width || !rect.height) return false;
+    const {scene, ink, wash, drop, reach, inkScale} = welcomeScene(win, rect);
+    scene.classList.add('welcome-close');
+    win.classList.add('welcome-is-closing');
+    const options = {duration:mobile() ? 340 : 460, easing:'linear', fill:'both'};
+    const gather = 'cubic-bezier(.55, 0, .7, .3)';
+    const steps = [[0, reach + 4], [.4, reach * .62], [.72, reach * .06], [.8, 0]];
+    const radiusFrames = (extra = () => ({}), soft = false) => [
+      ...steps.map(([offset, radius], index) => ({...welcomeReveal(radius, soft), ...extra(index), offset, easing:gather})),
+      {...welcomeReveal(0, soft), ...extra(steps.length - 1), offset:1}
+    ];
+    const animation = win.animate(radiusFrames(index => ({
+      transform:index ? 'none' : from.transform || 'none', opacity:index === 0 ? from.opacity || 1 : index < 3 ? 1 : 0
+    })), {...options, id:'welcome-close'});
+    const animations = [animation];
+    const add = (element, frames) => {
+      if (element) animations.push(element.animate(frames, options));
+    };
+    add(wash, radiusFrames(undefined, true));
+    add(content, [
+      {opacity:from.contentOpacity || 1, offset:0}, {opacity:0, offset:.28}, {opacity:0, offset:1}
+    ]);
+    const inkOpacity = [0, .5, .92, 0];
+    add(ink, [
+      ...steps.map(([offset, radius], index) => ({
+        opacity:inkOpacity[index], transform:`scale(${inkScale(Math.max(1, radius * 1.06))})`, offset, easing:gather
+      })),
+      {opacity:0, transform:`scale(${inkScale(1)})`, offset:1}
+    ]);
+    add(drop, [
+      {opacity:0, transform:'scale(.6)', offset:0},
+      {opacity:0, transform:'scale(.6)', offset:.68},
+      {opacity:1, transform:'scale(1)', offset:.8, easing:'ease-in'},
+      {opacity:0, transform:'translateY(8px) scale(.3)', offset:1}
+    ]);
+    windowClose.set(win, {animation, animations, scene});
+    win.inert = true;
+    animation.onfinish = animation.oncancel = () => {
+      if (windowClose.get(win)?.animation === animation) settleClose(win);
+    };
+    return true;
+  }
   function scheduleWindowLayerRelease(win) {
     clearTimeout(windowLayerCleanup.get(win));
     const timer = setTimeout(() => {
@@ -1019,7 +1233,7 @@
     focusWindow(win);
     if (focus) revealDockButton($(`.dock [data-open="${win.id}"]`));
     if (animate && restoring) animateWindow(win, false);
-    if (animate && starting && !directClose(win, false)) { launchMusic(win); launchAlbum(win); launchFiles(win); launchBrowser(win); launchThoughts(win); launchJiangshan(win); }
+    if (animate && starting && !directClose(win, false)) { launchMusic(win); launchAlbum(win); launchFiles(win); launchBrowser(win); launchThoughts(win); launchJiangshan(win); launchWelcome(win); }
     if (focus) win.focus({preventScroll: true});
     win.dispatchEvent(new CustomEvent('blanktime:window-opened'));
   }
@@ -1027,7 +1241,7 @@
     if (win.dataset.state === state) return;
     const wasOpen = win.dataset.state === 'open';
     win.dataset.state = state;
-    const animating = wasOpen && (state === 'closed' ? closeMusic(win) || closeAlbum(win) || closeFiles(win) || closeBrowser(win) || closeThoughts(win) || closeJiangshan(win) : animateWindow(win, true));
+    const animating = wasOpen && (state === 'closed' ? closeMusic(win) || closeAlbum(win) || closeFiles(win) || closeBrowser(win) || closeThoughts(win) || closeJiangshan(win) || closeWelcome(win) : animateWindow(win, true));
     if (!animating && state === 'closed') settleMotion(win);
     if (!animating) win.hidden = true;
     if (win === welcome) dismissWelcome();
@@ -1143,6 +1357,32 @@
     selectFile: row => window.blanktimeFiles?.selectFile(row)
   };
   const initialArticle = document.getElementById('article-source')?.content.querySelector('[data-article]');
+  delete document.documentElement.dataset.welcomeIntro;
   if (initialArticle || welcomeDismissed) { welcome.hidden = true; welcome.dataset.state = 'closed'; syncDock(); }
-  else openWindow(welcome, false);
+  else {
+    // 首次访问从关闭状态开始；等后续脚本执行完、帧率平稳后再播放水墨启动动画，
+    // 避免手机在加载阶段卡住主线程，让遮罩展开直接跳到结尾。
+    welcome.hidden = true;
+    welcome.dataset.state = 'closed';
+    syncDock();
+    introduceWelcome();
+  }
+  function introduceWelcome() {
+    const open = () => { if (welcome.dataset.state === 'closed') openWindow(welcome, false); };
+    if (reducedMotion.matches || typeof welcome.animate !== 'function' || typeof requestAnimationFrame !== 'function') { open(); return; }
+    const started = performance.now();
+    let last = null, calm = 0;
+    const settle = now => {
+      // 用户已从 Dock 手动打开时不再重复启动。
+      if (welcome.dataset.state !== 'closed') return;
+      calm = last !== null && now - last < 34 ? calm + 1 : 0;
+      last = now;
+      // 连续 4 帧平稳即开始；最多等待 1.5 秒，慢设备上也不会让欢迎窗口迟迟不出现。
+      if (calm >= 4 || now - started > 1500) open();
+      else requestAnimationFrame(settle);
+    };
+    requestAnimationFrame(settle);
+    // 少数 WebView 在页面可见时也会节流 requestAnimationFrame，用计时器兜底，避免欢迎窗口一直不出现。
+    setTimeout(() => { if (document.visibilityState !== 'hidden') open(); }, 2000);
+  }
 })();

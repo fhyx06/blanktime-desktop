@@ -20,8 +20,20 @@
 .context-music-meta strong,.context-music-meta > span {display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .context-music-meta strong {font-size:13px;font-weight:600;}
 .context-music-meta > span,.context-music-time {font-size:11px;color:var(--menu-muted);}
-.context-music-progress {height:3px;margin:6px 5px 8px;overflow:hidden;border-radius:3px;background:var(--menu-border);}
-.context-music-progress i {display:block;height:100%;width:0;background:var(--accent, #1270fe);border-radius:inherit;}
+/* 可点击、拖动的进度条：可视轨道 3px，点击区域放大到 14px；悬停、拖动或聚焦时轨道加粗并显示圆点。 */
+.context-music-progress {position:relative;height:14px;margin:1px 5px 3px;cursor:pointer;touch-action:none;outline:none;}
+.context-music-progress::before,.context-music-progress i {content:"";position:absolute;left:0;top:50%;height:3px;border-radius:3px;transform:translateY(-50%);transition:height .15s;}
+.context-music-progress::before {right:0;background:var(--menu-border);}
+.context-music-progress i {width:0;background:var(--accent, #1270fe);}
+.context-music-progress b {position:absolute;top:50%;left:0;width:11px;height:11px;margin-left:-5.5px;border-radius:50%;background:var(--accent, #1270fe);box-shadow:0 1px 3px #0003;transform:translateY(-50%) scale(0);transition:transform .15s;pointer-events:none;}
+.context-music-progress:is(:hover,.is-dragging,:focus-visible):not([aria-disabled="true"])::before,
+.context-music-progress:is(:hover,.is-dragging,:focus-visible):not([aria-disabled="true"]) i {height:5px;}
+.context-music-progress:is(:hover,.is-dragging,:focus-visible):not([aria-disabled="true"]) b {transform:translateY(-50%) scale(1);}
+.context-music-progress:focus-visible::before {box-shadow:0 0 0 2px var(--accent, #1270fe);}
+.context-music-progress[aria-disabled="true"] {cursor:default;}
+@media (prefers-reduced-motion: reduce) {
+  .context-music-progress::before,.context-music-progress i,.context-music-progress b {transition:none;}
+}
 .context-music-bottom {display:flex;align-items:center;justify-content:space-between;gap:5px;padding:0 3px;}
 .context-music-time {white-space:nowrap;font-variant-numeric:tabular-nums;}
 .context-music-controls {display:flex;gap:3px;}

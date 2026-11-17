@@ -11,7 +11,7 @@
   const notice = document.createElement('div');
   notice.className = 'context-menu-notice'; notice.hidden = true; notice.setAttribute('role', 'status');
   document.body.append(menu, notice);
-  let origin = null, focusOrigin = null, noticeTimer, stopMusic;
+  let origin = null, focusOrigin = null, noticeTimer, stopMusic, stepMusic = null;
   const observer = new MutationObserver(() => { if (!visible(origin)) close(); });
   const $ = selector => document.querySelector(selector);
   const item = (id, label, run, disabled = false) => ({id, label, run, disabled});
@@ -19,7 +19,7 @@
   function close(restoreFocus = false) {
     if (menu.hidden) return;
     observer.disconnect();
-    stopMusic?.(); stopMusic = null;
+    stopMusic?.(); stopMusic = null; stepMusic = null;
     menu.hidden = true;
     if (restoreFocus && visible(focusOrigin)) focusOrigin.focus({preventScroll:true});
     origin = focusOrigin = null;
@@ -59,7 +59,7 @@
     const panel = document.createElement('div'); panel.className = 'context-music';
     panel.setAttribute('role', 'group'); panel.setAttribute('aria-label', '音乐播放');
     // Static UI only; song metadata is assigned through textContent below.
-    panel.innerHTML = '<button type="button" role="menuitem" tabindex="-1" class="context-music-now" data-action="music-open" aria-label="打开音乐播放器" title="打开音乐播放器"><span class="context-music-cover" aria-hidden="true"><span>♪</span><img alt="" hidden></span><span class="context-music-meta"><strong></strong><span></span></span></button><div class="context-music-progress" aria-hidden="true"><i></i></div><div class="context-music-bottom"><span class="context-music-time" aria-hidden="true"></span><div class="context-music-controls"><button type="button" role="menuitem" tabindex="-1" data-action="music-prev" aria-label="上一首" title="上一首"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14M19 5l-10 7 10 7Z"/></svg></button><button type="button" role="menuitem" tabindex="-1" data-action="music-play" aria-label="播放" title="播放"></button><button type="button" role="menuitem" tabindex="-1" data-action="music-next" aria-label="下一首" title="下一首"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 5v14M5 5l10 7-10 7Z"/></svg></button></div></div>';
+    panel.innerHTML = '<button type="button" role="menuitem" tabindex="-1" class="context-music-now" data-action="music-open" aria-label="打开音乐播放器" title="打开音乐播放器"><span class="context-music-cover" aria-hidden="true"><span>♪</span><img alt="" hidden></span><span class="context-music-meta"><strong></strong><span></span></span></button><div class="context-music-progress" role="slider" tabindex="-1" aria-label="播放进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i><b></b></div><div class="context-music-bottom"><span class="context-music-time" aria-hidden="true"></span><div class="context-music-controls"><button type="button" role="menuitem" tabindex="-1" data-action="music-prev" aria-label="上一首" title="上一首"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14M19 5l-10 7 10 7Z"/></svg></button><button type="button" role="menuitem" tabindex="-1" data-action="music-play" aria-label="播放" title="播放"></button><button type="button" role="menuitem" tabindex="-1" data-action="music-next" aria-label="下一首" title="下一首"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 5v14M5 5l10 7-10 7Z"/></svg></button></div></div>';
     const art = panel.querySelector('img'), title = panel.querySelector('strong'), artist = panel.querySelector('.context-music-meta > span');
     const play = panel.querySelector('[data-action="music-play"]'), opener = panel.querySelector('[data-action="music-open"]');
     const format = seconds => {
@@ -85,10 +85,58 @@
       }
       panel.querySelectorAll('.context-music-controls button').forEach(button => { button.disabled = !state.ready; });
       if (panel.contains(document.activeElement) && document.activeElement.disabled) opener.focus({preventScroll:true});
+      const seekable = state.ready && state.duration > 0 && typeof player.seek === 'function';
+      progress.setAttribute('aria-disabled', String(!seekable));
+      // 拖动期间以手指/鼠标位置为准，不被播放进度的推送覆盖。
+      if (dragging) return;
       const percent = state.duration > 0 ? Math.max(0, Math.min(100, state.currentTime / state.duration * 100)) : 0;
-      panel.querySelector('.context-music-progress i').style.width = `${percent}%`;
-      panel.querySelector('.context-music-time').textContent = `${format(state.currentTime)} / ${format(state.duration)}`;
+      showProgress(percent / 100, state.currentTime, state.duration);
     }
+    // 进度条：点击跳转，按住拖动时只预览位置和时间，松手后才真正跳转，避免拖动中频繁 seek。
+    const progress = panel.querySelector('.context-music-progress');
+    let dragging = false;
+    function showProgress(ratio, time, total) {
+      progress.querySelector('i').style.width = `${ratio * 100}%`;
+      progress.querySelector('b').style.left = `${ratio * 100}%`;
+      progress.setAttribute('aria-valuenow', String(Math.round(ratio * 100)));
+      progress.setAttribute('aria-valuetext', `${format(time)} / ${format(total)}`);
+      panel.querySelector('.context-music-time').textContent = `${format(time)} / ${format(total)}`;
+    }
+    const ratioAt = event => {
+      const rect = progress.getBoundingClientRect();
+      return rect.width ? Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width)) : 0;
+    };
+    const preview = event => {
+      const total = player.getState().duration || 0, ratio = ratioAt(event);
+      showProgress(ratio, ratio * total, total);
+    };
+    function endDrag(event, commit) {
+      if (!dragging) return;
+      dragging = false;
+      progress.classList.remove('is-dragging');
+      if (progress.hasPointerCapture?.(event.pointerId)) progress.releasePointerCapture(event.pointerId);
+      if (commit && visible(origin)) player.seek(ratioAt(event));
+      update();
+    }
+    progress.addEventListener('pointerdown', event => {
+      if (event.button !== 0 || progress.getAttribute('aria-disabled') === 'true') return;
+      event.preventDefault();
+      dragging = true;
+      progress.classList.add('is-dragging');
+      progress.setPointerCapture?.(event.pointerId);
+      progress.focus({preventScroll:true});
+      preview(event);
+    });
+    progress.addEventListener('pointermove', event => { if (dragging) preview(event); });
+    progress.addEventListener('pointerup', event => endDrag(event, true));
+    progress.addEventListener('pointercancel', event => endDrag(event, false));
+    // 键盘：聚焦进度条时左右方向键快退／快进 5 秒。
+    stepMusic = seconds => {
+      const state = player.getState();
+      if (progress.getAttribute('aria-disabled') === 'true' || !(state.duration > 0)) return;
+      player.seek(Math.max(0, Math.min(state.duration, state.currentTime + seconds)) / state.duration);
+      update();
+    };
     opener.addEventListener('click', () => { close(true); player.open(); });
     for (const [id, action] of [['prev', 'previous'], ['play', 'togglePlayback'], ['next', 'next']]) {
       panel.querySelector(`[data-action="music-${id}"]`).addEventListener('click', () => {
@@ -206,11 +254,18 @@
     }
     return entries;
   }
+  // 这些位置的浏览器原生菜单有实际用途（复制、粘贴、另存图片、在新标签页打开等），始终保留。
+  const NATIVE = 'input, textarea, select, [contenteditable]:not([contenteditable="false"]), pre, code, audio, video, iframe, a[href], img';
+  // 返回值：true 已显示站内菜单；'native' 交给浏览器原生菜单；false 不显示任何菜单。
   function show(target, x, y) {
     close();
-    if (!(target instanceof Element) || !visible(target) || window.getSelection()?.toString()) return false;
-    const result = context(target); if (!result?.items.length) return false;
-    const entries = configuredItems(result); if (!entries.length) return false;
+    if (!(target instanceof Element) || window.getSelection()?.toString()) return 'native';
+    if (!visible(target)) return false;
+    const result = context(target);
+    // 没有站内菜单的区域（游戏棋盘外沿、窗口空白、按钮等）不再落到浏览器菜单，只有原生菜单有用的位置除外。
+    if (!result?.items.length) return target.closest(NATIVE) ? 'native' : false;
+    // 在配置中关闭的场景恢复浏览器原生菜单，与关闭前的行为一致。
+    const entries = configuredItems(result); if (!entries.length) return 'native';
     result.select?.(); origin = target;
     focusOrigin = target.closest('a[href], button, [tabindex]') || target.querySelector('a[href]') || target.closest('.app-window') || document.activeElement;
     const owner = target.closest('.app-window');
@@ -245,14 +300,14 @@
     if (menu.contains(event.target)) { event.preventDefault(); return; }
     const bounds = event.target.getBoundingClientRect?.();
     const x = event.clientX || bounds?.left + 16 || 8, y = event.clientY || bounds?.top + 16 || 8;
-    if (show(event.target, x, y)) event.preventDefault();
+    if (show(event.target, x, y) !== 'native') event.preventDefault();
   });
   // Capture prevents Escape/arrow keys from also reaching the album and image viewer.
   document.addEventListener('keydown', event => {
     if (event.key === 'ContextMenu' || (event.key === 'F10' && event.shiftKey)) {
       if (!allowCustom(event)) return;
       const target = event.target, bounds = target.getBoundingClientRect?.();
-      if (show(target, (bounds?.left || 0) + 16, (bounds?.top || 0) + 16)) { event.preventDefault(); event.stopImmediatePropagation(); }
+      if (show(target, (bounds?.left || 0) + 16, (bounds?.top || 0) + 16) === true) { event.preventDefault(); event.stopImmediatePropagation(); }
       return;
     }
     if (menu.hidden) return;
@@ -260,7 +315,9 @@
       event.preventDefault(); event.stopImmediatePropagation(); close(true); return;
     }
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-      event.preventDefault(); event.stopImmediatePropagation(); return;
+      event.preventDefault(); event.stopImmediatePropagation();
+      if (document.activeElement?.matches('.context-music-progress')) stepMusic?.(event.key === 'ArrowLeft' ? -5 : 5);
+      return;
     }
     if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
       event.preventDefault(); event.stopImmediatePropagation();

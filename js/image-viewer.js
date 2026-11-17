@@ -63,8 +63,73 @@
   }
   canvas.addEventListener('pointermove', syncSideHover);
   canvas.addEventListener('pointerleave', () => syncSideHover(null));
+  // 图片没有横向平移空间时，触摸左右滑动可切换上一张/下一张。
+  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+  let swipe = null, swipeMotion = null;
+  const canAnimate = () => typeof stage.animate === 'function' && !reducedMotion?.matches;
+  function resetSwipe() {
+    if (!swipe) return;
+    swipe = null;
+    stage.style.removeProperty('transform');
+  }
+  function stopSwipeMotion() {
+    if (!swipeMotion) return;
+    const motion = swipeMotion; swipeMotion = null;
+    motion.onfinish = motion.oncancel = null;
+    motion.cancel();
+    stage.style.removeProperty('transform');
+  }
+  function settleSwipeMotion() {
+    // 新的触摸会立即完成仍在进行的滑动动画，包括尚未执行的翻页。
+    const motion = swipeMotion;
+    if (motion?.pageChange) motion.onfinish(); else stopSwipeMotion();
+  }
+  function slideIn(direction) {
+    if (!canAnimate()) return;
+    const motion = stage.animate([
+      {transform:`translateX(${direction * Math.min(96, stage.clientWidth * .25)}px)`, opacity:0},
+      {transform:'translateX(0)', opacity:1}
+    ], {duration:220, easing:'cubic-bezier(.2, .8, .3, 1)'});
+    swipeMotion = motion;
+    motion.onfinish = motion.oncancel = () => { if (swipeMotion === motion) swipeMotion = null; };
+  }
+  function finishSwipe(state) {
+    swipe = null;
+    const width = Math.max(1, stage.clientWidth || canvas.clientWidth);
+    const direction = state.dx < 0 ? 1 : -1, target = index + direction;
+    const fast = Math.abs(state.velocity) > .45 && Math.abs(state.dx) > 24 && Math.sign(state.velocity) === Math.sign(state.dx);
+    const commit = target >= 0 && target < items.length && (Math.abs(state.dx) > Math.max(56, width * .18) || fast);
+    if (!canAnimate()) {
+      stage.style.removeProperty('transform');
+      if (commit) show(target);
+      return;
+    }
+    stage.style.removeProperty('transform');
+    const from = `translateX(${state.dx}px)`;
+    if (!commit) {
+      const motion = stage.animate([{transform:from}, {transform:'translateX(0)'}], {duration:200, easing:'cubic-bezier(.2, .8, .3, 1)'});
+      swipeMotion = motion;
+      motion.onfinish = motion.oncancel = () => { if (swipeMotion === motion) swipeMotion = null; };
+      return;
+    }
+    const remaining = width - Math.abs(state.dx);
+    const motion = stage.animate([{transform:from, opacity:1}, {transform:`translateX(${-direction * width}px)`, opacity:.35}],
+      {duration:Math.max(110, Math.min(220, remaining / Math.max(.9, Math.abs(state.velocity)))), easing:'cubic-bezier(.3, .5, .4, 1)', fill:'forwards'});
+    swipeMotion = motion; motion.pageChange = true;
+    motion.oncancel = () => { if (swipeMotion === motion) swipeMotion = null; };
+    motion.onfinish = () => {
+      if (swipeMotion !== motion) return;
+      motion.onfinish = motion.oncancel = null; motion.pageChange = false;
+      swipeMotion = null;
+      show(target);
+      // 先换图再取消滑出动画，避免旧图闪回。
+      motion.cancel();
+      slideIn(direction);
+    };
+  }
   function endGesture() {
     const ids = [...pointers.keys()];
+    resetSwipe();
     pointers.clear(); drag = null; pinch = null; tap = null;
     prev.classList.remove('is-near'); next.classList.remove('is-near');
     stage.classList.remove('is-panning');
@@ -130,11 +195,17 @@
   }
   function startGesture() {
     drag = null; pinch = null;
+    // 第二根手指按下时滑动转为双指缩放，图片先回到中间。
+    resetSwipe();
     if (pointers.size === 2) {
       pinch = {...pinchPosition(),scale,panX,panY};
     } else if (pointers.size === 1) {
       const [id,point] = [...pointers.entries()][0];
       drag = {id,...point,panX,panY};
+      const horizontalRoom = ready() && stage.clientWidth ? bounds()[0] > .5 : false;
+      if (point.type === 'touch' && items.length > 1 && !horizontalRoom) {
+        swipe = {id, x:point.x, y:point.y, dx:0, axis:null, velocity:0, lastX:point.x, lastTime:performance.now()};
+      }
     }
     stage.classList.toggle('is-panning',pointers.size > 0 && stage.classList.contains('can-pan'));
   }
@@ -142,8 +213,10 @@
     // A second finger invalidates the whole tap, even after one finger lifts.
     if (pointers.size) tap = null;
     const surface = event.target === photo || event.target === stage || event.target === $('feedback') || event.target === message;
-    if (stage.getAttribute('aria-busy') === 'true' || win.hidden || !surface || event.button !== 0 || pointers.size >= 2) return;
     const touch = event.pointerType === 'touch';
+    // 图片加载中仍可触摸滑过，其他输入方式需等待加载完成。
+    if ((stage.getAttribute('aria-busy') === 'true' && !(touch && items.length > 1)) || win.hidden || !surface || event.button !== 0 || pointers.size >= 2) return;
+    if (!pointers.size) settleSwipeMotion();
     // Track the first pointer even while the whole image fits, so taps/clicks can
     // toggle controls and a second touch finger can start a pinch.
     if (!touch && (event.isPrimary === false || pointers.size)) return;
@@ -160,6 +233,22 @@
     event.preventDefault();
     point.x = event.clientX; point.y = event.clientY;
     if (tap && Math.hypot(point.x - tap.x,point.y - tap.y) > 8) tap = null;
+    if (swipe?.id === event.pointerId) {
+      const dx = point.x - swipe.x, dy = point.y - swipe.y;
+      // 方向只判定一次：纵向拖动不会翻页，横向滑动不会平移。
+      if (!swipe.axis && Math.hypot(dx,dy) > 10) swipe.axis = Math.abs(dx) > Math.abs(dy) * 1.2 ? 'x' : 'y';
+      if (swipe.axis === 'y') swipe = null;
+      else if (swipe.axis === 'x') {
+        const now = performance.now(), elapsed = now - swipe.lastTime;
+        if (elapsed > 0) swipe.velocity = swipe.velocity * .3 + (point.x - swipe.lastX) / elapsed * .7;
+        swipe.lastX = point.x; swipe.lastTime = now;
+        const edge = (dx > 0 && index === 0) || (dx < 0 && index === items.length - 1);
+        // 到达首张或末张时施加阻尼，而不是直接拖不动。
+        swipe.dx = edge ? dx * .3 : dx;
+        stage.style.transform = `translateX(${swipe.dx}px)`;
+        return;
+      } else return;
+    }
     if (!ready()) return;
     if (pinch) {
       const current = pinchPosition();
@@ -178,9 +267,12 @@
     if (!pointers.delete(event.pointerId)) return;
     const tapped = tap?.id === event.pointerId && performance.now() - tap.time < 400 && Math.hypot(event.clientX - tap.x,event.clientY - tap.y) <= 8;
     tap = null;
+    const swiped = swipe?.id === event.pointerId && swipe.axis === 'x' ? swipe : null;
+    if (swiped) swipe = null;
     if (stage.hasPointerCapture?.(event.pointerId)) stage.releasePointerCapture(event.pointerId);
     // Lifting either finger continues as a one-finger pan without a jump.
     startGesture();
+    if (swiped) { finishSwipe(swiped); return; }
     if (tapped) setControlsVisible(!controlsVisible);
   });
   ['pointercancel','lostpointercapture'].forEach(type => stage.addEventListener(type, event => {
@@ -307,7 +399,8 @@
     img.alt = item.name; img.draggable = false; img.hidden = true;
     img.addEventListener('load', () => {
       if (current !== version || settled) return;
-      endGesture();
+      // 正在进行的横向滑动不会被刚加载完成的图片打断。
+      if (swipe?.axis !== 'x') endGesture();
       settled = true; clearTimeout(imageTimer); $('feedback').hidden = true;
       stage.setAttribute('aria-busy','false'); message.hidden = true; img.hidden = false;
       apply.disabled = !item.wallpaper;
@@ -361,7 +454,7 @@
     event.preventDefault(); event.stopPropagation();
   });
   win.addEventListener('blanktime:window-hidden', event => {
-    endGesture(); exitFullscreen();
+    stopSwipeMotion(); endGesture(); exitFullscreen();
     if (event.detail.state !== 'closed') return;
     resetView();
     ++version; clearTimeout(imageTimer); stopMetadata(); $('info').hidden = true; items = []; awaitingWallpaper = false;

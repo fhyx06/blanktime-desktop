@@ -618,7 +618,9 @@
     publishState();
   }).observe(win,{attributes:true,attributeFilter:['data-state','hidden']});
   window.blanktimeMusic = {getState, getPlaylist, retryPlaylist:loadPlaylist, playTrack,
-    togglePlayback, previous:() => stepSong(-1), next:() => stepSong(1), open:openPlayer};
+    togglePlayback, previous:() => stepSong(-1), next:() => stepSong(1), open:openPlayer,
+    // 按比例（0–1）跳转播放位置，供桌面右键的迷你进度条使用。
+    seek:ratio => { if (Number.isFinite(ratio)) seek(ratio); }};
   icon('btnPrev','prev');icon('btnNext','next');
   if ($('btnLink')) icon('btnLink','link');
   setLoop(store.get('loop'));accent(store.get('accent') || defaultAccent);

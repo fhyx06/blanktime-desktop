@@ -95,4 +95,54 @@
   .profile-name { margin-top: 12px; margin-bottom: 9px; }
 }
 
-
+/* Ink launch: a drop lands, spreads into a wash, and the paper window surfaces from it. */
+/* Hide the statically rendered window until desktop.js starts the launch; reveal anyway if scripts stall. */
+html[data-welcome-intro="pending"] #welcome { visibility: hidden; animation: welcome-intro-fallback 0s 2.5s forwards; }
+@keyframes welcome-intro-fallback { to { visibility: visible; } }
+.welcome-launch {
+  position: fixed;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+}
+/* The wash shares the window's reveal, so ink only ever stains the paper, never the wallpaper. */
+.welcome-launch-wash { position: absolute; inset: 0; display: block; }
+.welcome-launch-ink {
+  position: absolute;
+  display: block;
+  opacity: 0;
+  transform-origin: 50% 50%;
+  mix-blend-mode: multiply;
+  will-change: transform, opacity;
+}
+.welcome-launch-ink svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.welcome-launch-drop {
+  position: absolute;
+  left: calc(50% - 9px);
+  top: calc(50% - 11px);
+  width: 18px;
+  height: 22px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(circle at 36% 30%, #6d8277 0%, #1f2b25 52%, #111a15 100%);
+  /* A pale rim keeps the drop legible on dark wallpapers. */
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .7), 0 0 14px 3px rgba(255, 255, 255, .45), 0 4px 10px rgba(10, 20, 15, .35);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+html[data-system-theme="dark"] .welcome-launch-ink { mix-blend-mode: normal; }
+#welcome.welcome-is-starting,
+#welcome.welcome-is-closing {
+  will-change: clip-path, opacity;
+  transition: none;
+}
+/* 羽化遮罩只作用于墨晕浮层；窗口本体用 clip-path，避免部分 WebView 重建整窗图层时闪烁。 */
+@supports (mask-size: 1px 1px) {
+  .welcome-launch-wash {
+    mask-image: radial-gradient(circle closest-side, #000 82%, rgba(0, 0, 0, .5) 92%, transparent 100%);
+    mask-position: 50% 50%;
+    mask-repeat: no-repeat;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome-launch { display: none; }
+}
