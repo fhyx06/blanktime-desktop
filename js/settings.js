@@ -1,13 +1,22 @@
 (() => {
   const toggle = document.getElementById('settings-toggle');
   const panel = document.getElementById('settings-panel');
-  const themeSwitch = document.getElementById('settings-system-theme');
   const appearance = window.blanktimeAppearance;
-  const sync = () => themeSwitch.setAttribute('aria-checked',String(appearance.getTheme() === 'dark'));
+  const choices = [...document.querySelectorAll('#settings-system-theme [data-theme-choice]')];
+  // 单选组：只有选中项可 Tab 聚焦，方向键在三项之间移动并立即生效。
+  const sync = () => {
+    const current = appearance.getPreference();
+    choices.forEach(choice => {
+      const selected = choice.dataset.themeChoice === current;
+      choice.setAttribute('aria-checked', String(selected));
+      choice.tabIndex = selected ? 0 : -1;
+    });
+  };
+  const selectedChoice = () => choices.find(choice => choice.getAttribute('aria-checked') === 'true') || choices[0];
   function show(open, restoreFocus = false) {
     panel.hidden = !open;
     toggle.setAttribute('aria-expanded',String(open));
-    if (open) { sync(); themeSwitch.focus(); }
+    if (open) { sync(); selectedChoice()?.focus(); }
     else if (restoreFocus) toggle.focus();
   }
   toggle.addEventListener('click',() => show(panel.hidden));
@@ -20,9 +29,15 @@
   document.addEventListener('keydown',event => {
     if (event.key === 'Escape' && !panel.hidden) {event.preventDefault();show(false,true);}
   });
-  themeSwitch.addEventListener('click',() => {
-    appearance.setTheme(appearance.getTheme() === 'dark' ? 'light' : 'dark');
-    sync();
+  choices.forEach((choice, index) => {
+    choice.addEventListener('click',() => { appearance.setPreference(choice.dataset.themeChoice); sync(); });
+    choice.addEventListener('keydown',event => {
+      const step = {ArrowRight:1, ArrowDown:1, ArrowLeft:-1, ArrowUp:-1}[event.key];
+      if (!step) return;
+      event.preventDefault();
+      const next = choices[(index + step + choices.length) % choices.length];
+      next.click(); next.focus();
+    });
   });
   document.addEventListener('blanktime:system-theme', sync);
   document.getElementById('settings-system-info').addEventListener('click',() => show(false));

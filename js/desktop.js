@@ -1328,8 +1328,8 @@
   desktopFiles.addEventListener('click', () => openWindow(filesWindow));
   $('#welcome-start-reading').addEventListener('click', () => {
     openWindow($('#browser'));
-
-
+    // 进入阅读后欢迎窗口随之关闭（播放水墨收拢动画），本次会话内不再自动弹出。
+    hideWindow(welcome, 'closed');
   });
   $('.desktop-toggle').addEventListener('click', () => {
     const visible = windows.filter(win => win.dataset.state === 'open');

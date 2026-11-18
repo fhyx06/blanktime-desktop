@@ -1,0 +1,52 @@
+/* ICP 备案号，仿 Windows“激活 Windows”水印。备案号链接到工信部备案管理系统。 */
+
+/* 电脑端：右下角两行半透明文字。与真正的水印一样悬浮在所有窗口之上（低于 Dock、设置面板和菜单），
+   因此任何窗口都不会遮住它；只有备案号这一行可以点击，其余部分点击穿透，不影响下方窗口的操作。 */
+.site-record {
+  position: fixed;
+  right: 32px;
+  bottom: 26px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  /* 近白文字配一圈柔和的深色光晕（类似视频字幕）：叠在深色壁纸和白色窗口上都清晰可读，
+     只用浅灰色时压在白色窗口上的对比度仅约 1.3:1，几乎看不见。 */
+  color: #f4f6f5e6;
+  text-shadow: 0 0 1px #00000080, 0 0 3px #00000059, 0 1px 4px #00000040;
+  pointer-events: none;
+  user-select: none;
+}
+.site-record a {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: .01em;
+  pointer-events: auto;
+  transition: color .18s;
+}
+.site-record a:hover { color: #ffffff; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.site-record span { font-size: 12.5px; line-height: 1.4; }
+
+/* 手机端：悬浮在窗口上会挡住内容，改为在底部应用栏上方留出 24px 窄带，靠右显示一行备案号。 */
+@media (max-width: 760px) {
+  body.has-site-record { --mobile-bottom: calc(80px + env(safe-area-inset-bottom)); }
+  .site-record {
+    left: 0;
+    right: 0;
+    bottom: calc(56px + env(safe-area-inset-bottom));
+    height: 24px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: max(14px, env(safe-area-inset-right));
+    color: #ffffffd9;
+    text-shadow: 0 1px 2px #0009;
+  }
+  .site-record a { font-size: 10.5px; line-height: 24px; }
+  .site-record span { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-record a { transition: none; }
+}

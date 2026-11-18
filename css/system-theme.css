@@ -22,6 +22,11 @@ html[data-system-theme="dark"] :is(.settings-panel,.toast) {background:var(--sys
 html[data-system-theme="dark"] :is(.settings-profile p,.settings-note) {color:var(--sys-muted);}
 html[data-system-theme="dark"] :is(.settings-items>button,.settings-note) {border-color:var(--sys-border);}
 html[data-system-theme="dark"] .settings-items>button:hover {background:var(--sys-hover);}
+html[data-system-theme="dark"] .settings-appearance {border-color:var(--sys-border);}
+html[data-system-theme="dark"] .settings-segment {background:var(--sys-base);}
+html[data-system-theme="dark"] .settings-segment button {color:var(--sys-muted);}
+html[data-system-theme="dark"] .settings-segment button:hover {color:var(--sys-text);}
+html[data-system-theme="dark"] .settings-segment button[aria-checked="true"] {background:var(--sys-hover);color:#80b6ff;box-shadow:none;}
 html[data-system-theme="dark"] .settings-switch {background:#637080;}
 html[data-system-theme="dark"] [aria-checked="true"]>.settings-switch {background:var(--accent);}
 /* Welcome, statistics and contact cards. QR images retain their white backing. */
