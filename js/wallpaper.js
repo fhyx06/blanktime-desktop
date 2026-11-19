@@ -12,8 +12,34 @@
   const wallpaper = document.querySelector('.wallpaper');
   const absolute = src => new URL(src, location.href).href;
   const images = new Map(choices.map(button => [absolute(button.dataset.src), button]));
-  let current = {src:defaultSrc, name:'默认壁纸'};
+  // 竖屏变体：portrait 为竖版图片，focus 为没有竖版时竖屏裁切的中心。
+  const variantOf = button => ({portrait:button.dataset.portrait ? absolute(button.dataset.portrait) : '', focus:button.dataset.focus || ''});
+  const defaultVariant = {portrait:win.dataset.defaultPortrait ? absolute(win.dataset.defaultPortrait) : '', focus:win.dataset.defaultFocus || ''};
+  // 没有 matchMedia 的环境按横屏处理。
+  const media = query => typeof window.matchMedia === 'function' ? window.matchMedia(query) : {matches:false};
+  const portraitScreen = media('(orientation: portrait)');
+  const portraitPreview = media('(orientation: portrait) and (max-width: 760px)');
+  // 设为 initial 即“无效值”，var() 回退到样式表中的默认位置（手机 38%、宽屏居中）。
+  const portraitPosition = variant => variant.portrait ? 'center' : variant.focus || 'initial';
+  const cssUrl = src => 'url('+JSON.stringify(src)+')';
+  let current = {src:defaultSrc, name:'默认壁纸', ...defaultVariant};
   let opened = false;
+  // 壁纸通过 CSS 变量绘制，横竖屏切换由样式表的方向媒体查询完成；variant 为空时恢复页面默认壁纸。
+  function paint(variant) {
+    const style = wallpaper.style;
+    style.removeProperty('background-image');
+    if (!variant) {
+      ['--wallpaper', '--wallpaper-portrait', '--wallpaper-portrait-position'].forEach(name => style.removeProperty(name));
+      return;
+    }
+    style.setProperty('--wallpaper', cssUrl(variant.src));
+    style.setProperty('--wallpaper-portrait', cssUrl(variant.portrait || variant.src));
+    style.setProperty('--wallpaper-portrait-position', portraitPosition(variant));
+  }
+  choices.forEach(button => {
+    const {focus} = variantOf(button);
+    if (focus) button.querySelector('img').style.setProperty('--preview-position', focus);
+  });
   function notify(message) {
     for (const id of ['album-status', 'wallpaper-status']) {
       const feedback = document.getElementById(id);
@@ -35,11 +61,16 @@
     if (koiPreview) koiPreview.hidden = current.kind !== 'koi';
     if (current.kind === 'koi') { preview.hidden = true; return; }
     if (!src) { preview.hidden = true; preview.removeAttribute('src'); return; }
-    if (preview.getAttribute('src') !== src) {
+    // 手机竖屏时预览实际显示的竖版或焦点裁切；竖版与壁纸同一张图，不会额外下载。
+    const portrait = portraitPreview.matches && current.portrait ? absolute(current.portrait) : '';
+    const shown = portrait || src;
+    preview.style.setProperty('--preview-position', portraitPreview.matches ? portraitPosition(current) : 'initial');
+    if (preview.getAttribute('src') !== shown) {
       preview.hidden = true;
-      preview.src = src;
+      preview.src = shown;
     } else if (preview.complete && preview.naturalWidth) preview.hidden = false;
   }
+  portraitPreview.addEventListener?.('change', syncSelection);
   preview.addEventListener('load', () => { preview.hidden = current.kind === 'koi'; });
   preview.addEventListener('error', () => { preview.hidden = true; });
   function syncLiveStatus() {
@@ -280,11 +311,13 @@
         throw new Error('只能将壁纸文件夹中的图片设为壁纸。');
       }
       pending(src);
-      await checkImage(src);
+      const variant = variantOf(images.get(src));
+      // 竖屏设备先确认实际要显示的竖版能加载，横屏和电脑端确认横版。
+      await checkImage(portraitScreen.matches && variant.portrait ? variant.portrait : src);
       if (request !== revision) return;
       live?.clear();
-      wallpaper.style.backgroundImage='url('+JSON.stringify(src)+')';
-      current = {src, name:images.get(src).dataset.name};
+      paint({src, ...variant});
+      current = {src, name:images.get(src).dataset.name, ...variant};
       syncSelection();
       if (persist) {
         try {await storage(value,true);if(request===revision)notify('壁纸已更换并保存在当前浏览器。');}
@@ -307,8 +340,8 @@
     const request=++revision;
     pending();
     live?.clear();
-    wallpaper.style.removeProperty('background-image');
-    current = {src:defaultSrc, name:'默认壁纸'};
+    paint(null);
+    current = {src:defaultSrc, name:'默认壁纸', ...defaultVariant};
     syncSelection();
     try {await storage(null,true);if(request===revision)notify('已恢复默认壁纸。');}
     catch {if(request===revision)notify('已恢复默认，但浏览器无法清除保存的偏好。');}

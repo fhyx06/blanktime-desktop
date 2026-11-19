@@ -11,10 +11,16 @@
   let active, sequence = 0;
   const homePath = document.body.dataset.home;
   const siteTitle = document.title.split(' · ').pop();
+  // 首页有“卡片 / 归档”两种视图；归档视图对应 /archives/ 地址。
+  const archive = $('.browser-archive'), archivePath = archive && win.dataset.archivePath || '';
+  const archiveItems = archive ? [...archive.querySelectorAll('.browser-archive-item')] : [];
+  const viewButtons = [...win.querySelectorAll('[data-browser-view]')];
+  let view = 'cards';
+  const homeTitle = () => view === 'archive' && archivePath ? '归档 · ' + siteTitle : siteTitle;
   function route(tab, hash = '', replace = false) {
-    const path = tab.key === 'home' ? homePath : tab.key + hash;
+    const path = tab.key === 'home' ? (view === 'archive' && archivePath ? archivePath : homePath) : tab.key + hash;
     if (location.pathname + location.hash !== path) history[replace ? 'replaceState' : 'pushState']({}, '', path);
-    document.title = tab.key === 'home' ? siteTitle : tab.title + ' · ' + siteTitle;
+    document.title = tab.key === 'home' ? homeTitle() : tab.title + ' · ' + siteTitle;
   }
   const screenMode = matchMedia('(max-width:760px)');
   const tocKey = () => 'blanktime-reader-toc-' + (screenMode.matches ? 'mobile' : 'desktop');
@@ -65,10 +71,40 @@
     const filePath = article ? filesystem?.articlePath?.(active.url?.href || active.key)
       : filesystem?.home ? filesystem.home + '/Documents/Posts/' : null;
     const address = $('.browser-location');
-    address.textContent = filePath ? 'http://127.0.0.1' + filePath
+    const archiveView = !article && view === 'archive';
+    address.textContent = archiveView ? '空白时间 / 归档' : filePath ? 'http://127.0.0.1' + filePath
       : article ? '空白时间 / ' + active.title : '空白时间 / 所有文章';
     address.title = address.textContent;
-    status.textContent = article ? (active.summary || '正在加载文章…') : `共 ${cards.filter(card => !card.hidden).length} 篇文章`;
+    status.textContent = article ? (active.summary || '正在加载文章…')
+      : archiveView ? archiveSummary() : `共 ${cards.filter(card => !card.hidden).length} 篇文章`;
+  }
+  // 归档状态栏：可见篇数与年份跨度，例如“共 20 篇 · 2025–2026”。
+  function archiveSummary() {
+    const years = [...archive.querySelectorAll('.browser-archive-year:not([hidden])')].map(section => Number(section.dataset.year));
+    const count = archiveItems.filter(item => !item.parentElement.hidden).length;
+    if (!years.length) return '共 0 篇';
+    const first = Math.min(...years), last = Math.max(...years);
+    return `共 ${count} 篇 · ${first === last ? first : `${first}–${last}`}`;
+  }
+  function refreshEmpty() {
+    const visible = view === 'archive' ? archiveItems.some(item => !item.parentElement.hidden) : cards.some(card => !card.hidden);
+    $('.browser-empty').hidden = visible;
+  }
+  function setView(next, navigate = true) {
+    if (!archive) return;
+    view = next === 'archive' ? 'archive' : 'cards';
+    $('.browser-posts').hidden = view === 'archive';
+    archive.hidden = view !== 'archive';
+    viewButtons.forEach(button => {
+      const selected = button.dataset.browserView === view;
+      button.setAttribute('aria-checked', String(selected));
+      button.tabIndex = selected ? 0 : -1;
+    });
+    refreshEmpty();
+    if (active === home) {
+      if (navigate) route(home); else document.title = homeTitle();
+      updateTools();
+    }
   }
   function activate(tab, focus = true, navigate = true) {
     if (active && active !== tab) {
@@ -124,7 +160,25 @@
     window.blanktimeDesktop.settleWindowMotion?.(win);
     const query = event.target.value.trim().toLocaleLowerCase();
     cards.forEach(card => { card.hidden = !card.textContent.toLocaleLowerCase().includes(query); });
-    $('.browser-empty').hidden = cards.some(card => !card.hidden); updateTools();
+    // 归档同步筛选：没有匹配文章的月份和年份整段隐藏，年份篇数随之更新。
+    archiveItems.forEach(item => { item.parentElement.hidden = !item.textContent.toLocaleLowerCase().includes(query); });
+    archive?.querySelectorAll('.browser-archive-month').forEach(month => { month.hidden = !month.querySelector('li:not([hidden])'); });
+    archive?.querySelectorAll('.browser-archive-year').forEach(year => {
+      const count = year.querySelectorAll('li:not([hidden])').length, total = year.querySelector('small');
+      year.hidden = count === 0;
+      total.textContent = `${query ? count : total.dataset.total} 篇`;
+    });
+    refreshEmpty(); updateTools();
+  });
+  viewButtons.forEach((button, index) => {
+    button.addEventListener('click', () => { if (view !== button.dataset.browserView) setView(button.dataset.browserView); });
+    button.addEventListener('keydown', event => {
+      const step = {ArrowRight:1, ArrowDown:1, ArrowLeft:-1, ArrowUp:-1}[event.key];
+      if (!step) return;
+      event.preventDefault();
+      const next = viewButtons[(index + step + viewButtons.length) % viewButtons.length];
+      next.click(); next.focus();
+    });
   });
   win.querySelectorAll('.browser-cover img').forEach(img => {
     const fallback = () => { img.hidden = true; };
@@ -304,15 +358,21 @@
     tabs.forEach(tab => tab.comments?.setActive(false));
     if (event.detail?.state === 'closed') tabs.forEach(suspend);
   });
-  win.addEventListener('blanktime:window-opened', () => { if (active) resume(active); });
+  win.addEventListener('blanktime:window-opened', () => {
+    if (!active) return;
+    resume(active);
+    // 手机上最小化阅读窗口会回收它的历史记录、地址回到首页；恢复时把地址同步回当前文章。
+    route(active, active.url?.hash || '', true);
+  });
   document.addEventListener('blanktime:open-article', event => {
     const url = new URL(event.detail.href, location.href);
     const card = posts.get(url.pathname);
     if (card) openArticle(url, card.dataset.title);
   });
   addEventListener('popstate', () => {
-    if (location.pathname === homePath) {
-      activate(home, false, false); window.blanktimeDesktop.openWindow(win); document.title = siteTitle;
+    if (location.pathname === homePath || (archivePath && location.pathname === archivePath)) {
+      setView(location.pathname === archivePath ? 'archive' : 'cards', false);
+      activate(home, false, false); window.blanktimeDesktop.openWindow(win); document.title = homeTitle();
     } else {
       const card = posts.get(location.pathname);
       if (card) { openArticle(new URL(location.href), card.dataset.title, null, {navigate:false}); document.title = card.dataset.title + ' · ' + siteTitle; }
@@ -321,4 +381,9 @@
   const initial = document.getElementById('article-source')?.content.querySelector('[data-article]');
   // A page load restores content directly, without a launch scene or moving focus.
   if (initial) openArticle(new URL(location.href), initial.dataset.title, initial, {navigate:false, focus:false, animate:false});
+  // 直接访问 /archives/：打开博客浏览器并显示归档时间线。
+  else if (win.dataset.initialView === 'archive' && archive) {
+    setView('archive', false);
+    window.blanktimeDesktop.openWindow(win, false, {animate:false});
+  }
 })();

@@ -104,3 +104,23 @@ body.koi-size-preview .wallpaper-koi-size-preview-field::before {content:"";posi
   .wallpaper-window > .window-status {min-height:32px;font-size:10px;padding:8px 12px;}
   .wallpaper-window > .window-status > span:last-child {display:none;}
 }
+
+/* ===== 竖屏壁纸 =====
+   竖屏时优先使用竖版（--wallpaper-portrait）；没有竖版时按焦点（--wallpaper-portrait-position）裁切；
+   两者都没有时保持原来的位置：手机 38% 横向、宽屏居中。只有匹配的媒体查询会下载对应图片。 */
+@media (orientation: portrait) {
+  .wallpaper {background-image:var(--wallpaper-portrait,var(--wallpaper));background-position:var(--wallpaper-portrait-position,center);}
+}
+@media (orientation: portrait) and (max-width: 760px) {
+  .wallpaper {background-position:var(--wallpaper-portrait-position,38% center);}
+  /* 壁纸设置按竖屏比例预览，选之前就能看到实际效果。 */
+  .wallpaper-current-preview {flex-basis:112px;aspect-ratio:9/16;}
+  .wallpaper-current-preview img {object-position:var(--preview-position,38% center);}
+  .wallpaper-choices:not(.wallpaper-live-choices) {grid-template-columns:repeat(auto-fill,minmax(min(100%,96px),1fr));gap:16px 12px;}
+  .wallpaper-choice-image {aspect-ratio:9/16;}
+  .wallpaper-choice-image > img {object-position:var(--preview-position,38% center);}
+  .wallpaper-choice .wallpaper-choice-portrait {display:block;}
+}
+/* 有竖版的壁纸在竖屏缩略图上标注“竖版”。 */
+.wallpaper-choice-portrait {position:absolute;z-index:1;right:6px;bottom:6px;display:none;padding:1px 6px;border-radius:5px;background:#000a;color:#fff;font-size:10.5px;line-height:17px;}
+.wallpaper-choice-portrait:empty {display:none !important;}

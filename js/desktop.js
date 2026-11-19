@@ -1358,7 +1358,9 @@
   };
   const initialArticle = document.getElementById('article-source')?.content.querySelector('[data-article]');
   delete document.documentElement.dataset.welcomeIntro;
-  if (initialArticle || welcomeDismissed) { welcome.hidden = true; welcome.dataset.state = 'closed'; syncDock(); }
+  // 直接访问文章或归档页时，阅读窗口已经打开，不再弹出欢迎窗口。
+  const initialArchive = document.getElementById('browser')?.dataset.initialView === 'archive';
+  if (initialArticle || initialArchive || welcomeDismissed) { welcome.hidden = true; welcome.dataset.state = 'closed'; syncDock(); }
   else {
     // 首次访问从关闭状态开始；等后续脚本执行完、帧率平稳后再播放水墨启动动画，
     // 避免手机在加载阶段卡住主线程，让遮罩展开直接跳到结尾。
@@ -1368,13 +1370,20 @@
     introduceWelcome();
   }
   function introduceWelcome() {
-    const open = () => { if (welcome.dataset.state === 'closed') openWindow(welcome, false); };
+    // 自动打开只发生一次：无论由平稳帧、计时兜底还是用户手动打开，之后都不再自动打开，
+    // 否则用户在 2 秒内关掉欢迎窗口（例如点“让我看看”）时，兜底计时器会把它重新打开。
+    let done = false;
+    const open = () => {
+      if (done) return;
+      done = true;
+      if (welcome.dataset.state === 'closed' && !welcomeDismissed) openWindow(welcome, false);
+    };
     if (reducedMotion.matches || typeof welcome.animate !== 'function' || typeof requestAnimationFrame !== 'function') { open(); return; }
     const started = performance.now();
     let last = null, calm = 0;
     const settle = now => {
       // 用户已从 Dock 手动打开时不再重复启动。
-      if (welcome.dataset.state !== 'closed') return;
+      if (welcome.dataset.state !== 'closed') { done = true; return; }
       calm = last !== null && now - last < 34 ? calm + 1 : 0;
       last = now;
       // 连续 4 帧平稳即开始；最多等待 1.5 秒，慢设备上也不会让欢迎窗口迟迟不出现。

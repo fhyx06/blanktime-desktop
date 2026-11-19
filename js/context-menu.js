@@ -175,7 +175,7 @@
       copyItem('复制图片地址',imageFile.fileNode.url),
       item('details','详细信息',() => window.blanktimeFileDetails?.open(imageFile.fileNode),!window.blanktimeFileDetails)
     ]};
-    const row = target.closest('.post-file, .browser-card');
+    const row = target.closest('.post-file, .browser-card, .browser-archive-item');
     if (row) {
       const link = row.matches('a[href]') ? row : row.querySelector('a[href]');
       if (!link) return null;
