@@ -86,6 +86,13 @@
     popped.forEach(entry => { entry.stale = true; });
     // 宽屏下文章前进后退保持浏览器原生行为。
     if (!mobile.matches && popped.length && popped.every(entry => entry.kind === 'nav')) return;
+    if (document.documentElement.dataset.locked || document.documentElement.dataset.overlay) {
+      // 锁屏或搜索面板打开时，返回键只负责关掉它们，不关闭后面的窗口、也不继续后退：
+      // 被越过的窗口记录等下一次点按时补回。
+      for (const entry of popped) if (entry.kind === 'window' && isOpen(entry.id)) pending.add(entry.id);
+      if (!popped.some(entry => entry.kind === 'nav')) event.stopImmediatePropagation();
+      return;
+    }
     let closed = false;
     fromBack = true;
     try {

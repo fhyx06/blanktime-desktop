@@ -1,0 +1,64 @@
+/* ===== 全局搜索（聚焦式搜索面板） =====
+   层级在 Dock、设置面板之上，锁屏之下；手机上从顶部展开为整宽面板。 */
+.spotlight {position:fixed;inset:0;z-index:1450;display:flex;justify-content:center;align-items:flex-start;padding:max(12vh,56px) 16px 24px;}
+.spotlight-backdrop {position:absolute;inset:0;background:#0b141c47;}
+.spotlight-panel {position:relative;display:flex;flex-direction:column;width:min(640px,100%);max-height:min(560px,calc(100dvh - 15vh));overflow:hidden;border:1px solid #ffffff99;border-radius:16px;background:#fffffff2;-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);box-shadow:0 24px 70px #0c1c2a40,0 3px 12px #0000001a;color:#2c343b;animation:spotlight-in .18s cubic-bezier(.2,.8,.3,1);}
+@keyframes spotlight-in {from {opacity:0;transform:translateY(-8px) scale(.985);}}
+.spotlight-field {display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #e7ebee;}
+.spotlight-field > svg {flex:none;width:22px;height:22px;color:#7b8691;stroke-width:1.8;}
+#spotlight-input {flex:1;min-width:0;border:0;outline:none;background:none;color:inherit;font:inherit;font-size:18px;line-height:1.5;}
+#spotlight-input::placeholder {color:#9aa3ab;}
+#spotlight-input::-webkit-search-cancel-button {display:none;}
+.spotlight-close {flex:none;}
+.spotlight kbd {display:inline-block;min-width:20px;padding:0 6px;border:1px solid #dfe4e8;border-bottom-width:2px;border-radius:5px;background:#f6f8f9;color:#6f7a84;font:inherit;font-size:11px;line-height:18px;text-align:center;}
+.spotlight-results {flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:6px 8px 8px;}
+.spotlight-heading {margin:10px 10px 4px;font-size:12px;font-weight:600;color:#86909a;}
+.spotlight-option {display:flex;align-items:center;gap:12px;min-height:48px;padding:7px 10px;border-radius:10px;cursor:var(--cursor-pointer,pointer);}
+.spotlight-option[aria-selected="true"] {background:color-mix(in srgb,var(--accent,#52755d) 14%,transparent);}
+.spotlight-icon {display:grid;place-items:center;flex:0 0 34px;height:34px;overflow:hidden;border-radius:8px;background:#eef2f4;color:#5e6b76;}
+.spotlight-icon svg {width:20px;height:20px;stroke-width:1.7;}
+.spotlight-icon img {width:100%;height:100%;object-fit:cover;}
+.spotlight-icon .dock-app-icon,.spotlight-icon > img:only-child {width:28px;height:28px;object-fit:contain;}
+.spotlight-option[aria-selected="true"] .spotlight-icon {background:#fff;}
+.spotlight-text {display:flex;flex:1;flex-direction:column;gap:2px;min-width:0;}
+.spotlight-text strong,.spotlight-text > span {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.spotlight-text strong {font-size:14px;font-weight:600;}
+.spotlight-text > span {font-size:12px;color:#86909a;}
+.spotlight-text mark {border-radius:3px;background:color-mix(in srgb,var(--accent,#52755d) 22%,transparent);color:inherit;}
+.spotlight-lock svg {width:13px;height:13px;margin-left:5px;vertical-align:-1px;color:#86909a;stroke-width:1.8;}
+.spotlight-enter {visibility:hidden;}
+.spotlight-option[aria-selected="true"] .spotlight-enter {visibility:visible;}
+.spotlight-empty {margin:0;padding:34px 16px;text-align:center;font-size:13px;color:#86909a;}
+.spotlight-footer {display:flex;gap:16px;justify-content:flex-end;padding:8px 14px;border-top:1px solid #e7ebee;font-size:11px;color:#86909a;}
+.spotlight-footer kbd {min-width:18px;margin-right:2px;padding:0 4px;}
+
+/* 状态栏左侧的放大镜。 */
+.desktop-search-button {display:grid;place-items:center;width:20px;height:20px;margin:-4px -2px;padding:0;border-radius:6px;color:inherit;}
+.desktop-search-button:hover {background:#0000000f;}
+.desktop-search-button svg {width:15px;height:15px;stroke-width:2;}
+
+/* 暗色模式。 */
+html[data-system-theme="dark"] .spotlight-panel {border-color:var(--sys-border,#3a434d);background:#20262df2;color:var(--sys-text,#e6edf3);}
+html[data-system-theme="dark"] :is(.spotlight-field,.spotlight-footer) {border-color:var(--sys-border,#3a434d);}
+html[data-system-theme="dark"] .spotlight kbd {border-color:#46505a;background:#2b323a;color:var(--sys-muted,#9aa6b2);}
+html[data-system-theme="dark"] .spotlight-icon {background:#2b323a;color:var(--sys-muted,#9aa6b2);}
+html[data-system-theme="dark"] .spotlight-option[aria-selected="true"] .spotlight-icon {background:#38414b;}
+html[data-system-theme="dark"] .spotlight-option[aria-selected="true"] {background:#ffffff14;}
+html[data-system-theme="dark"] .spotlight-text mark {background:#80b6ff3d;}
+html[data-system-theme="dark"] .desktop-search-button:hover {background:#ffffff1a;}
+
+/* 手机：顶部整宽面板，更大的点按区域；没有键盘，隐藏按键提示。 */
+@media (max-width: 760px) {
+  .spotlight {padding:max(8px,env(safe-area-inset-top)) 8px 8px;}
+  .spotlight-panel {max-height:calc(100dvh - var(--mobile-bottom,62px) - 16px);border-radius:14px;}
+  #spotlight-input {font-size:16px;}
+  .spotlight-option {min-height:54px;}
+}
+@media (hover: none) and (pointer: coarse) {
+  .spotlight-footer,.spotlight-enter {display:none;}
+  .spotlight-close kbd {display:none;}
+  .spotlight-close::after {content:"取消";font-size:14px;color:var(--accent,#52755d);}
+}
+@media (prefers-reduced-motion: reduce) {
+  .spotlight-panel {animation:none;}
+}

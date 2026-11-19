@@ -1,0 +1,68 @@
+/* ===== 锁屏 =====
+   锁屏是一整张不透明的“页面”：.lock-screen-sheet 里有自己的壁纸（跟随桌面时在锁定瞬间复制当前壁纸，
+   锦鲤则截取当前画面）和内容。锁定、解锁和上滑时整页移动，下方的桌面由 .lock-screen-shade 压暗，
+   随进度变淡，因此能清楚看出是两层。完全锁定后桌面界面隐藏且不可操作。 */
+html[data-locked="true"] :is(.desktop, .dock, .desktop-status, .settings-panel, .context-menu) {visibility:hidden;}
+/* 锁屏期间备案号仍要露出来。 */
+html[data-locked] .site-record {z-index:1600;}
+
+.lock-screen {position:fixed;inset:0;z-index:1500;overflow:hidden;color:#fff;outline:none;touch-action:none;user-select:none;-webkit-user-select:none;cursor:default;}
+.lock-screen-shade {position:absolute;inset:0;background:#000;opacity:.55;pointer-events:none;}
+.lock-screen-sheet {position:absolute;inset:0;display:flex;overflow:hidden;background:#1b2530;will-change:transform;}
+/* 移动中的锁屏底边带圆角和阴影，像一张被拉起的卡片。 */
+.lock-screen-sheet.is-moving {border-radius:0 0 26px 26px;box-shadow:0 18px 50px #000a;}
+.lock-screen-backdrop {position:absolute;inset:0;background-image:var(--lock-wallpaper,none);background-size:cover;background-position:center;}
+.lock-screen-snapshot {position:absolute;inset:0;width:100%;height:100%;}
+.lock-screen-backdrop::after {content:"";position:absolute;inset:0;background:rgb(0 0 0 / var(--lock-dim,.25));}
+@media (orientation: portrait) {
+  .lock-screen-backdrop {background-image:var(--lock-wallpaper-portrait,var(--lock-wallpaper,none));background-position:var(--lock-wallpaper-portrait-position,center);}
+}
+@media (orientation: portrait) and (max-width: 760px) {
+  .lock-screen-backdrop {background-position:var(--lock-wallpaper-portrait-position,38% center);}
+}
+
+.lock-screen-content {position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;min-width:0;padding:max(11vh,56px) 24px max(5vh,32px);text-align:center;text-shadow:0 1px 14px #0006;}
+.lock-screen-time {display:block;font-size:clamp(76px,10vw,128px);font-weight:300;line-height:1;letter-spacing:.02em;font-variant-numeric:tabular-nums;}
+.lock-screen-date {margin:16px 0 0;font-size:clamp(16px,1.5vw,20px);color:#ffffffe6;letter-spacing:.04em;}
+.lock-screen-poem {max-width:min(560px,100%);margin:14px 0 0;font-family:"KaiTi","STKaiti","Songti SC",serif;font-size:17px;line-height:1.8;color:#ffffffcc;overflow-wrap:anywhere;}
+.lock-screen-cards {display:flex;flex-direction:column;gap:12px;width:min(380px,100%);margin-top:auto;text-shadow:none;}
+.lock-screen-music,.lock-screen-post {display:flex;align-items:center;gap:12px;min-width:0;padding:12px 14px;border:1px solid #ffffff33;border-radius:16px;background:#ffffff26;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);color:#fff;text-align:left;}
+.lock-screen-cover {position:relative;display:grid;place-items:center;flex:0 0 44px;height:44px;overflow:hidden;border-radius:10px;background:#ffffff2e;font-size:20px;}
+.lock-screen-cover img {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.lock-screen-music-meta {display:flex;flex:1;flex-direction:column;gap:3px;min-width:0;}
+.lock-screen-music-meta > *,.lock-screen-post strong {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lock-screen-music-meta strong {font-size:14px;font-weight:600;}
+.lock-screen-music-meta span,.lock-screen-post-label {font-size:12px;color:#ffffffbf;}
+.lock-screen-music button {display:grid;place-items:center;flex:0 0 38px;height:38px;border-radius:50%;color:#fff;}
+.lock-screen-music button:hover {background:#ffffff2e;}
+.lock-screen-music svg {width:20px;height:20px;stroke-width:2;}
+.lock-screen-post {flex-direction:column;align-items:flex-start;gap:4px;}
+.lock-screen-post strong {max-width:100%;font-size:15px;font-weight:600;}
+.lock-screen-post:hover {background:#ffffff38;}
+.lock-screen :focus-visible {outline:2px solid #fff;outline-offset:3px;}
+.lock-screen-hint {display:flex;flex-direction:column;align-items:center;gap:2px;margin:22px 0 0;font-size:13px;color:#ffffffcc;animation:lock-hint 2.4s ease-in-out infinite;}
+.lock-screen-hint svg {width:20px;height:20px;stroke-width:2;}
+.lock-screen-hint-touch {display:none;}
+@media (hover: none) and (pointer: coarse) {
+  .lock-screen-hint-touch {display:inline;}
+  .lock-screen-hint-pointer {display:none;}
+}
+@keyframes lock-hint {0%,100% {transform:translateY(0);} 50% {transform:translateY(-6px);}}
+
+/* 手机：时间更紧凑，提示与卡片避开底部的备案号窄带。 */
+@media (max-width: 760px) {
+  .lock-screen-content {padding:max(13vh,64px) 18px calc(34px + env(safe-area-inset-bottom));}
+  /* 锁屏时底部应用栏隐藏，备案号移到屏幕最底部，解锁提示留在它上方。 */
+  html[data-locked] .site-record {bottom:calc(2px + env(safe-area-inset-bottom));}
+  body.has-site-record .lock-screen-content {padding-bottom:calc(40px + env(safe-area-inset-bottom));}
+  .lock-screen-time {font-size:84px;}
+  .lock-screen-poem {font-size:16px;}
+}
+@media (prefers-reduced-motion: reduce) {
+  .lock-screen-hint {animation:none;}
+}
+
+/* 设置面板“锁定”一行右侧的快捷键提示；触屏设备上没有键盘，隐藏。 */
+.settings-shortcut {margin-left:auto;padding:1px 6px;border:1px solid #e1e5eb;border-radius:5px;font:inherit;font-size:11px;line-height:18px;color:#92979c;}
+html[data-system-theme="dark"] .settings-shortcut {border-color:var(--sys-border);color:var(--sys-muted);}
+@media (hover: none) and (pointer: coarse) {.settings-shortcut {display:none;}}

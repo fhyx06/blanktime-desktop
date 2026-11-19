@@ -223,12 +223,14 @@
     if (target.matches('body, html, .wallpaper, .desktop, .desktop-status, .desktop-status *')) {
       const anyOpen = [...document.querySelectorAll('.app-window')].some(win => win.dataset.state === 'open');
       return {group:'desktop', items:[
+        ...(window.blanktimeSearch ? [item('search', '搜索…', () => window.blanktimeSearch.open()), null] : []),
         ...(window.blanktimeMusic ? [{...item('music-player', '音乐播放器'), kind:'music'}, null] : []),
         item('files', '文件管理', () => openApp('files')),
         item('browser', '博客浏览器', () => openApp('browser')),
         item('album', '相册', () => openApp('album')),
         ...($('#terminal') ? [item('terminal', '终端', () => openApp('terminal'))] : []), null,
         ...(anyOpen ? [buttonItem('desktop', '显示桌面', $('.desktop-toggle'))] : []),
+        ...(window.blanktimeLock ? [item('lock', '锁定', () => window.blanktimeLock.lock())] : []),
         // Settings actions are available even while their panel is hidden.
         item('wallpapers', '更换壁纸', () => $('#settings-wallpaper-toggle').click()),
         item('system-info', '基础信息', () => openApp('system-info')),

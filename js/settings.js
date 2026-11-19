@@ -42,6 +42,11 @@
   document.addEventListener('blanktime:system-theme', sync);
   document.getElementById('settings-system-info').addEventListener('click',() => show(false));
   document.getElementById('settings-terminal')?.addEventListener('click',() => show(false));
+  // 锁屏：先关闭设置面板再锁定，解锁后焦点回到设置按钮。
+  document.getElementById('settings-lock')?.addEventListener('click',() => {
+    show(false,true);
+    window.blanktimeLock?.lock();
+  });
   document.getElementById('settings-desktop').addEventListener('click',() => {
     show(false,true);
     document.querySelector('.desktop-toggle').click();
