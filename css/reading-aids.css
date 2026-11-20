@@ -1,0 +1,34 @@
+/* ===== 阅读辅助：继续阅读提示、文章卡片的阅读进度、文末相关文章 ===== */
+.browser-article-page {position:relative;}
+.resume-reading {position:absolute;z-index:6;left:50%;bottom:16px;display:flex;align-items:center;gap:10px;max-width:calc(100% - 24px);padding:7px 7px 7px 14px;border:1px solid #dfe5e1;border-radius:999px;background:#fffffff2;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:0 8px 28px #12241a24;font-size:13px;color:#3f4a45;transform:translateX(-50%);animation:resume-in .22s cubic-bezier(.2,.8,.3,1);}
+.resume-reading.is-leaving {opacity:0;transform:translate(-50%,8px);transition:opacity .2s,transform .2s;}
+@keyframes resume-in {from {opacity:0;transform:translate(-50%,10px);}}
+.resume-reading > svg {flex:none;width:16px;height:16px;color:var(--accent,#52755d);}
+.resume-reading-text {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.resume-reading-go {flex:none;padding:5px 12px;border-radius:999px;background:var(--accent,#52755d);color:#fff;font-size:12px;}
+.resume-reading-go:hover {filter:brightness(1.08);}
+.resume-reading-close {display:grid;place-items:center;flex:none;width:26px;height:26px;border-radius:50%;color:#8a948f;}
+.resume-reading-close:hover {background:#0000000d;}
+.resume-reading-close svg {width:14px;height:14px;stroke-width:2;}
+.reader-window[data-theme="dark"] .resume-reading {border-color:#3a434d;background:#252c34f2;color:#d5dde5;}
+.reader-window[data-theme="dark"] .resume-reading-close:hover {background:#ffffff14;}
+
+/* 读到一半的文章卡片。 */
+.browser-card.is-reading footer > span:last-child {color:var(--accent,#52755d);font-weight:600;}
+
+/* 文末相关文章。 */
+.related-posts {margin-top:42px;padding-top:22px;border-top:1px solid var(--line,#e6eae7);}
+.related-posts-title {margin:0 0 14px;font-size:15px;color:#35434d;}
+.related-posts-list {display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:12px;}
+.related-post {display:flex;flex-direction:column;gap:6px;min-width:0;padding:13px 15px;border:1px solid #e6eae7;border-radius:10px;background:#fbfcfb;line-height:1.5;transition:border-color .15s,background .15s;}
+.related-post:hover {border-color:color-mix(in srgb,var(--accent,#52755d) 45%,transparent);background:#fff;}
+.related-post strong {font-size:14px;font-weight:600;color:#35434d;overflow-wrap:anywhere;}
+.related-post-lock {width:13px;height:13px;margin-left:5px;vertical-align:-1px;color:#8a948f;}
+.related-post time {font-size:12px;color:#969d9e;}
+.related-post-tags {display:flex;flex-wrap:wrap;gap:5px;}
+.related-post-tags span {padding:1px 7px;border-radius:999px;background:color-mix(in srgb,var(--accent,#52755d) 12%,transparent);color:var(--accent,#52755d);font-size:11px;}
+.reader-window[data-theme="dark"] .related-posts {border-color:#333b44;}
+.reader-window[data-theme="dark"] .related-posts-title,.reader-window[data-theme="dark"] .related-post strong {color:#dbe3ea;}
+.reader-window[data-theme="dark"] .related-post {border-color:#333b44;background:#232a31;}
+.reader-window[data-theme="dark"] .related-post:hover {background:#283039;}
+@media (prefers-reduced-motion: reduce) {.resume-reading {animation:none;}}

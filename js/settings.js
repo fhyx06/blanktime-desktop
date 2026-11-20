@@ -55,6 +55,15 @@
     show(false);
     document.querySelector('.dock-button[data-open="welcome"]').click();
   });
+  // 安装为应用：只在当前浏览器可以安装、且还没有以应用形式打开时出现。
+  const install = document.getElementById('settings-install');
+  const syncInstall = () => { if (install) install.hidden = !window.blanktimePWA?.canInstall?.(); };
+  install?.addEventListener('click',() => {
+    show(false,true);
+    window.blanktimePWA?.install();
+  });
+  document.addEventListener('blanktime:pwa-change', syncInstall);
+  syncInstall();
   document.getElementById('settings-wallpaper-toggle').addEventListener('click',() => {
     show(false);
   });

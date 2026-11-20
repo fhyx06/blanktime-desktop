@@ -7,6 +7,6 @@
 @media (max-width: 760px) {
   .desktop > .desktop-file-icon[data-shortcut] {
     left: calc(20px + var(--shortcut-mobile-col) * 100px);
-    top: calc(64px + var(--shortcut-mobile-row) * 108px);
+    top: calc(64px + env(safe-area-inset-top, 0px) + var(--shortcut-mobile-row) * 108px);
   }
 }

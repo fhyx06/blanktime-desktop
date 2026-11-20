@@ -1,0 +1,25 @@
+/* 站点更新提示：沿用 .toast 的位置与外观，右侧带“刷新”“稍后”。 */
+.app-update {display:flex;align-items:center;gap:12px;padding:10px 10px 10px 18px;}
+.app-update button {flex:none;padding:5px 12px;border-radius:6px;background:var(--accent,#52755d);color:#fff;font-size:13px;}
+.app-update button:hover {filter:brightness(1.08);}
+.app-update .app-update-later {padding:5px 8px;background:none;color:inherit;opacity:.7;}
+.app-update .app-update-later:hover {opacity:1;filter:none;}
+
+/* iPhone / iPad 的“添加到主屏幕”指引：居中卡片，层级与搜索相同。 */
+.install-guide {position:fixed;inset:0;z-index:1450;display:grid;place-items:center;padding:16px;}
+.install-guide-backdrop {position:absolute;inset:0;background:#0b141c59;}
+.install-guide-card {position:relative;width:min(340px,100%);padding:24px 22px 18px;border:1px solid #ffffff99;border-radius:18px;background:#fffffff5;-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);box-shadow:0 24px 70px #0c1c2a40;color:#2c343b;text-align:center;outline:none;animation:install-guide-in .2s cubic-bezier(.2,.8,.3,1);}
+@keyframes install-guide-in {from {opacity:0;transform:translateY(8px) scale(.98);}}
+.install-guide-app {display:block;width:64px;height:64px;margin:0 auto 12px;border-radius:15px;box-shadow:0 4px 14px #0000001f;}
+.install-guide-card h2 {margin:0 0 6px;font-size:18px;}
+.install-guide-card > p {margin:0 0 16px;font-size:13px;line-height:1.6;color:#7b8691;}
+.install-guide-card ol {display:grid;gap:8px;margin:0 0 16px;padding:0;list-style:none;text-align:left;}
+.install-guide-card li {display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:#f1f4f5;font-size:14px;}
+.install-guide-number {display:grid;place-items:center;flex:none;width:22px;height:22px;border-radius:50%;background:var(--accent,#52755d);color:#fff;font-size:12px;font-weight:600;}
+.install-guide-text {flex:1;}
+.install-guide-icon svg {display:block;width:22px;height:22px;color:#0a7aff;stroke-width:1.8;}
+.install-guide-done {width:100%;padding:11px;border-radius:12px;background:var(--accent,#52755d);color:#fff;font-size:15px;font-weight:500;}
+html[data-system-theme="dark"] .install-guide-card {border-color:var(--sys-border,#3a434d);background:#20262df5;color:var(--sys-text,#e6edf3);}
+html[data-system-theme="dark"] .install-guide-card li {background:#2b323a;}
+html[data-system-theme="dark"] .install-guide-card > p {color:var(--sys-muted,#9aa6b2);}
+@media (prefers-reduced-motion: reduce) {.install-guide-card {animation:none;}}

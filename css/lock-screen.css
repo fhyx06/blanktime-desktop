@@ -51,7 +51,7 @@ html[data-locked] .site-record {z-index:1600;}
 
 /* 手机：时间更紧凑，提示与卡片避开底部的备案号窄带。 */
 @media (max-width: 760px) {
-  .lock-screen-content {padding:max(13vh,64px) 18px calc(34px + env(safe-area-inset-bottom));}
+  .lock-screen-content {padding:max(13vh,64px,calc(env(safe-area-inset-top) + 40px)) 18px calc(34px + env(safe-area-inset-bottom));}
   /* 锁屏时底部应用栏隐藏，备案号移到屏幕最底部，解锁提示留在它上方。 */
   html[data-locked] .site-record {bottom:calc(2px + env(safe-area-inset-bottom));}
   body.has-site-record .lock-screen-content {padding-bottom:calc(40px + env(safe-area-inset-bottom));}

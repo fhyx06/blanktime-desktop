@@ -146,6 +146,7 @@
   }
   function close(tab) {
     const list = [...tabs.values()], index = list.indexOf(tab);
+    tab.position?.detach();
     suspend(tab); tab.controller.abort(); tab.observer?.disconnect(); tabs.delete(tab.key);
     tab.comments?.destroy();
     tab.wrap.remove(); tab.page.remove(); tab.frames = [];
@@ -291,11 +292,14 @@
     tab.comments?.setActive(active === tab && !win.hidden && win.dataset.state === 'open');
     scroll.addEventListener('scroll', progress, {passive:true});
     tab.observer = new ResizeObserver(progress); tab.observer.observe(scroll);
+    // 继续阅读：记录读到的位置，重新打开时提示从上次的位置继续。
+    tab.position = window.blanktimeReadingPosition?.attach({path:tab.key, article, scroll, page:tab.page, prefix:tab.prefix, hash:tab.url.hash});
     if (active !== tab || win.hidden || win.dataset.state === 'closed') suspend(tab);
     if (active === tab) { updateTools(); progress(); if (tab.url.hash) jump(tab, tab.url.hash); }
   }
   async function load(tab, initialSource = null) {
     tab.comments?.destroy(); tab.comments = null;
+    tab.position?.detach(); tab.position = null;
     tab.observer?.disconnect(); tab.toc = null; tab.article = null; tab.progress = null; tab.ready = false;
     tab.page.replaceChildren(); tab.page.setAttribute('aria-busy', 'true');
     const message = document.createElement('div'); message.className = 'browser-message'; message.textContent = '正在加载文章…'; tab.page.append(message);

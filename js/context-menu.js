@@ -238,6 +238,9 @@
           const appearance = window.blanktimeAppearance;
           appearance.setTheme(appearance.getTheme() === 'dark' ? 'light' : 'dark');
         })] : []),
+        ...(window.blanktimePWA?.canInstall?.() ? [item('install', '安装为应用', () => window.blanktimePWA.install())] : []),
+        // 以应用形式打开时没有浏览器的刷新按钮，在这里补上。
+        ...(window.blanktimePWA?.isStandalone?.() ? [item('reload', '重新加载', () => location.reload())] : []),
         item('settings', '设置', () => { if ($('#settings-panel').hidden) $('#settings-toggle').click(); })
       ]};
     }
